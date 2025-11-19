@@ -1,22 +1,54 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
-
 @{
-    // Kiểm tra HttpContext và Session trước khi truy cập
     var userRoleId = HttpContextAccessor?.HttpContext?.Session?.GetString("RoleId") ?? string.Empty;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
-    <!-- Link to Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .account-info .account-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border: 2px solid #007bff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .account-info .account-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .account-info .account-icon i {
+            font-size: 26px;
+            color: #007bff;
+        }
+        
+        .account-info .account-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <div class="d-flex flex-column">
@@ -26,15 +58,14 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 style="font-size:2.5rem">Admin Dashboard</h1>
                     <div class="account-info">
-                        <div class="account-icon">
+                        <div class="account-icon" id="adminAvatar">
                             <i class="fas fa-user-circle"></i>
                         </div>
-                        <div class="account-name">@ViewBag.AdminName</div>
+                        <div class="account-name" id="adminName">Loading...</div>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Sidebar and Main Content -->
         <div class="d-flex">
             <nav class="sidebar bg-light border-right" style="width: 220px">
@@ -42,30 +73,102 @@
                     <a href="/Dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-home"></i> Trang Chủ
                     </a>
-
                     @if (!string.IsNullOrEmpty(userRoleId) && userRoleId.Trim().Equals("Quản trị viên", StringComparison.OrdinalIgnoreCase))
                     {
                         <a href="/Account" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Tài khoản admin
                         </a>
                     }
-                    <a href="/Admin_user" class="list-group-item list-group-item-action"><i class="fas fa-list"></i> Người dùng</a>
-                    <a href="/Admin_category" class="list-group-item list-group-item-action"><i class="fas fa-list"></i> Danh Mục</a>
-                    <a href="/Admin_product" class="list-group-item list-group-item-action"><i class="fas fa-box"></i> Sản Phẩm</a>
-                    <a href="/Voucher" class="list-group-item list-group-item-action"><i class="fas fa-tags"></i> Mã Giảm Giá</a>
-                    <a href="/Admin_order" class="list-group-item list-group-item-action"><i class="fas fa-shopping-cart"></i> Đơn Hàng</a>
-                    <a href="/Admin_singin" class="list-group-item list-group-item-action text-danger">
+                    <a href="/Admin_user" class="list-group-item list-group-item-action">
+                        <i class="fas fa-list"></i> Người dùng
+                    </a>
+                    <a href="/Admin_category" class="list-group-item list-group-item-action">
+                        <i class="fas fa-list"></i> Danh Mục
+                    </a>
+                    <a href="/Admin_product" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box"></i> Sản Phẩm
+                    </a>
+                    <a href="/Voucher" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tags"></i> Mã Giảm Giá
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action text-danger" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i> Đăng Xuất
                     </a>
                 </div>
             </nav>
-
-            @RenderBody();
+            @RenderBody()
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        // Lấy thông tin admin từ localStorage khi trang load
+        window.addEventListener('DOMContentLoaded', async function() {
+            const adminId = localStorage.getItem('AdminId');
+            const adminToken = localStorage.getItem('AdminToken');
+            
+            // Kiểm tra xem có đăng nhập chưa
+            if (!adminId || !adminToken) {
+                // Nếu không có thông tin đăng nhập, redirect về trang login
+                window.location.href = '/Admin_singin';
+                return;
+            }
+            
+            try {
+                // Gọi API để lấy thông tin admin
+                const response = await fetch(`/Admin_singin/GetAdminInfo?adminId=${adminId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Cập nhật tên admin
+                    document.getElementById('adminName').textContent = result.name;
+                    
+                    // Cập nhật avatar
+                    const avatarDiv = document.getElementById('adminAvatar');
+                    if (result.avatar) {
+                        avatarDiv.innerHTML = `<img src="${result.avatar}" alt="Admin Avatar" />`;
+                    } else {
+                        avatarDiv.innerHTML = '<i class="fas fa-user-circle"></i>';
+                    }
+                } else {
+                    console.error('Không thể lấy thông tin admin:', result.message);
+                    // Nếu lỗi, xóa localStorage và redirect về login
+                    localStorage.removeItem('AdminId');
+                    localStorage.removeItem('AdminToken');
+                    window.location.href = '/Admin_singin';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Nếu có lỗi, vẫn cho phép truy cập nhưng hiển thị thông báo
+                document.getElementById('adminName').textContent = 'Admin';
+            }
+        });
+        
+        // Xử lý đăng xuất
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            // Xóa AdminId và Token khỏi localStorage
+            localStorage.removeItem('AdminId');
+            localStorage.removeItem('AdminToken');
+            
+            // Hoặc xóa tất cả localStorage
+            // localStorage.clear();
+            
+            try {
+                // Gọi API logout để xóa session
+                await fetch('/Admin_singin/Logout', {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Redirect về trang login
+            window.location.href = '/Admin_singin';
+        });
+    </script>
 </body>
 </html>

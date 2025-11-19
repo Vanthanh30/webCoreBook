@@ -1,16 +1,40 @@
-﻿@model List<webCore.Models.Product_admin> // Specify the model type
-
+﻿@model List<webCore.Models.Product_admin>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý sản phẩm";
     Layout = "Admin";
 }
-<link rel="stylesheet" href="/css/Account_admin.css" />
+<link rel="stylesheet" href="/css/browse_product.css" />
 
 <div class="container">
     <h1>Danh sách sản phẩm</h1>
-    <div class="button-container">
-        <a href="@Url.Action("Create", "Admin_product")" class="add-btn">
-            <i class="fas fa-user-plus icon"></i> Thêm
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Bộ lọc trạng thái -->
+    <div class="filter-container">
+        <a href="@Url.Action("Index", "Admin_product", new { filter = "all" })"
+           class="filter-btn @(ViewBag.CurrentFilter == "all" ? "active" : "")">
+            <i class="fas fa-list"></i> Tất cả
+        </a>
+        <a href="@Url.Action("Index", "Admin_product", new { filter = "active" })"
+           class="filter-btn @(ViewBag.CurrentFilter == "active" ? "active" : "")">
+            <i class="fas fa-check-circle"></i> Đang hoạt động
+        </a>
+        <a href="@Url.Action("Index", "Admin_product", new { filter = "inactive" })"
+           class="filter-btn @(ViewBag.CurrentFilter == "inactive" ? "active" : "")">
+            <i class="fas fa-pause-circle"></i> Không hoạt động
         </a>
     </div>
 
@@ -28,73 +52,117 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var product in Model)
+            @if (Model.Count == 0)
             {
                 <tr>
-                    <td>@product.Title</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(product.Image))
-                        {
-                            <img src="@product.Image" alt="Image" style="width: 50px; height: 50px" />
-                        }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
-                    </td>
-                    <td>@product.CategoryTitle</td>
-                    <td>@product.Price</td>
-                    <td>@product.Stock</td>
-
-                    <td class="status-@product.Status.ToLower()">
-                        @if (product.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
-                        {
-                            <span class="status-active">Hoạt động</span>
-                        }
-                        else
-                        {
-                            <span class="status-inactive">Dừng hoạt động</span>
-                        }
-                    </td>
-                    <td>@product.Position</td>
-                    <td class="actions-cell">
-                        <button class="icon-btn edit-btn" title="Edit" onclick="window.location.href='@Url.Action("Update", "Admin_product", new { id = product.Id })'">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <form action="@Url.Action("DeleteConfirmed", "Admin_product", new { id = product.Id })" method="post" style="display: inline-block;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="icon-btn delete-btn" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-
+                    <td colspan="8">
+                        <i class="fas fa-inbox"></i>
+                        <p>Không có sản phẩm nào</p>
                     </td>
                 </tr>
+            }
+            else
+            {
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td><strong>@product.Title</strong></td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(product.Image))
+                            {
+                                <img src="@product.Image" alt="@product.Title" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;" />
+                            }
+                            else
+                            {
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px dashed #cbd5e0;">
+                                    <i class="fas fa-image" style="color: #a0aec0; font-size: 20px;"></i>
+                                </div>
+                            }
+                        </td>
+                        <td>@(product.CategoryTitle ?? "Chưa phân loại")</td>
+                        <td style="white-space: nowrap;"><strong style="color: #e74c3c;">@product.Price.ToString("N0") đ</strong></td>
+                        <td>
+                            @if (product.Stock > 0)
+                            {
+                                <span style="color: #27ae60; font-weight: 600;">@product.Stock</span>
+                            }
+                            else
+                            {
+                                <span style="color: #e74c3c; font-weight: 600;">Hết hàng</span>
+                            }
+                        </td>
+                        <td>
+                            @if (product.Status == "Hoạt động")
+                            {
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-check-circle"></i> Hoạt động
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-inactive">
+                                    <i class="fas fa-pause-circle"></i> Không hoạt động
+                                </span>
+                            }
+                        </td>
+                        <td>@product.Position</td>
+                        <td class="actions-cell">
+                            <!-- Nút xem chi tiết -->
+                            <button class="icon-btn view-btn" title="Xem chi tiết"
+                                    onclick="window.location.href='@Url.Action("Details", "Admin_product", new { id = product.Id })'">
+                                <i class="fas fa-eye"></i>
+                            </button>
+
+                            @if (product.Status != "Hoạt động")
+                            {
+                                <!-- Nút duyệt -->
+                                <form action="@Url.Action("Approve", "Admin_product", new { id = product.Id })"
+                                      method="post" style="display: inline-block;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="icon-btn approve-btn" title="Duyệt sản phẩm"
+                                            onclick="return confirm('Bạn có chắc muốn duyệt sản phẩm này?')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            }
+
+                            @if (product.Status != "Không hoạt động")
+                            {
+                                <!-- Nút từ chối -->
+                                <form action="@Url.Action("Reject", "Admin_product", new { id = product.Id })"
+                                      method="post" style="display: inline-block;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="icon-btn reject-btn" title="Từ chối sản phẩm"
+                                            onclick="return confirm('Bạn có chắc muốn từ chối sản phẩm này?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 
     <!-- Pagination -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <!-- Previous Page -->
-            <li class="page-item @((ViewBag.CurrentPage == 1) ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = ViewBag.CurrentPage - 1 })" tabindex="-1">Trước</a>
-            </li>
-
-            <!-- Page Numbers -->
-            @for (var i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = i })">@i</a>
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item @((ViewBag.CurrentPage == 1) ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = ViewBag.CurrentPage - 1, filter = ViewBag.CurrentFilter })" tabindex="-1">Trước</a>
                 </li>
-            }
-
-            <!-- Next Page -->
-            <li class="page-item @((ViewBag.CurrentPage == ViewBag.TotalPages) ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = ViewBag.CurrentPage + 1 })">Tiếp theo</a>
-            </li>
-        </ul>
-    </nav>
-
+                @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = i, filter = ViewBag.CurrentFilter })">@i</a>
+                    </li>
+                }
+                <li class="page-item @((ViewBag.CurrentPage == ViewBag.TotalPages) ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Admin_product", new { page = ViewBag.CurrentPage + 1, filter = ViewBag.CurrentFilter })">Tiếp theo</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>

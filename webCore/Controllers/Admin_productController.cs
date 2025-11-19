@@ -26,7 +26,7 @@ namespace webCore.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string filter = "all")
         {
             var adminName = HttpContext.Session.GetString("AdminName");
             ViewBag.AdminName = adminName;
@@ -35,35 +35,65 @@ namespace webCore.Controllers
 
             try
             {
-                const int pageSize = 7; // Number of products per page
+                const int pageSize = 7;
                 var products = await _CategoryProductCollection.GetProduct();
-                var categories = await _CategoryProductCollection.GetCategory(); // Get categories list
+                var categories = await _CategoryProductCollection.GetCategory();
 
-                // Create a dictionary to map CategoryId to CategoryTitle
-                var categoryDictionary = categories.ToDictionary(c => c.Id, c => c.Title);
-
-                // Assign CategoryTitle to each product
-                foreach (var product in products)
+                // Tạo dictionary để map CategoryId -> CategoryTitle
+                var categoryDictionary = new Dictionary<string, string>();
+                foreach (var cat in categories)
                 {
-                    if (!string.IsNullOrEmpty(product.CategoryId) && categoryDictionary.TryGetValue(product.CategoryId, out var categoryTitle))
+                    if (!categoryDictionary.ContainsKey(cat.Id))
                     {
-                        product.CategoryTitle = categoryTitle;
+                        categoryDictionary.Add(cat.Id, cat.Title);
                     }
                 }
 
-                // Sort products by position
-                var sortedProducts = products.OrderBy(c => c.Position).ToList();
+                // Gán CategoryTitle cho mỗi product
+                foreach (var product in products)
+                {
+                    if (!string.IsNullOrEmpty(product.CategoryId) && categoryDictionary.ContainsKey(product.CategoryId))
+                    {
+                        product.CategoryTitle = categoryDictionary[product.CategoryId];
+                    }
+                }
 
-                // Pagination logic
+                // Lọc sản phẩm theo trạng thái
+                List<Product_admin> filteredProducts;
+                if (filter == "active")
+                {
+                    filteredProducts = products.Where(p =>
+                        p.Status != null &&
+                        p.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+                else if (filter == "inactive")
+                {
+                    filteredProducts = products.Where(p =>
+                        p.Status != null &&
+                        (p.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase) ||
+                         p.Status.Equals("Dừng hoạt động", StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
+                }
+                else // all
+                {
+                    filteredProducts = products.ToList();
+                }
+
+                // Sắp xếp theo Position
+                var sortedProducts = filteredProducts.OrderBy(c => c.Position).ToList();
+
+                // Pagination
                 var totalItems = sortedProducts.Count;
                 var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
                 var productsToDisplay = sortedProducts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-                ViewBag.Products = productsToDisplay; // Paginated products
+                ViewBag.Products = productsToDisplay;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentPage = page;
+                ViewBag.CurrentFilter = filter;
 
-                return View(productsToDisplay); // Return paginated products to view
+                return View(productsToDisplay);
             }
             catch (Exception ex)
             {
@@ -72,205 +102,103 @@ namespace webCore.Controllers
             }
         }
 
-        public IActionResult Create()
+        // Xem chi tiết sản phẩm
+        public async Task<IActionResult> Details(string id)
         {
             var adminName = HttpContext.Session.GetString("AdminName");
             ViewBag.AdminName = adminName;
             var productName = HttpContext.Session.GetString("ProductName");
             ViewBag.ProductName = productName;
-            ViewBag.Products = _CategoryProductCollection.GetProduct().Result;
-            ViewBag.Categories = _CategoryProductCollection.GetCategory().Result;
-            var hierarchicalCategories = GetHierarchicalCategories(ViewBag.Categories);
-            ViewBag.Categories = hierarchicalCategories;
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product_admin product, IFormFile Image, string categoryid)
-        {
-            if (ModelState.IsValid)
-            {
-                // Kiểm tra xem có sản phẩm nào đã tồn tại với tiêu đề này không
-                var existingProduct = (await _CategoryProductCollection.GetProduct())
-                    .FirstOrDefault(a => a.Title == product.Title);
-
-                if (existingProduct != null)
-                {
-                    ModelState.AddModelError("Tên sản phẩm", "Đã có sản phẩm này.");
-                    ViewBag.Categories = await _CategoryProductCollection.GetCategory();
-                    return View(product);
-                }
-
-                product.Id = Guid.NewGuid().ToString();
-                product.CategoryId = categoryid;
-                product.Description = product.Description;
-                // Lấy CategoryTitle từ danh mục
-                var category = await _CategoryProductCollection.GetCategoryByIdAsync(categoryid);
-                if (category != null)
-                {
-                    product.CategoryTitle = category.Title; // Gán CategoryTitle
-                }
-                else
-                {
-                    ModelState.AddModelError("CategoryId", "Danh mục không hợp lệ.");
-                }
-
-                var products = await _CategoryProductCollection.GetProduct();
-                int maxPosition = products.Any() ? products.Max(c => c.Position) : 0;
-                product.Position = maxPosition + 1;
-
-                if (Image != null && Image.Length > 0)
-                {
-                    try
-                    {
-                        product.Image = await _cloudinaryService.UploadImageAsync(Image);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error uploading image to Cloudinary.");
-                        ViewBag.Categories = await _CategoryProductCollection.GetCategory();
-                        ModelState.AddModelError("", "Failed to upload image. Please try again.");
-                        return View(product);
-                    }
-                }
-
-                try
-                {
-                    await _CategoryProductCollection.SaveProductAsync(product);
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error saving product to MongoDB.");
-                    ModelState.AddModelError("", "Could not save product to database. Please try again.");
-                }
-            }
-
-            // Gán lại danh sách danh mục vào ViewBag nếu ModelState không hợp lệ
-            ViewBag.Categories = await _CategoryProductCollection.GetCategory();
-            return View(product);
-        }
-        public async Task<IActionResult> Update(string id)
-        {
 
             var product = await _CategoryProductCollection.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
-            var adminName = HttpContext.Session.GetString("AdminName");
-            ViewBag.AdminName = adminName;
-            var productName = HttpContext.Session.GetString("ProductName");
-            ViewBag.ProductName = productName;
-            ViewBag.Products = await _CategoryProductCollection.GetProduct();
-            ViewBag.Categories = await _CategoryProductCollection.GetCategory();
-            var hierarchicalCategories = GetHierarchicalCategories(ViewBag.Categories);
-            ViewBag.Categories = hierarchicalCategories;
-            return View(product);
-        }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Product_admin product, IFormFile Image, string categoryId)
-        {
-            if (ModelState.IsValid)
+            // Lấy thông tin category
+            if (!string.IsNullOrEmpty(product.CategoryId))
             {
-                try
+                var category = await _CategoryProductCollection.GetCategoryByIdAsync(product.CategoryId);
+                if (category != null)
                 {
-                    // Fetch the existing category from the database to retain its Position
-                    var existingProduct = await _CategoryProductCollection.GetProductByIdAsync(product.Id);
-                    if (existingProduct == null)
-                    {
-                        return NotFound(); // If the category doesn't exist, return 404
-                    }
-
-                    // Preserve the Position from the existing category
-                    product.Position = existingProduct.Position;
-                    var category = await _CategoryProductCollection.GetCategoryByIdAsync(product.CategoryId);
-                    product.CategoryTitle = category?.Title;
-
-                    // Update the category in the database
-                    await _CategoryProductCollection.UpdateProductAsync(product);
-
-                    if (Image != null && Image.Length > 0)
-                    {
-                        try
-                        {
-                            product.Image = await _cloudinaryService.UploadImageAsync(Image);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error uploading image to Cloudinary.");
-                            ModelState.AddModelError("", "Failed to upload image. Please try again.");
-                            ViewBag.Products = await _CategoryProductCollection.GetProduct();
-                            return View(product);
-                        }
-                    }
-                    else
-                    {
-                        // Nếu không có hình ảnh mới, giữ hình ảnh hiện tại
-                        product.Image = existingProduct.Image;
-                    }
-
-                    // Cập nhật sản phẩm trong cơ sở dữ liệu
-                    await _CategoryProductCollection.UpdateProductAsync(product);
+                    product.CategoryTitle = category.Title;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error updating product in MongoDB.");
-                    ModelState.AddModelError("", "Could not update product in database. Please try again.");
-                    return View(product);
-                }
-
-                return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Products = await _CategoryProductCollection.GetProduct();
-            ViewBag.Categories = await _CategoryProductCollection.GetCategory();
             return View(product);
         }
-        // POST: Admin_category/DeleteConfirmed/{id}
+
+        // Duyệt sản phẩm (chuyển sang trạng thái Hoạt động)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> Approve(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                ModelState.AddModelError("", "Product ID is invalid.");
+                TempData["ErrorMessage"] = "ID sản phẩm không hợp lệ.";
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
-
-                var productToDelete = await _CategoryProductCollection.GetProductByIdAsync(id);
-                if (productToDelete == null)
+                var product = await _CategoryProductCollection.GetProductByIdAsync(id);
+                if (product == null)
                 {
-                    return NotFound(); 
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm.";
+                    return RedirectToAction(nameof(Index));
                 }
 
-                await _CategoryProductCollection.DeleteProductAsync(id);
+                product.Status = "Hoạt động";
+                product.UpdatedAt = DateTime.UtcNow;
 
-                var remainingProducts = await _CategoryProductCollection.GetProduct();
+                await _CategoryProductCollection.UpdateProductAsync(product);
 
-                for (int i = 0; i < remainingProducts.Count; i++)
-                {
-                    remainingProducts[i].Position = i + 1; // Set position starting from 1
-                    await _CategoryProductCollection.UpdateProductAsync(remainingProducts[i]); 
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogError(ex, "Product not found or already deleted.");
-                ModelState.AddModelError("", "The Product was not found or has already been deleted.");
+                TempData["SuccessMessage"] = $"Đã duyệt sản phẩm '{product.Title}' thành công!";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting Product from MongoDB.");
-                ModelState.AddModelError("", "Could not delete Product from database. Please try again.");
+                _logger.LogError(ex, "Error approving product.");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi duyệt sản phẩm.";
             }
 
-            return RedirectToAction(nameof(Index)); 
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Từ chối sản phẩm (chuyển sang trạng thái Không hoạt động)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                TempData["ErrorMessage"] = "ID sản phẩm không hợp lệ.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var product = await _CategoryProductCollection.GetProductByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                product.Status = "Không hoạt động";
+                product.UpdatedAt = DateTime.UtcNow;
+
+                await _CategoryProductCollection.UpdateProductAsync(product);
+
+                TempData["SuccessMessage"] = $"Đã từ chối sản phẩm '{product.Title}'!";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rejecting product.");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi từ chối sản phẩm.";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         private List<Category_admin> GetHierarchicalCategories(List<Category_admin> categories, string parentId = null, int level = 0)
@@ -279,16 +207,12 @@ namespace webCore.Controllers
 
             foreach (var category in categories.Where(c => c.ParentId == parentId))
             {
-                // Thêm dấu gạch ngang để thể hiện cấp bậc
                 category.Title = new string('-', level * 2) + " " + category.Title;
                 result.Add(category);
-                // Đệ quy để lấy danh mục con
                 result.AddRange(GetHierarchicalCategories(categories, category.Id, level + 1));
             }
 
             return result;
         }
     }
-
 }
-

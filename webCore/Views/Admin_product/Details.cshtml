@@ -1,0 +1,155 @@
+﻿@model webCore.Models.Product_admin
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "Admin";
+}
+<link rel="stylesheet" href="/css/browse_product.css" />
+
+<div class="form-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>Chi tiết sản phẩm</h2>
+        <a href="@Url.Action("Index", "Admin_product")" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="product-details">
+        <div class="detail-row">
+            <label><i class="fas fa-tag"></i> Tên sản phẩm</label>
+            <p><strong>@Model.Title</strong></p>
+        </div>
+
+        <div class="detail-row">
+            <label><i class="fas fa-image"></i> Hình ảnh</label>
+            <div>
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <img src="@Model.Image" alt="@Model.Title" class="product-image" />
+                }
+                else
+                {
+                    <div class="no-image">
+                        <i class="fas fa-image"></i>
+                        <p>Không có hình ảnh</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <label><i class="fas fa-align-left"></i> Mô tả</label>
+            <div class="description-box">
+                @Html.Raw(Model.Description?.Replace("\n", "<br/>") ?? "<i style='color: #999;'>Không có mô tả</i>")
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-row">
+                <label><i class="fas fa-folder"></i> Danh mục</label>
+                <p>@(Model.CategoryTitle ?? "Chưa phân loại")</p>
+            </div>
+
+            <div class="detail-row">
+                <label><i class="fas fa-dollar-sign"></i> Giá</label>
+                <p class="price-text">@Model.Price.ToString("N0") đ</p>
+            </div>
+
+            <div class="detail-row">
+                <label><i class="fas fa-percentage"></i> Giảm giá</label>
+                <p><strong>@Model.DiscountPercentage%</strong></p>
+            </div>
+
+            <div class="detail-row">
+                <label><i class="fas fa-boxes"></i> Số lượng</label>
+                <p>
+                    @if (Model.Stock > 0)
+                    {
+                        <span style="color: #27ae60; font-weight: 700; font-size: 16px;">@Model.Stock</span>
+                    }
+                    else
+                    {
+                        <span style="color: #e74c3c; font-weight: 700; font-size: 16px;">Hết hàng</span>
+                    }
+                </p>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <label><i class="fas fa-star"></i> Đặc trưng</label>
+            <p>
+                @switch (Model.Featured)
+                {
+                    case 0:
+                        <span class="badge badge-featured">Nổi bật</span>
+                        break;
+                    case 1:
+                        <span class="badge badge-new">Mới</span>
+                        break;
+                    case 2:
+                        <span class="badge badge-suggest">Gợi ý</span>
+                        break;
+                    case 3:
+                        <span class="badge badge-no">Không nổi bật</span>
+                        break;
+                    default:
+                        <span class="badge badge-no">Không xác định</span>
+                        break;
+                }
+            </p>
+        </div>
+
+        <div class="detail-row">
+            <label><i class="fas fa-info-circle"></i> Trạng thái</label>
+            <p>
+                @if (Model.Status == "Hoạt động")
+                {
+                    <span class="badge badge-success"><i class="fas fa-check-circle"></i> Hoạt động</span>
+                }
+                else
+                {
+                    <span class="badge badge-danger"><i class="fas fa-pause-circle"></i> Không hoạt động</span>
+                }
+            </p>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-row">
+                <label><i class="fas fa-sort"></i> Vị trí</label>
+                <p><strong>#@Model.Position</strong></p>
+            </div>
+
+            <div class="detail-row">
+                <label><i class="fas fa-calendar-plus"></i> Ngày tạo</label>
+                <p>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+
+            <div class="detail-row">
+                <label><i class="fas fa-calendar-check"></i> Ngày cập nhật</label>
+                <p>@Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+        @if (Model.Status != "Hoạt động")
+        {
+            <form action="@Url.Action("Approve", "Admin_product", new { id = Model.Id })" method="post" style="display: inline-block;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-success" onclick="return confirm('Bạn có chắc muốn duyệt sản phẩm này?\n\nSản phẩm sẽ chuyển sang trạng thái Hoạt động.')">
+                    <i class="fas fa-check-circle"></i> Duyệt sản phẩm
+                </button>
+            </form>
+        }
+
+        @if (Model.Status != "Không hoạt động")
+        {
+            <form action="@Url.Action("Reject", "Admin_product", new { id = Model.Id })" method="post" style="display: inline-block;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn từ chối sản phẩm này?\n\nSản phẩm sẽ chuyển sang trạng thái Không hoạt động.')">
+                    <i class="fas fa-times-circle"></i> Từ chối sản phẩm
+                </button>
+            </form>
+        }
+    </div>
+</div>

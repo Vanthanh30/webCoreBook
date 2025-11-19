@@ -1,9 +1,7 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +17,9 @@
         {
             <div class="alert alert-danger" role="alert">
                 @ViewBag.ErrorMessage
-            </div>}
-        <form asp-action="Login" method="post">
+            </div>
+        }
+        <form id="loginForm" asp-action="Login" method="post">
             <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required />
@@ -33,7 +32,40 @@
             <a href="#" class="link">Forgot Password?</a>
         </form>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/Admin_singin/LoginApi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Lưu AdminId và Token vào localStorage
+                    localStorage.setItem('AdminId', result.adminId);
+                    localStorage.setItem('AdminToken', result.token);
+                    
+                    // Redirect đến Dashboard
+                    window.location.href = '/Dashboard';
+                } else {
+                    alert(result.message || 'Đăng nhập thất bại!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi đăng nhập!');
+            }
+        });
+    </script>
 </body>
 </html>
-
-

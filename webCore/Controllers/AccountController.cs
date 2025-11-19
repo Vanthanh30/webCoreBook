@@ -28,9 +28,18 @@ namespace webCore.Controllers
         // Combine the two Index methods
         public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
         {
-            // Fetch admin name from session
+            // Fetch admin name and avatar from session
             var adminName = HttpContext.Session.GetString("AdminName");
+            var adminId = HttpContext.Session.GetString("AdminId");
+
             ViewBag.AdminName = adminName;
+
+            // Lấy thông tin admin để hiển thị avatar
+            if (!string.IsNullOrEmpty(adminId))
+            {
+                var admin = await _accountService.GetAccountByIdAsync(adminId);
+                ViewBag.AdminAvatar = admin?.Avatar ?? "";
+            }
 
             try
             {
@@ -61,10 +70,20 @@ namespace webCore.Controllers
             }
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var adminName = HttpContext.Session.GetString("AdminName");
+            var adminId = HttpContext.Session.GetString("AdminId");
+
             ViewBag.AdminName = adminName;
+
+            // Lấy thông tin admin để hiển thị avatar
+            if (!string.IsNullOrEmpty(adminId))
+            {
+                var admin = await _accountService.GetAccountByIdAsync(adminId);
+                ViewBag.AdminAvatar = admin?.Avatar ?? "";
+            }
+
             return View();
         }
 
@@ -120,6 +139,7 @@ namespace webCore.Controllers
 
             return View(account);
         }
+
         public async Task<IActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -127,6 +147,18 @@ namespace webCore.Controllers
 
             try
             {
+                // Lấy admin info để hiển thị header
+                var adminName = HttpContext.Session.GetString("AdminName");
+                var adminId = HttpContext.Session.GetString("AdminId");
+
+                ViewBag.AdminName = adminName;
+
+                if (!string.IsNullOrEmpty(adminId))
+                {
+                    var admin = await _accountService.GetAccountByIdAsync(adminId);
+                    ViewBag.AdminAvatar = admin?.Avatar ?? "";
+                }
+
                 // Lấy tài khoản từ MongoDB
                 var account = await _accountService.GetAccountByIdAsync(id);
                 if (account == null)
@@ -140,6 +172,7 @@ namespace webCore.Controllers
                 return View("Error");
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Account_admin updatedAccount, IFormFile Avatar, string Password)
@@ -212,6 +245,7 @@ namespace webCore.Controllers
             // Trả lại view với thông tin tài khoản đã chỉnh sửa nếu có lỗi
             return View(updatedAccount);
         }
+
         // GET: Account/Delete/{id}
         public async Task<IActionResult> Delete(string id)
         {
@@ -220,6 +254,18 @@ namespace webCore.Controllers
 
             try
             {
+                // Lấy admin info để hiển thị header
+                var adminName = HttpContext.Session.GetString("AdminName");
+                var adminId = HttpContext.Session.GetString("AdminId");
+
+                ViewBag.AdminName = adminName;
+
+                if (!string.IsNullOrEmpty(adminId))
+                {
+                    var admin = await _accountService.GetAccountByIdAsync(adminId);
+                    ViewBag.AdminAvatar = admin?.Avatar ?? "";
+                }
+
                 // Fetch the account by ID from MongoDB
                 var account = await _accountService.GetAccountByIdAsync(id);
                 if (account == null)
@@ -234,7 +280,9 @@ namespace webCore.Controllers
                 return View("Error");
             }
         }
+
         // POST: Account/Delete/{id}
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
@@ -260,8 +308,8 @@ namespace webCore.Controllers
                 return View("Error");
             }
         }
+
         //role
-       
         public async Task<IActionResult> Dashboard()
         {
             var userId = HttpContext.User.Identity.Name;
@@ -280,4 +328,3 @@ namespace webCore.Controllers
         }
     }
 }
-

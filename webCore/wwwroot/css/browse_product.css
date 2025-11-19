@@ -1,0 +1,688 @@
+﻿/* ===== BROWSE PRODUCT - GENERAL STYLES ===== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+    .container h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 25px;
+        text-align: center;
+        border-bottom: 3px solid #007bff;
+        padding-bottom: 15px;
+    }
+
+/* ===== ALERTS ===== */
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert i {
+    font-size: 20px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #dc3545;
+}
+
+/* ===== FILTER BUTTONS ===== */
+.filter-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 12px 24px;
+    border: 2px solid #ddd;
+    background: #ffffff;
+    color: #555;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+    .filter-btn i {
+        font-size: 16px;
+    }
+
+    .filter-btn:hover {
+        background: #f8f9fa;
+        border-color: #007bff;
+        color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    }
+
+    .filter-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+
+/* ===== TABLE STYLES ===== */
+.account-table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+    .account-table thead {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+
+        .account-table thead th {
+            padding: 18px 15px;
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .account-table tbody tr {
+        border-bottom: 1px solid #ddd;
+        transition: background-color 0.3s;
+    }
+
+        .account-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+    .account-table tbody td {
+        padding: 15px;
+        color: #555;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+        .account-table tbody td strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+    .account-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    /* Empty state */
+    .account-table tbody td[colspan] {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+        .account-table tbody td[colspan] i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .account-table tbody td[colspan] p {
+            color: #999;
+            font-size: 16px;
+            margin: 0;
+        }
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+    .status-badge i {
+        font-size: 12px;
+    }
+
+.status-active {
+    background: #28a745;
+    color: white;
+}
+
+.status-inactive {
+    background: #dc3545;
+    color: white;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: #333;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.actions-cell {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.icon-btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease;
+    margin: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+    .icon-btn i {
+        pointer-events: none;
+    }
+
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+.view-btn {
+    background: #17a2b8;
+}
+
+    .view-btn:hover {
+        background: #138496;
+    }
+
+.approve-btn {
+    background: #28a745;
+}
+
+    .approve-btn:hover {
+        background: #218838;
+    }
+
+.reject-btn {
+    background: #dc3545;
+}
+
+    .reject-btn:hover {
+        background: #c82333;
+    }
+
+.edit-btn {
+    background: #ffa500;
+}
+
+    .edit-btn:hover {
+        background: #ff8c00;
+    }
+
+.delete-btn {
+    background: #e74c3c;
+}
+
+    .delete-btn:hover {
+        background: #c0392b;
+    }
+
+/* ===== PAGINATION ===== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    padding: 20px 0;
+}
+
+.page-item {
+    list-style: none;
+}
+
+.page-link {
+    padding: 10px 16px;
+    background: white;
+    color: #555;
+    text-decoration: none;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: block;
+}
+
+    .page-link:hover {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+        transform: translateY(-2px);
+    }
+
+.page-item.active .page-link {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+    background: #f5f5f5;
+    color: #ccc;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+    .page-item.disabled .page-link:hover {
+        background: #f5f5f5;
+        color: #ccc;
+        transform: none;
+    }
+
+/* ===== DETAILS PAGE STYLES ===== */
+.form-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+    .form-container h2 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 25px;
+    }
+
+.back-btn {
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+    .back-btn:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    }
+
+.product-details {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.detail-row {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+    .detail-row:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .detail-row label {
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 15px;
+    }
+
+        .detail-row label i {
+            color: #007bff;
+            width: 22px;
+            font-size: 18px;
+        }
+
+    .detail-row p {
+        color: #555;
+        margin: 0;
+        line-height: 1.7;
+        font-size: 15px;
+    }
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 25px 0;
+}
+
+    .detail-grid .detail-row {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+
+/* Product Image */
+.product-image {
+    max-width: 100%;
+    max-height: 500px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+    .product-image:hover {
+        transform: scale(1.02);
+    }
+
+.no-image {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+}
+
+    .no-image i {
+        font-size: 72px;
+        color: #ccc;
+        margin-bottom: 15px;
+    }
+
+    .no-image p {
+        color: #999;
+        font-weight: 500;
+    }
+
+/* Description Box */
+.description-box {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+    min-height: 100px;
+    color: #555;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.price-text {
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+/* Badges */
+.badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+}
+
+.badge-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.badge-warning {
+    background: #ffc107;
+    color: #333;
+}
+
+.badge-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.badge-featured {
+    background: #007bff;
+    color: white;
+}
+
+.badge-new {
+    background: #28a745;
+    color: white;
+}
+
+.badge-suggest {
+    background: #17a2b8;
+    color: white;
+}
+
+.badge-no {
+    background: #6c757d;
+    color: white;
+}
+
+/* Action Buttons */
+.action-buttons {
+    margin-top: 35px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding-top: 25px;
+    border-top: 2px solid #ddd;
+}
+
+.btn {
+    padding: 14px 35px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn i {
+        font-size: 18px;
+    }
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+    .btn-success:hover {
+        background: #218838;
+    }
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: #0069d9;
+    }
+
+.btn-warning {
+    background: #ffc107;
+    color: #333;
+}
+
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+        .container h1 {
+            font-size: 22px;
+        }
+
+    .filter-container {
+        flex-direction: column;
+    }
+
+    .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .account-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+        .account-table thead th,
+        .account-table tbody td {
+            padding: 12px 10px;
+            font-size: 13px;
+        }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .product-image {
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .icon-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    .status-badge {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+
+    .badge {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+}
+
+/* ===== ADD BUTTON (for consistency) ===== */
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+    .add-btn:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    .add-btn .icon {
+        font-size: 16px;
+    }
