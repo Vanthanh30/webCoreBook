@@ -48,7 +48,24 @@ else
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="gender">Giới tính</label>
-                                <p>@Model.Gender</p>
+                                <p>
+                                    @if (Model.Gender?.ToLower() == "male")
+                                    {
+                                        <span>Nam</span>
+                                    }
+                                    else if (Model.Gender?.ToLower() == "female")
+                                    {
+                                        <span>Nữ</span>
+                                    }
+                                    else if (Model.Gender?.ToLower() == "other")
+                                    {
+                                        <span>Khác</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@Model.Gender</span>
+                                    }
+                                </p>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="address">Địa chỉ</label>

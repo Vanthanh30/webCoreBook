@@ -28,14 +28,16 @@ namespace webCore.Controllers
 
         public async Task<IActionResult> Index(int page = 1, string filter = "all")
         {
-            var adminName = HttpContext.Session.GetString("AdminName");
-            ViewBag.AdminName = adminName;
-            var productName = HttpContext.Session.GetString("ProductName");
-            ViewBag.ProductName = productName;
-
             try
             {
-                const int pageSize = 7;
+                var adminName = HttpContext.Session.GetString("AdminName");
+                ViewBag.AdminName = adminName;
+                var productName = HttpContext.Session.GetString("ProductName");
+                ViewBag.ProductName = productName;
+
+                const int pageSize = 5;
+
+                // Lấy tất cả sản phẩm và danh mục
                 var products = await _CategoryProductCollection.GetProduct();
                 var categories = await _CategoryProductCollection.GetCategory();
 
@@ -83,50 +85,83 @@ namespace webCore.Controllers
                 // Sắp xếp theo Position
                 var sortedProducts = filteredProducts.OrderBy(c => c.Position).ToList();
 
-                // Pagination
-                var totalItems = sortedProducts.Count;
-                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-                var productsToDisplay = sortedProducts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+                // Tính toán phân trang
+                var totalProducts = sortedProducts.Count;
+                var totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
 
-                ViewBag.Products = productsToDisplay;
-                ViewBag.TotalPages = totalPages;
+                // Đảm bảo page hợp lệ
+                if (page < 1) page = 1;
+                if (page > totalPages && totalPages > 0) page = totalPages;
+
+                // Lấy dữ liệu cho trang hiện tại
+                var productsToDisplay = sortedProducts
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // Truyền thông tin phân trang vào ViewBag
                 ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentFilter = filter;
+
+                // Kiểm tra nếu không có sản phẩm nào
+                if (totalProducts == 0)
+                {
+                    TempData["ErrorMessage"] = "Không có sản phẩm nào để hiển thị.";
+                    return View(new List<Product_admin>());
+                }
 
                 return View(productsToDisplay);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching products from MongoDB.");
-                return View("Error");
+                TempData["ErrorMessage"] = "Lỗi khi tải danh sách sản phẩm. " + ex.Message;
+                return RedirectToAction("Error");
             }
         }
 
         // Xem chi tiết sản phẩm
+        [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
-            var adminName = HttpContext.Session.GetString("AdminName");
-            ViewBag.AdminName = adminName;
-            var productName = HttpContext.Session.GetString("ProductName");
-            ViewBag.ProductName = productName;
-
-            var product = await _CategoryProductCollection.GetProductByIdAsync(id);
-            if (product == null)
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
-            // Lấy thông tin category
-            if (!string.IsNullOrEmpty(product.CategoryId))
+            try
             {
-                var category = await _CategoryProductCollection.GetCategoryByIdAsync(product.CategoryId);
-                if (category != null)
-                {
-                    product.CategoryTitle = category.Title;
-                }
-            }
+                var adminName = HttpContext.Session.GetString("AdminName");
+                ViewBag.AdminName = adminName;
+                var productName = HttpContext.Session.GetString("ProductName");
+                ViewBag.ProductName = productName;
 
-            return View(product);
+                var product = await _CategoryProductCollection.GetProductByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Sản phẩm không tồn tại.";
+                    return RedirectToAction("Index");
+                }
+
+                // Lấy thông tin category
+                if (!string.IsNullOrEmpty(product.CategoryId))
+                {
+                    var category = await _CategoryProductCollection.GetCategoryByIdAsync(product.CategoryId);
+                    if (category != null)
+                    {
+                        product.CategoryTitle = category.Title;
+                    }
+                }
+
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching product details.");
+                TempData["ErrorMessage"] = "Lỗi khi tải chi tiết sản phẩm: " + ex.Message;
+                return RedirectToAction("Error");
+            }
         }
 
         // Duyệt sản phẩm (chuyển sang trạng thái Hoạt động)

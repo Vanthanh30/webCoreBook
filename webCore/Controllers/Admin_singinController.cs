@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using webCore.Models;
 using webCore.MongoHelper;
 using webCore.Services;
+using webCore.Helpers; // ← THÊM DÒNG NÀY
 
 namespace webCore.Controllers
 {
@@ -31,11 +32,14 @@ namespace webCore.Controllers
         {
             try
             {
-                // Tìm kiếm tài khoản trong MongoDB
+                // Tìm tài khoản theo email
                 var account = (await _accountService.GetAccounts())
-                    .FirstOrDefault(a => a.Email == request.Username && a.Password == request.Password);
+                    .FirstOrDefault(a => a.Email == request.Username);
 
-                if (account != null && account.Status == "Hoạt động")
+                // ← SỬA PHẦN NÀY: Dùng PasswordHasher.VerifyPassword thay vì so sánh trực tiếp
+                if (account != null &&
+                    account.Status == "Hoạt động" &&
+                    PasswordHasher.VerifyPassword(request.Password, account.Password))
                 {
                     // Lưu thông tin admin vào session (backup)
                     HttpContext.Session.SetString("AdminId", account.Id);
@@ -86,7 +90,7 @@ namespace webCore.Controllers
                 }
 
                 var admin = await _accountService.GetAccountByIdAsync(adminId);
-                
+
                 if (admin != null)
                 {
                     return Json(new
@@ -116,7 +120,7 @@ namespace webCore.Controllers
         {
             // Xóa tất cả thông tin khỏi session
             HttpContext.Session.Clear();
-            
+
             return RedirectToAction("Index");
         }
     }
