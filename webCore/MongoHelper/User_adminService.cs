@@ -28,8 +28,8 @@ namespace webCore.MongoHelper
         public async Task<User> GetUserByIdAsync(string id)
         {
             // Chuyển đổi id (string) sang Guid và truy vấn người dùng trong cơ sở dữ liệu
-            var userId = Guid.Parse(id); // Chuyển đổi id sang Guid
-            return await _userAdminCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+           // var userId = Guid.Parse(id); // Chuyển đổi id sang Guid
+            return await _userAdminCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
         }
         public async Task<bool> UpdateUserStatusAsync(string id, int newStatus)
         {
@@ -42,10 +42,10 @@ namespace webCore.MongoHelper
                 }
 
                 // Chuyển đổi id từ string sang Guid
-                var userId = Guid.Parse(id);
+               // var userId = Guid.Parse(id);
 
                 // Tìm người dùng trong cơ sở dữ liệu
-                var user = await _userAdminCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+                var user = await _userAdminCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
 
                 if (user == null)
                 {
@@ -59,7 +59,7 @@ namespace webCore.MongoHelper
                 }
 
                 // Tạo bộ lọc để xác định người dùng cần cập nhật
-                var filter = Builders<User>.Filter.Eq(user => user.Id, userId);
+                var filter = Builders<User>.Filter.Eq(user => user.Id, id);
 
                 // Tạo bộ cập nhật trạng thái
                 var update = Builders<User>.Update.Set(user => user.Status, newStatus);

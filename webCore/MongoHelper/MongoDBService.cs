@@ -13,6 +13,12 @@ namespace webCore.Services
     {
         internal readonly IMongoCollection<Product_admin> _productCollection;
         internal readonly IMongoCollection<User> _userCollection;
+
+        internal IMongoCollection<T> GetCollection<T>(string v)
+        {
+            throw new NotImplementedException();
+        }
+
         internal IMongoCollection<Product_admin> _detailProductCollection;
         internal readonly IMongoCollection<Cart> _cartCollection;
         internal readonly IMongoCollection<Voucher> _voucherCollection;
@@ -20,6 +26,7 @@ namespace webCore.Services
         internal readonly IMongoCollection<Order> _orders;
         private readonly IMongoDatabase _mongoDatabase;
         internal readonly IMongoCollection<Account_admin> _accountCollection;
+        internal readonly IMongoCollection<Role> _roleCollection;
 
         public IMongoCollection<ForgotPassword> ForgotPasswords { get; internal set; }
 
@@ -36,6 +43,7 @@ namespace webCore.Services
             _cartCollection = mongoDatabase.GetCollection<Cart>("Cart");
             _orders = mongoDatabase.GetCollection<Order>("Orders");
             _voucherCollection = mongoDatabase.GetCollection<Voucher>("Vouchers");
+            _roleCollection = mongoDatabase.GetCollection<Role>("Roles");
         }
 
     }

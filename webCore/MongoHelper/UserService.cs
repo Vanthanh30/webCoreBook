@@ -81,14 +81,10 @@ namespace webCore.MongoHelper
 
         public async Task<User> GetUserByIdAsync(string userId)
         {
-            if (!Guid.TryParse(userId, out var guid))
-            {
-                return null; // Trả về null nếu userId không hợp lệ
-            }
-
-            var user = await _userCollection.Find(u => u.Id == guid).FirstOrDefaultAsync();
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
             return user;
         }
+
         // Save user
         public async Task<bool> UpdatePasswordAsync(string email, string newPassword)
         {
@@ -99,5 +95,6 @@ namespace webCore.MongoHelper
 
             return result.ModifiedCount > 0;
         }
+
     }
 }
