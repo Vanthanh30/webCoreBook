@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace webCore.Models
 {
+    [BsonIgnoreExtraElements] // Thêm dòng này để bỏ qua các trường không có trong model
     public class User
     {
         [BsonId]
@@ -26,15 +27,16 @@ namespace webCore.Models
         public string ConfirmPassword { get; set; }
 
         public string Token { get; set; } = GenerateRandomString(20);
-
         public int? Status { get; set; }
-
         public bool Deleted { get; set; }
         public DateTime? Birthday { get; set; }
         public string Phone { get; set; }
         public string Gender { get; set; }
         public string Address { get; set; }
-        public string ProfileImage { get; set; } = "default-image-url"; // Cung cấp giá trị mặc định cho ảnh đại diện.
+        public string ProfileImage { get; set; } = "default-image-url";
+
+        // HOẶC nếu bạn muốn sử dụng RoleId, thêm property này:
+        // public string RoleId { get; set; }
 
         private static string GenerateRandomString(int length)
         {

@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
     Layout = "Admin";
 }
@@ -7,77 +6,97 @@
 <div class="flex-grow-1 p-4">
     <div class="row">
         <div class="col-md-4">
-            <div class="card text-white bg-danger mb-4">
+            <div class="card text-white bg-primary mb-4">
                 <div class="card-body text-center">
-                    <i class="fas fa-shopping-cart card-icon fa-3x"></i>
-                    <h3>Đơn Hàng</h3>
-                    <p>@ViewBag.TotalOrders</p>
+                    <i class="fas fa-users card-icon fa-3x"></i>
+                    <h3>Người Dùng</h3>
+                    <p>@ViewBag.TotalUsers</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-4">
+            <div class="card text-white bg-warning mb-4">
                 <div class="card-body text-center">
-                    <i class="fas fa-dollar-sign card-icon fa-3x"></i>
-                    <h3>Tổng Doanh Thu</h3>
-                    <p>@ViewBag.TotalRevenue.ToString("C")</p>
+                    <i class="fas fa-list card-icon fa-3x"></i>
+                    <h3>Danh Mục</h3>
+                    <p>@ViewBag.TotalCategories</p>
                 </div>
             </div>
         </div>
-          <div class="col-md-4">
+        <div class="col-md-4">
             <div class="card text-white bg-info mb-4">
                 <div class="card-body text-center">
                     <i class="fas fa-box card-icon fa-3x"></i>
                     <h3>Sản Phẩm</h3>
-                    <p>@ViewBag.TotalProducts</p> <!-- Display total products here -->
+                    <p>@ViewBag.TotalProducts</p>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="container">
-        <h3>Đơn Hàng Cần Xác Nhận</h3>
+        <h3>Sản Phẩm Cần Duyệt</h3>
         <table class="account-table">
             <thead>
                 <tr>
-                    <th>Khách Hàng</th>
-                    <th>Ngày Đặt Hàng</th>
-                    <th>Giỏ Hàng</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Danh Mục</th>
+                    <th>Giá</th>
+                    <th>Ngày Tạo</th>
                     <th>Trạng Thái</th>
+                    <th>Thao Tác</th>
                 </tr>
             </thead>
             <tbody>
-                @if (ViewBag.RecentOrders != null && ViewBag.RecentOrders.Count > 0)
+                @if (ViewBag.PendingProducts != null && ViewBag.PendingProducts.Count > 0)
                 {
-                    foreach (var order in ViewBag.RecentOrders)
+                    foreach (var product in ViewBag.PendingProducts)
                     {
                         <tr>
-                            <td>@order.FullName</td>
-                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
                             <td>
-                                @if (order.Items != null)
+                                <a href="/Admin_product/Details/@product.Id" class="text-primary">
+                                    @product.Title
+                                </a>
+                            </td>
+                            <td>@(product.CategoryTitle ?? "Chưa phân loại")</td>
+                            <td>@product.Price.ToString("N0") VNĐ</td>
+                            <td>@product.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(product.Status))
                                 {
-                                    var items = order.Items as List<CartItem>;
-                                    var totalQuantity = items?.Sum(item => item.Quantity) ?? 0; // Tính tổng hoặc trả về 0 nếu null
-                                    @totalQuantity
+                                    <span class="badge badge-secondary">Chưa xác định</span>
+                                }
+                                else if (product.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge badge-success">Hoạt động</span>
+                                }
+                                else if (product.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase) ||
+                                product.Status.Equals("Dừng hoạt động", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge badge-danger">Không hoạt động</span>
                                 }
                                 else
                                 {
-                                    <span>0</span> <!-- Nếu không có sản phẩm -->
+                                    <span class="badge badge-warning">@product.Status</span>
                                 }
                             </td>
                             <td>
-                                @if (order.Status == "Đang chờ duyệt")
+                                @if (!product.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <span class="badge badge-warning">Chờ Xác Nhận</span>
+                                    <form method="post" action="/Admin_product/Approve/@product.Id" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bạn có chắc muốn duyệt sản phẩm này?')">
+                                            <i class="fas fa-check"></i> Duyệt
+                                        </button>
+                                    </form>
                                 }
-                                else if (order.Status == "Đã duyệt")
+                                @if (!product.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <span class="badge badge-success">Đã duyệt</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-danger">Đã hủy</span>
+                                    <form method="post" action="/Admin_product/Reject/@product.Id" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn từ chối sản phẩm này?')">
+                                            <i class="fas fa-times"></i> Từ chối
+                                        </button>
+                                    </form>
                                 }
                             </td>
                         </tr>
@@ -86,11 +105,11 @@
                 else
                 {
                     <tr>
-                        <td colspan="4" class="text-center">Không có đơn hàng gần đây.</td>
+                        <td colspan="6" class="text-center">Không có sản phẩm cần duyệt.</td>
                     </tr>
                 }
             </tbody>
         </table>
-        <a href="/Admin_order" class="btn btn-link">Xem tất cả đơn hàng →</a>
+        <a href="/Admin_product" class="btn btn-link">Xem tất cả sản phẩm →</a>
     </div>
 </div>
