@@ -1,1 +1,83 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+}
+<link rel="stylesheet" href="/css/create_account.css" />
+
+<div class="form-container">
+    <h2>Thêm mới sản phẩm</h2>
+
+    <!-- Alert giả - có thể ẩn/hiện bằng JavaScript -->
+    <div class="alert alert-danger" style="display: none;" id="errorAlert">
+        <ul id="errorList">
+            <!-- Errors will be inserted here -->
+        </ul>
+    </div>
+
+    <div class="alert alert-success" style="display: none;" id="successAlert">
+        Sản phẩm đã được thêm thành công!
+    </div>
+
+    <form id="createProductForm" onsubmit="handleSubmit(event)">
+        <label for="Title">Tên sản phẩm *</label>
+        <input type="text" id="Title" name="Title" required placeholder="Nhập tên sản phẩm" />
+
+        <label for="Image">Ảnh sản phẩm</label>
+        <input type="file" id="Image" name="Image" accept="image/*" onchange="previewImage(event)" />
+        <div class="image-preview-container">
+            <img id="imagePreview" alt="Ảnh xem trước" style="max-width: 300px; display: none;" />
+        </div>
+
+        <label for="Description">Mô tả sản phẩm</label>
+        <textarea id="Description" name="Description" style="width: 100%; height: 200px;" placeholder="Nhập mô tả chi tiết về sản phẩm"></textarea>
+
+        <div class="status">
+            <label>Đặc trưng:</label>
+            <input type="radio" id="featured" name="featured" value="0" checked />
+            <label for="featured" class="featured">Nổi bật</label>
+            <input type="radio" id="new" name="featured" value="1" />
+            <label for="new" class="new">Mới</label>
+            <input type="radio" id="suggest" name="featured" value="2" />
+            <label for="suggest" class="suggest">Gợi ý</label>
+            <input type="radio" id="no" name="featured" value="3" />
+            <label for="no" class="no">Không nổi bật</label>
+        </div>
+
+        <label for="CategoryId">Danh mục *</label>
+        <select id="CategoryId" name="categoryId" class="form-control" required>
+            <option value="">-- Chọn danh mục --</option>
+            <option value="1">Văn học Việt Nam</option>
+            <option value="2">Văn học nước ngoài</option>
+            <option value="3">Sách Kỹ Năng Sống</option>
+            <option value="4">Kinh tế</option>
+            <option value="5">Lịch sử</option>
+            <option value="6">Khoa học - Công nghệ</option>
+            <option value="7">Tiểu thuyết</option>
+            <option value="8">Sách thiếu nhi</option>
+        </select>
+
+        <label for="Price">Giá bán (VNĐ) *</label>
+        <input type="number" id="Price" name="Price" required placeholder="0" min="0" />
+
+        <label for="DiscountPercentage">Giảm giá (%)</label>
+        <input type="number" id="DiscountPercentage" name="DiscountPercentage" placeholder="0" min="0" max="100" />
+
+        <label for="Stock">Số lượng trong kho *</label>
+        <input type="number" id="Stock" name="Stock" required placeholder="0" min="0" />
+
+        <div class="status">
+            <label>Trạng thái</label>
+            <input type="radio" id="active" name="Status" value="Hoạt động" checked />
+            <label for="active" class="active">Hoạt động</label>
+            <input type="radio" id="inactive" name="Status" value="Không hoạt động" />
+            <label for="inactive" class="inactive">Dừng hoạt động</label>
+        </div>
+
+        <button type="submit">Tạo mới</button>
+        <button type="button" onclick="window.history.back()" style="background-color: #6c757d; margin-top: 20px">Hủy</button>
+    </form>
+</div>
+
+<script>}
+    }
+</script>

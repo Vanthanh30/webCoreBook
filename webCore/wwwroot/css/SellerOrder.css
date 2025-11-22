@@ -1,0 +1,110 @@
+﻿/* wwwroot/css/SellerOrder.css */
+.order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: #fff;
+}
+
+.order-header {
+    background-color: #f8f9fa;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-id {
+    font-weight: 600;
+    color: #ee4d2d;
+}
+
+.order-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+    /* CỐ ĐỊNH KÍCH THƯỚC ẢNH - QUAN TRỌNG */
+    .product-item img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 16px;
+        flex-shrink: 0; /* không bị co lại */
+        border: 1px solid #eee;
+    }
+
+/* Khu vực thông tin sản phẩm */
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+    .product-info h6 {
+        margin: 0 0 4px 0;
+        font-size: 15px;
+        line-height: 1.4;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .product-info small {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+.product-price {
+    color: #ee4d2d;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Tổng tiền */
+.order-total {
+    text-align: right;
+    padding: 14px 20px;
+    background-color: #fafafa;
+    border-top: 1px dashed #ddd;
+    font-size: 16px;
+}
+
+/* Nút hành động luôn ở góc dưới bên phải */
+.order-actions {
+    margin-top: auto;
+    text-align: right;
+    padding-top: 16px;
+    border-top: 1px dashed #eee;
+}
+
+/* Badge trạng thái */
+.badge {
+    font-size: 13px;
+    padding: 4px 8px;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 576px) {
+    .product-item img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .order-body {
+        padding: 15px;
+    }
+}

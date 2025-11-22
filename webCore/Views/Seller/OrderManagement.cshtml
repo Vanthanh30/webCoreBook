@@ -1,0 +1,443 @@
+﻿@{
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Quản lý Đơn hàng";
+}
+
+<link rel="stylesheet" href="~/css/SellerOrder.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<div class="container-fluid py-4">
+    <h3 class="mb-4">Quản lý đơn hàng</h3>
+
+    <ul class="nav nav-pills mb-4" id="orderTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="pill" href="#tab-all">Tất cả</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#tab-pending">
+                Chờ xác nhận <span class="badge badge-warning ml-1">3</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#tab-packing">Chờ lấy hàng <span class="badge badge-info ml-1">4</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#tab-shipping">Đang giao <span class="badge badge-primary ml-1">6</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#tab-completed">Đã giao <span class="badge badge-success ml-1">2</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#tab-return">Trả hàng <span class="badge badge-danger ml-1">1</span></a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-all">
+
+        <div class="card order-card">
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Mã đơn: #1001</span>
+                    <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                </div>
+                <span class="badge badge-warning">Chờ xác nhận</span>
+            </div>
+
+            <div class="order-body">
+                <div class="product-item">
+                    <img src="/image/book_cover_placeholder.png" alt="Take note">
+                    <div class="product-info">
+                        <h6>Take Note - Ghi chép thông minh</h6>
+                        <small>Phân loại: Bìa cứng, Màu đen</small>
+                        <div class="product-price">200.000đ x 2</div>
+                    </div>
+                </div>
+
+                <div class="order-total">
+                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                </div>
+
+                <div class="order-actions">
+                    <button class="btn btn-outline-secondary btn-sm mr-2-2">
+                        <i class="fas fa-comment-dots"></i> Liên hệ người mua
+                    </button>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-check"></i> Xác nhận đơn hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card order-card">
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Mã đơn: #1002</span>
+                    <span class="ml-3 text-muted">| Trần Thị Lan</span>
+                </div>
+                <span class="badge badge-info">Chờ lấy hàng</span>
+            </div>
+
+            <div class="order-body">
+                <div class="product-item">
+                    <img src="/image/book_cover_placeholder.png" alt="Atomic Habits">
+                    <div class="product-info">
+                        <h6>Atomic Habits - Thói quen nguyên tử (Tái bản 2024)</h6>
+                        <small>Phân loại: Tiếng Việt</small>
+                        <div class="product-price">135.000đ x 1</div>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <img src="/image/book_cover_placeholder.png" alt="Bút">
+                    <div class="product-info">
+                        <h6>Bút gel cao cấp Uni-ball Signo 0.5mm</h6>
+                        <div class="product-price">25.000đ x 3</div>
+                    </div>
+                </div>
+
+                <div class="order-total">
+                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">210.000đ</strong>
+                </div>
+
+                <div class="order-actions">
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-truck"></i> Đã chuẩn bị hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card order-card">
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Mã đơn: #1003</span>
+                    <span class="ml-3 text-muted">| Lê Văn Minh</span>
+                </div>
+                <span class="badge badge-primary">Đang giao</span>
+            </div>
+
+            <div class="order-body">
+                <div class="product-item">
+                    <img src="/image/book_cover_placeholder.png" alt="Dấu chân">
+                    <div class="product-info">
+                        <h6>Dấu chân trên cát</h6>
+                        <div class="product-price">89.000đ x 1</div>
+                    </div>
+                </div>
+
+                <div class="order-total">
+                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">89.000đ</strong>
+                </div>
+
+                <div class="order-actions">
+                    <button class="btn btn-outline-info btn-sm" disabled>
+                        Đang giao bởi GHTK
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-pending">
+            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label font-weight-bold" for="selectAll">
+                        Chọn tất cả (<span id="selectedCount">0</span>)
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-success btn-sm mr-2" id="btnConfirmAll" disabled>
+                        <i class="fas fa-check-double"></i> Xác nhận tất cả
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-list">
+
+                <div class="card order-card mb-3">
+                    <div class="order-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
+                            </div>
+                            <div>
+                                <span class="order-id">Mã đơn: #1001</span>
+                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-warning">Chờ xác nhận</span>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="product-item">
+                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
+                            <div class="product-info">
+                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
+                                <small>Bìa cứng, Đen</small>
+                                <div class="product-price">200.000đ × 2</div>
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline-secondary btn-sm mr-2">
+                                <i class="fas fa-comment-dots"></i> Liên hệ
+                            </button>
+                            <button class="btn btn-primary btn-sm mr-2">
+                                <i class="fas fa-check"></i> Xác nhận
+                            </button>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i> Hủy đơn
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-packing">
+            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label font-weight-bold" for="selectAll">
+                        Chọn tất cả (<span id="selectedCount">0</span>)
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-list">
+
+                <div class="card order-card mb-3">
+                    <div class="order-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
+                            </div>
+                            <div>
+                                <span class="order-id">Mã đơn: #1001</span>
+                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-info">Chờ lấy hàng</span>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="product-item">
+                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
+                            <div class="product-info">
+                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
+                                <small>Bìa cứng, Đen</small>
+                                <div class="product-price">200.000đ × 2</div>
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline-secondary btn-sm mr-2">
+                                <i class="fas fa-comment-dots"></i> Liên hệ
+                            </button>
+                            <button class="btn btn-success btn-sm mr-2"><i class="fas fa-box"></i> Giao hàng</button>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i> Hủy đơn
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-shipping">
+            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label font-weight-bold" for="selectAll">
+                        Chọn tất cả (<span id="selectedCount">0</span>)
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-list">
+
+                <div class="card order-card mb-3">
+                    <div class="order-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
+                            </div>
+                            <div>
+                                <span class="order-id">Mã đơn: #1001</span>
+                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-primary">Đang giao</span>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="product-item">
+                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
+                            <div class="product-info">
+                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
+                                <small>Bìa cứng, Đen</small>
+                                <div class="product-price">200.000đ × 2</div>
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                        </div>
+                        <div class="order-actions">
+                            <a href="@Url.Action("OrderDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
+                                Xem chi tiết
+                            </a>
+                            <button class="btn btn-success btn-sm">
+                                Đã giao
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-completed">
+            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label font-weight-bold" for="selectAll">
+                        Chọn tất cả (<span id="selectedCount">0</span>)
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-list">
+
+                <div class="card order-card mb-3">
+                    <div class="order-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
+                            </div>
+                            <div>
+                                <span class="order-id">Mã đơn: #1001</span>
+                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-success">Đã giao</span>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="product-item">
+                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
+                            <div class="product-info">
+                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
+                                <small>Bìa cứng, Đen</small>
+                                <div class="product-price">200.000đ × 2</div>
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                        </div>
+                        <div class="order-actions">
+                            <a href="@Url.Action("OrderDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
+                                Xem chi tiết
+                            </a>
+                            <button class="btn btn-outline-secondary btn-sm mr-2">
+                                <i class="fas fa-comment-dots"></i> Liên hệ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-return">
+            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label font-weight-bold" for="selectAll">
+                        Chọn tất cả (<span id="selectedCount">0</span>)
+                    </label>
+                </div>
+                <div>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                    </button>
+                </div>
+            </div>
+
+            <div class="order-list">
+
+                <div class="card order-card mb-3">
+                    <div class="order-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check mr-3">
+                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
+                            </div>
+                            <div>
+                                <span class="order-id">Mã đơn: #1001</span>
+                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
+                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-danger">Đã hủy</span>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="product-item">
+                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
+                            <div class="product-info">
+                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
+                                <small>Bìa cứng, Đen</small>
+                                <div class="product-price">200.000đ × 2</div>
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline-secondary btn-sm mr-2">
+                                <i class="fas fa-comment-dots"></i> Liên hệ
+                            </button>
+                            <a href="@Url.Action("CancelDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
+                                Xem chi tiết
+                            </a>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i> Từ chối
+                            </button>
+                            <button class="btn btn-primary btn-sm mr-2">
+                                <i class="fas fa-check"></i> Duyệt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
