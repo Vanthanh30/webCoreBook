@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using webCore.Helpers;
 using webCore.Models;
 using webCore.MongoHelper;
 
@@ -32,12 +33,12 @@ namespace webCore.Controllers.ApiControllers
             if (string.IsNullOrEmpty(user.Password))
                 return BadRequest(new { success = false, message = "Mật khẩu không được để trống" });
 
-            // lấy role Buyer từ DB
+            user.Password = PasswordHasher.HashPassword(user.Password);
+
             var buyerRole = await _roleService.GetRoleByNameAsync("Buyer");
             if (buyerRole == null)
                 return StatusCode(500, new { success = false, message = "Role Buyer chưa có trong DB" });
 
-            // gán role Buyer
             user.RoleId.Add(buyerRole.Id);
 
             await _userService.SaveUserAsync(user);
@@ -45,25 +46,43 @@ namespace webCore.Controllers.ApiControllers
             return Ok(new { success = true, message = "Đăng ký thành công" });
         }
 
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] User login)
         {
             var user = await _userService.GetAccountByEmailAsync(login.Email);
-            if (user == null || user.Password != login.Password)
+            if (user == null)
+                return Unauthorized(new { success = false, message = "Sai email hoặc mật khẩu" });
+
+            bool validPassword = PasswordHasher.VerifyPassword(login.Password, user.Password);
+
+            if (!validPassword)
                 return Unauthorized(new { success = false, message = "Sai email hoặc mật khẩu" });
 
             if (user.Status == 0)
                 return Unauthorized(new { success = false, message = "Tài khoản bị khóa" });
 
-            // lấy tên role
-            var roleNames = new System.Collections.Generic.List<string>();
+            var roleNames = new List<string>();
             foreach (var roleId in user.RoleId)
             {
-                var r = await _roleService.GetRoleByIdAsync(roleId);
-                if (r != null) roleNames.Add(r.Name);
+                var role = await _roleService.GetRoleByIdAsync(roleId);
+                if (role != null)
+                {
+                    roleNames.Add(role.Name);
+
+                    // Nếu là admin → không cho đăng nhập
+                    if (role.Name.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Unauthorized(new
+                        {
+                            success = false,
+                            message = "Tài khoản không có quyền truy cập trang này"
+                        });
+                    }
+                }
             }
 
-            // session optional
+
             HttpContext.Session.SetString("UserId", user.Id);
             HttpContext.Session.SetString("UserToken", user.Token);
             HttpContext.Session.SetString("UserName", user.Name);
@@ -77,6 +96,7 @@ namespace webCore.Controllers.ApiControllers
                 token = user.Token
             });
         }
+
 
         [HttpPost("upgrade-seller")]
         public async Task<IActionResult> UpgradeSeller([FromBody] User req)
