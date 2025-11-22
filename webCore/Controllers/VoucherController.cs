@@ -19,6 +19,7 @@ namespace webCore.Controllers
         {
             _voucherService = voucherService;
         }
+
         public async Task<IActionResult> Index(int page = 1)
         {
             // Number of items per page
@@ -30,6 +31,24 @@ namespace webCore.Controllers
 
             // Fetch total number of vouchers
             var totalVouchers = await _voucherService.GetVouchers();
+
+            // Cập nhật trạng thái cho tất cả voucher dựa trên ngày hiện tại
+            var currentDate = DateTime.Now.Date;
+            foreach (var voucher in totalVouchers)
+            {
+                // Kiểm tra nếu voucher đã hết hạn
+                if (voucher.EndDate.Date < currentDate)
+                {
+                    voucher.IsActive = false;
+                }
+                // Kiểm tra nếu voucher đang trong thời gian hoạt động
+                else if (voucher.StartDate.Date <= currentDate && voucher.EndDate.Date >= currentDate)
+                {
+                    voucher.IsActive = true;
+                }
+                // Nếu chưa đến ngày bắt đầu, giữ nguyên IsActive
+            }
+
             var totalPages = (int)Math.Ceiling(totalVouchers.Count / (double)pageSize);
 
             // Fetch vouchers for the current page
@@ -41,7 +60,6 @@ namespace webCore.Controllers
 
             return View(vouchers);
         }
-
 
         // GET: VoucherController/Create - Giao diện tạo voucher cho Admin
         public IActionResult Create()
@@ -62,6 +80,11 @@ namespace webCore.Controllers
                 if (voucher.StartDate <= voucher.EndDate)
                 {
                     voucher.UsageCount = 0; // Đặt số lần sử dụng ban đầu là 0
+
+                    // Tự động xác định trạng thái dựa trên ngày hiện tại
+                    var currentDate = DateTime.Now.Date;
+                    voucher.IsActive = voucher.StartDate <= currentDate && voucher.EndDate >= currentDate;
+
                     await _voucherService.CreateVoucherAsync(voucher);
                     TempData["Message"] = "Voucher đã được tạo thành công!";
                     return RedirectToAction("Index");
@@ -74,6 +97,7 @@ namespace webCore.Controllers
 
             return View(voucher);
         }
+
         // GET: VoucherController/Edit/{id}
         public async Task<IActionResult> Edit(string id)
         {
@@ -100,8 +124,31 @@ namespace webCore.Controllers
             {
                 try
                 {
+                    // Kiểm tra ngày bắt đầu và ngày kết thúc hợp lệ
+                    if (updatedVoucher.StartDate > updatedVoucher.EndDate)
+                    {
+                        ModelState.AddModelError("", "Ngày bắt đầu phải trước ngày kết thúc.");
+                        return View(updatedVoucher);
+                    }
+
                     // Gán lại ObjectId cho voucher
                     updatedVoucher.Id = new ObjectId(id);
+
+                    // Tự động cập nhật trạng thái dựa trên ngày hiện tại
+                    var currentDate = DateTime.Now.Date;
+
+                    // Kiểm tra nếu voucher còn trong thời gian hoạt động
+                    if (updatedVoucher.StartDate <= currentDate && updatedVoucher.EndDate >= currentDate)
+                    {
+                        // Nếu trong thời gian hoạt động, set IsActive = true
+                        updatedVoucher.IsActive = true;
+                    }
+                    else if (updatedVoucher.EndDate < currentDate)
+                    {
+                        // Nếu đã quá ngày kết thúc, set IsActive = false
+                        updatedVoucher.IsActive = false;
+                    }
+                    // Nếu chưa tới ngày bắt đầu, giữ nguyên giá trị IsActive từ form
 
                     // Gọi service để cập nhật voucher
                     bool result = await _voucherService.UpdateVoucherAsync(id, updatedVoucher);
@@ -123,9 +170,6 @@ namespace webCore.Controllers
 
             return View(updatedVoucher);
         }
-
-
-
 
         // GET: VoucherController/Delete/{id}
         public async Task<IActionResult> Delete(string id)
@@ -151,16 +195,11 @@ namespace webCore.Controllers
             if (result)
             {
                 TempData["Message"] = "Voucher đã được xóa thành công!";
-                // Redirect back to the Index page after successful deletion
                 return RedirectToAction("Index");
             }
 
             ModelState.AddModelError("", "Không thể xóa voucher.");
-            // In case of error, redirect back to the Index page to show an error message
             return RedirectToAction("Index");
         }
-
-
     }
 }
-

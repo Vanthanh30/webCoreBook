@@ -1,23 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using webCore.MongoHelper;
 using webCore.Services;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace webCore.Controllers
 {
     [AuthenticateHelper]
     public class DashboardController : Controller
     {
-        private readonly Order_adminService _orderadminService;
-        private readonly ProductService _productService;
-        private readonly OrderService _orderService;
+        private readonly User_adminService _useradminService;
+        private readonly CategoryProduct_adminService _categoryProductCollection;
 
-        public DashboardController(ProductService productService, OrderService orderService, Order_adminService orderadminService)
+        public DashboardController(User_adminService useradminService, CategoryProduct_adminService categoryProductAdminService)
         {
-            _productService = productService;
-            _orderService = orderService;
-            _orderadminService = orderadminService;
+            _useradminService = useradminService;
+            _categoryProductCollection = categoryProductAdminService;
         }
 
         // GET: DashboardController
@@ -28,22 +29,49 @@ namespace webCore.Controllers
             ViewBag.Token = token;
 
             // Lấy số liệu thống kê
-            var totalProducts = await _productService.GetProductCountAsync();
-            var totalOrders = await _orderService.GetTotalOrdersAsync();
-            var totalRevenue = await _orderService.GetTotalRevenueAsync();
+            var allUsers = await _useradminService.GetAllUsersAsync();
+            var totalUsers = allUsers.Count;
 
-            // Lấy 3 đơn hàng gần đây nhất
-            var recentOrders = await _orderadminService.GetRecentOrdersAsync();
+            var allCategories = await _categoryProductCollection.GetCategory();
+            var totalCategories = allCategories.Count;
+
+            var allProducts = await _categoryProductCollection.GetProduct();
+            var totalProducts = allProducts.Count;
+
+            // Lấy danh sách sản phẩm cần duyệt (Status khác "Hoạt động")
+            var pendingProducts = allProducts
+                .Where(p => string.IsNullOrEmpty(p.Status) ||
+                           !p.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(5)
+                .ToList();
+
+            // Tạo dictionary để map CategoryId -> CategoryTitle
+            var categoryDictionary = new Dictionary<string, string>();
+            foreach (var cat in allCategories)
+            {
+                if (!categoryDictionary.ContainsKey(cat.Id))
+                {
+                    categoryDictionary.Add(cat.Id, cat.Title);
+                }
+            }
+
+            // Gán CategoryTitle cho mỗi sản phẩm cần duyệt
+            foreach (var product in pendingProducts)
+            {
+                if (!string.IsNullOrEmpty(product.CategoryId) && categoryDictionary.ContainsKey(product.CategoryId))
+                {
+                    product.CategoryTitle = categoryDictionary[product.CategoryId];
+                }
+            }
 
             // Truyền dữ liệu vào ViewBag
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.TotalCategories = totalCategories;
             ViewBag.TotalProducts = totalProducts;
-            ViewBag.TotalOrders = totalOrders;
-            ViewBag.TotalRevenue = totalRevenue;
-            ViewBag.RecentOrders = recentOrders;
+            ViewBag.PendingProducts = pendingProducts;
 
             return View();
         }
-
-
     }
 }
