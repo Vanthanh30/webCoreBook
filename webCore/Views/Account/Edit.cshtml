@@ -1,8 +1,8 @@
-﻿@model webCore.Models.Account_admin
-
-@{
+﻿@{
     ViewData["Title"] = "Chỉnh sửa tài khoản";
     Layout = "Admin";
+
+    string id = ViewBag.Id;
 }
 
 <style>
@@ -16,7 +16,6 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    /* Heading */
     h2 {
         text-align: center;
         font-size: 24px;
@@ -24,7 +23,6 @@
         margin-bottom: 20px;
     }
 
-    /* Alert messages */
     .alert-danger {
         background-color: #f8d7da;
         border-color: #f5c6cb;
@@ -34,17 +32,6 @@
         border-radius: 4px;
     }
 
-        .alert-danger ul {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-        }
-
-        .alert-danger li {
-            font-size: 14px;
-        }
-
-    /* Form fields */
     label {
         display: block;
         margin-bottom: 5px;
@@ -65,7 +52,6 @@
         margin-bottom: 15px;
     }
 
-    /* Image preview */
     .image-preview-container {
         text-align: start;
         margin-bottom: 15px;
@@ -77,12 +63,11 @@
         border-radius: 4px;
         margin-top: 10px;
         display: block;
-        object-fit:cover;
+        object-fit: cover;
         margin-left: auto;
         margin-right: auto;
     }
 
-    /* Radio buttons */
     .status {
         margin-bottom: 20px;
     }
@@ -96,7 +81,6 @@
         margin-right: 5px;
     }
 
-    /* Submit button */
     button[type="submit"] {
         background-color: #4CAF50;
         color: white;
@@ -112,69 +96,45 @@
         button[type="submit"]:hover {
             background-color: #45a049;
         }
-
-    /* Styling for disabled inputs */
-    input[disabled], select[disabled] {
-        background-color: #f1f1f1;
-        cursor: not-allowed;
-    }
 </style>
 
 <div class="form-container">
     <h2>Chỉnh sửa tài khoản</h2>
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul>
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <li>@error.ErrorMessage</li>
-                }
-            </ul>
-        </div>
-    }
 
-    <form asp-action="Edit" method="post" enctype="multipart/form-data">
-        <!-- ID của tài khoản (ẩn) -->
-        <input type="hidden" asp-for="Id" />
+    <div id="errorBox" class="alert alert-danger d-none"></div>
 
-        <label for="name">Họ tên *</label>
-        <input type="text" id="name" name="FullName" value="@Model.FullName" required />
+    <form id="editForm" enctype="multipart/form-data">
 
-        <label for="email">Email *</label>
-        <input type="email" id="email" name="Email" value="@Model.Email" required />
+        <input type="hidden" id="Id" value="@id" />
 
-        <label for="phone">Điện thoại *</label>
-        <input type="text" id="phone" name="Phone" value="@Model.Phone" required style="width:100%" />
+        <label for="Name">Họ tên *</label>
+        <input type="text" id="Name" required />
 
-        <label for="password">Mật Khẩu (Chỉ nhập nếu muốn thay đổi)</label>
-        <input type="password" id="password" name="Password" placeholder="Không thay đổi nếu để trống" />
+        <label for="Email">Email *</label>
+        <input type="email" id="Email" required />
+
+        <label for="Phone">Điện thoại *</label>
+        <input type="text" id="Phone" required style="width:100%" />
+
+        <label for="Password">Mật Khẩu (Chỉ nhập nếu muốn thay đổi)</label>
+        <input type="password" id="Password" placeholder="Không thay đổi nếu để trống" />
 
         <label for="image">Ảnh đại diện</label>
-        <input type="file" id="image" name="Avatar" accept="image/*" onchange="previewImage(event)" />
+        <input type="file" id="image" accept="image/*" onchange="previewImage(event)" />
 
         <div class="image-preview-container">
-            @if (!string.IsNullOrEmpty(Model.Avatar))
-            {
-                <img id="imagePreview" src="@Model.Avatar" alt="Ảnh hiện tại" />
-            }
-            else
-            {
-                <img id="imagePreview" alt="Ảnh xem trước" />
-            }
+            <img id="imagePreview" src="" alt="Ảnh xem trước" />
         </div>
 
-        <label for="role">Phân quyền</label>
-        <select id="role" name="RoleId">
-            <option value="Quản trị viên" >Quản trị viên</option>
-            <option value="Quản lý nội dung">Quản lý nội dung</option>
-        </select>
+        <label for="RoleId">Phân quyền</label>
+        <select id="RoleId"></select>
 
         <div class="status">
             <label>Trạng thái</label>
-            <input type="radio" id="active" name="Status" value="Hoạt động" @(Model.Status == "Hoạt động" ? "checked" : "") />
+            <input type="radio" id="active" name="Status" value="1" />
             <label for="active" class="active">Hoạt động</label>
-            <input type="radio" id="inactive" name="Status" value="Không hoạt động" @(Model.Status == "Không hoạt động" ? "checked" : "") />
+
+            <input type="radio" id="inactive" name="Status" value="0" />
             <label for="inactive" class="inactive">Dừng hoạt động</label>
         </div>
 
@@ -182,4 +142,122 @@
     </form>
 </div>
 
-<script src="/js/upload_img.js"></script>
+<script>
+    const userId = "@id";
+
+    async function loadUser() {
+        const res = await fetch(`/api/account/edit/${userId}`);
+        if (!res.ok) return showError("Không tải được dữ liệu.");
+
+        const user = await res.json();
+
+        document.getElementById("Name").value = user.name;
+        document.getElementById("Email").value = user.email;
+        document.getElementById("Phone").value = user.phone || "";
+
+        loadPreviewImage(user.profileImage);
+        loadRoles(user.roleId);
+
+        if (user.status === 1)
+            document.getElementById("active").checked = true;
+        else
+            document.getElementById("inactive").checked = true;
+    }
+
+    // ⭐ HIỂN THỊ ICON NẾU KHÔNG CÓ ẢNH
+    function loadPreviewImage(profileImage) {
+        const container = document.querySelector(".image-preview-container");
+        const img = document.getElementById("imagePreview");
+
+        container.innerHTML = ""; // Xóa icon cũ nếu có
+        container.appendChild(img); // thêm img vào lại
+
+        if (profileImage && profileImage !== "default-image-url") {
+            img.src = profileImage;
+            img.style.display = "block";
+        } else {
+            img.style.display = "none"; // Ẩn ảnh
+
+            // Thêm icon
+            container.innerHTML += `
+                <i class="fas fa-user-circle"
+                   style="font-size: 80px; color: #999; display:block; text-align:center;">
+                </i>`;
+        }
+    }
+
+    // ⭐ Chọn file thì hiện preview ảnh
+    function previewImage(e) {
+        const file = e.target.files[0];
+        const img = document.getElementById("imagePreview");
+        const container = document.querySelector(".image-preview-container");
+
+        if (file) {
+            img.src = URL.createObjectURL(file);
+            img.style.display = "block";
+
+            // Xóa icon khi chọn ảnh
+            container.querySelector("i")?.remove();
+        }
+    }
+
+    async function loadRoles(selected) {
+        const res = await fetch("/api/role/list");
+        const roles = await res.json();
+
+        const select = document.getElementById("RoleId");
+        select.innerHTML = "";
+
+        roles.forEach(r => {
+            const opt = document.createElement("option");
+            opt.value = r.id;
+            opt.textContent = r.name;
+
+            if (selected.includes(r.id)) opt.selected = true;
+
+            select.appendChild(opt);
+        });
+    }
+
+    // ⭐ Submit Form
+    document.getElementById("editForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const fd = new FormData();
+        fd.append("Name", document.getElementById("Name").value);
+        fd.append("Email", document.getElementById("Email").value);
+        fd.append("Phone", document.getElementById("Phone").value);
+
+        const pass = document.getElementById("Password").value;
+        if (pass) fd.append("Password", pass);
+
+        const img = document.getElementById("image").files[0];
+        if (img) fd.append("ProfileImage", img);
+
+        const status = document.querySelector("input[name='Status']:checked").value;
+        fd.append("Status", parseInt(status));
+
+        // ⭐ Sửa lỗi roleId
+        const roleId = document.getElementById("RoleId").value;
+        fd.append("RoleId[0]", roleId);
+
+        const res = await fetch(`/api/account/edit/${userId}`, {
+            method: "PUT",
+            body: fd
+        });
+
+        const result = await res.json();
+        if (!result.success) return showError(result.message);
+
+        alert("Cập nhật thành công!");
+        window.location.href = "/Account";
+    });
+
+    function showError(msg) {
+        const box = document.getElementById("errorBox");
+        box.innerHTML = msg;
+        box.classList.remove("d-none");
+    }
+
+    loadUser();
+</script>

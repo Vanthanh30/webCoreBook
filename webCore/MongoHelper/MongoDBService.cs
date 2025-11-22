@@ -25,7 +25,7 @@ namespace webCore.Services
         internal readonly IMongoCollection<Category> _categoryCollection;
         internal readonly IMongoCollection<Order> _orders;
         private readonly IMongoDatabase _mongoDatabase;
-        internal readonly IMongoCollection<Account_admin> _accountCollection;
+        internal readonly IMongoCollection<User> _accountCollection;
         internal readonly IMongoCollection<Role> _roleCollection;
 
         public IMongoCollection<ForgotPassword> ForgotPasswords { get; internal set; }
@@ -34,7 +34,7 @@ namespace webCore.Services
         {
             var mongoClient = new MongoClient(configuration["MongoDB:ConnectionString"]);
             var mongoDatabase = mongoClient.GetDatabase(configuration["MongoDB:DatabaseName"]);
-            _accountCollection = mongoDatabase.GetCollection<Account_admin>("Accounts");
+            _accountCollection = mongoDatabase.GetCollection<User>("Users");
             _productCollection = mongoDatabase.GetCollection<Product_admin>("Product");
             _userCollection = mongoDatabase.GetCollection<User>("Users");
             ForgotPasswords = mongoDatabase.GetCollection<ForgotPassword>("ForgotPasswords");

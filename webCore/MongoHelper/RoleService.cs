@@ -26,6 +26,18 @@ namespace webCore.MongoHelper
         {
             return await _roles.Find(r => r.Id == id).FirstOrDefaultAsync();
         }
+        public async Task<List<string>> GetAdminRoleIdsAsync()
+        {
+            var filter = Builders<Role>.Filter.Eq(r => r.Name, "Admin");
+            var roles = await _roles.Find(filter).ToListAsync();
+
+            return roles.Select(r => r.Id).ToList();
+        }
+        public async Task<List<Role>> GetAllRolesAsync()
+        {
+            return await _roles.Find(_ => true).ToListAsync();
+        }
+
     }
 
 }

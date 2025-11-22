@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using webCore.Models;
@@ -8,31 +9,47 @@ namespace webCore.MongoHelper
 {
     public class AccountService
     {
-        private readonly IMongoCollection<Account_admin> _accountCollection;
+        private readonly IMongoCollection<User> _accountCollection;
+        private readonly RoleService _roleService;
 
-        public AccountService(MongoDBService mongoDBService)
+        public AccountService(MongoDBService mongoDBService, RoleService roleService)
         {
             _accountCollection = mongoDBService._accountCollection;
+            _roleService = roleService;
         }
-        public async Task CreateAccountAsync(Account_admin account)
+        public async Task CreateAccountAsync(User account)
         {
             await _accountCollection.InsertOneAsync(account);
         }
-        public async Task<List<Account_admin>> GetAccounts()
+        public async Task<List<User>> GetAccounts()
         {
-            return await _accountCollection.Find(_ => true).ToListAsync();
+            var adminRoleIds = await _roleService.GetAdminRoleIdsAsync();
+
+            var roleFilter = Builders<User>.Filter.AnyIn(u => u.RoleId, adminRoleIds);
+            var notDeletedFilter = Builders<User>.Filter.Eq(u => u.Deleted, false);
+
+            var filter = Builders<User>.Filter.And(roleFilter, notDeletedFilter);
+
+            return await _accountCollection.Find(filter).ToListAsync();
         }
-        internal async Task SaveAccountAsync(Account_admin account)
+
+        public async Task<User> GetAccountByEmailAsync(string email)
+        {
+            var filter = Builders<User>.Filter.Eq(a => a.Email, email);
+            return await _accountCollection.Find(filter).FirstOrDefaultAsync();
+        }
+
+        internal async Task SaveAccountAsync(User account)
         {
             await _accountCollection.InsertOneAsync(account);
         }
         // Get account by ID
-        public async Task<Account_admin> GetAccountByIdAsync(string id)
+        public async Task<User> GetAccountByIdAsync(string id)
         {
             return await _accountCollection.Find(account => account.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task UpdateAccountAsync(Account_admin updatedAccount)
+        public async Task UpdateAccountAsync(User updatedAccount)
         {
             await _accountCollection.ReplaceOneAsync(account => account.Id == updatedAccount.Id, updatedAccount);
         }
@@ -40,8 +57,13 @@ namespace webCore.MongoHelper
         // Delete an account by ID
         public async Task DeleteAccountAsync(string id)
         {
-            var filter = Builders<Account_admin>.Filter.Eq(a => a.Id, id);
-            await _accountCollection.DeleteOneAsync(filter);
+            var filter = Builders<User>.Filter.Eq(a => a.Id, id);
+            var update = Builders<User>.Update
+                .Set(a => a.Deleted, true)
+                .Set(a => a.DeletedAt, DateTime.UtcNow);
+
+            await _accountCollection.UpdateOneAsync(filter, update);
         }
+
     }
 }

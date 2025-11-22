@@ -18,17 +18,6 @@ namespace webCore.Controllers
         public IActionResult SellerChannel() => View();
 
 
-        // Action xử lý đăng xuất
-/*        [HttpPost]
-        public IActionResult Sign_out()
-        {
-            // Xóa thông tin UserName và UserToken khỏi session
-            HttpContext.Session.Remove("UserName");
-            HttpContext.Session.Remove("UserToken");
-
-            // Chuyển hướng về trang chủ
-            return RedirectToAction("Index", "Home");
-        }*/
 
     }
 }

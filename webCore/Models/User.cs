@@ -59,7 +59,7 @@ namespace webCore.Models
         public string Token { get; set; } = GenerateRandomString(20);
 
         [BsonElement("Status")]
-        public int? Status { get; set; } = 1;
+        public int? Status { get; set; } = 1; // 1 = hoạt động, 0 = khóa
 
         [BsonElement("RoleId")]
         public List<string> RoleId { get; set; } = new List<string>();

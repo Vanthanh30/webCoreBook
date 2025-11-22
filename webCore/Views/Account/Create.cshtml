@@ -7,53 +7,99 @@
 <div class="form-container">
     <h2>Thêm mới tài khoản</h2>
 
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul>
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-        <li>@error.ErrorMessage</li>                }
-            </ul>
-        </div>}
+    <div id="errorBox" class="alert alert-danger d-none"></div>
 
-    <form asp-action="Create" method="post" enctype="multipart/form-data">
+    <form id="createForm" enctype="multipart/form-data">
         <label for="name">Họ tên *</label>
-        <input type="text" id="name" name="FullName" required />
+        <input type="text" id="name" required />
 
         <label for="email">Email *</label>
-        <input type="email" id="email" name="Email" required />
+        <input type="email" id="email" required />
 
         <label for="phone">Điện thoại *</label>
-        <input type="phone" id="phone" name="phone" required style="width:100%" />
+        <input type="phone" id="phone" required style="width:100%" />
 
         <label for="password">Mật Khẩu *</label>
-        <input type="password" id="password" name="Password" required />
+        <input type="password" id="password" required />
 
         <label for="image">Ảnh</label>
-        <input type="file" id="image" name="Avatar" accept="image/*" onchange="previewImage(event)" />
+        <input type="file" id="image" accept="image/*" onchange="previewImage(event)" />
 
         <div class="image-preview-container">
             <img id="imagePreview" alt="Ảnh xem trước" />
         </div>
 
         <label for="role">Phân quyền</label>
-        <select id="role" name="RoleId">
-            <option value="Quản trị viên">Quản trị viên</option>
-            <option value="Quản lý nội dung">Quản trị nội dung</option>
-        </select>
+        <select id="role"></select>
 
         <div class="status">
             <label>Trạng thái</label>
-            <input type="radio" id="active" name="Status" value="Hoạt động" checked />
+            <input type="radio" id="active" name="Status" value="1" checked />
             <label for="active" class="active">Hoạt động</label>
-            <input type="radio" id="inactive" name="Status" value="không hoạt động" />
+            <input type="radio" id="inactive" name="Status" value="0" />
             <label for="inactive" class="inactive">Dừng hoạt động</label>
         </div>
 
         <button type="submit">Tạo mới</button>
     </form>
-</div>
+    </div>
+    <script>
+        // LOAD ROLE TỪ API
+        async function loadRoles() {
+            const res = await fetch("/api/role/list");
+            const roles = await res.json();
 
-<script src="/js/upload_img.js"></script>
+            const select = document.getElementById("role");
+            select.innerHTML = "";
 
+            roles.forEach(r => {
+                const opt = document.createElement("option");
+                opt.value = r.id;
+                opt.textContent = r.name;
+                select.appendChild(opt);
+            });
+        }
+        loadRoles();
+
+        // Preview ảnh
+        function previewImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById("imagePreview").src = URL.createObjectURL(file);
+            }
+        }
+
+        // GỬI ĐẾN API
+        document.getElementById("createForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const fd = new FormData();
+            fd.append("Name", document.getElementById("name").value);
+            fd.append("Email", document.getElementById("email").value);
+            fd.append("Phone", document.getElementById("phone").value);
+            fd.append("Password", document.getElementById("password").value);
+
+            const img = document.getElementById("image").files[0];
+            if (img) fd.append("ProfileImage", img);
+
+            // LẤY ROLE TỪ DB
+            fd.append("RoleId[0]", document.getElementById("role").value);
+
+            const status = document.querySelector("input[name='Status']:checked").value;
+            fd.append("Status", status);
+
+            const res = await fetch("/api/account/create", {
+                method: "POST",
+                body: fd
+            });
+
+            const result = await res.json();
+            if (!result.success) {
+                alert(result.message);
+                return;
+            }
+
+            alert("Tạo tài khoản thành công!");
+            window.location.href = "/Account";
+        });
+    </script>
