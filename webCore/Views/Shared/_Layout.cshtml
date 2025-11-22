@@ -112,6 +112,7 @@
                     <div id="userDropdownMenu" class="user-dropdown hidden">
                         <!-- Mục thông tin cá nhân và đăng xuất (hiển thị nếu người dùng đã đăng nhập) -->
                         <a id="profileLink" href="@Url.Action("Index", "DetailUser")" class="hidden">Thông tin cá nhân</a>
+                        <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đăng kí shop</a>
                         <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đơn mua</a>
                         <form id="logoutForm" method="post" action="@Url.Action("Sign_out", "User")">
                             <button type="submit" id="logoutButton">Đăng xuất</button>
