@@ -224,8 +224,39 @@ namespace webCore.Controllers
             await _cartService.AddOrUpdateCartAsync(cart);
 
             // Trả về kết quả thành công
-            return Json(new { success = true, message = "Sản phẩm đã được xóa khỏi giỏ hàng." });
+            return Json(new { success = true });
         }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMultiple([FromBody] List<string> productIds)
+        {
+            // Lấy userId từ session
+            var userId = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập để xóa sản phẩm." });
+            }
+
+            if (productIds == null || productIds.Count == 0)
+            {
+                return Json(new { success = false, message = "Chọn sản phẩm cần xóa." });
+            }
+
+            bool deleted = await _cartService.RemoveMutipleItemsFromCartAsync(userId, productIds);
+
+            return Json(new { success = deleted });
+        }
+
+        private string GetCurrentUserId()
+        {
+            return User.FindFirst("UserId")?.Value;
+        }
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
         // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
         [HttpPost]
         public async Task<IActionResult> UpdateQuantity(string productId, int quantity)

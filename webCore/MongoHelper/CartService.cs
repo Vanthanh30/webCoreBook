@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,23 @@ namespace webCore.MongoHelper
                 await _cartCollection.UpdateOneAsync(filter, update);
             }
         }
+        //xóa nhiều sản phẩm khỏi giỏ hàng
+        public async Task<bool> RemoveMutipleItemsFromCartAsync(string userId, List<string> productIds)
+        {
+            if (string.IsNullOrEmpty(userId) || productIds == null || !productIds.Any())
+                return false;
 
+            var cart = await GetCartByUserIdAsync(userId);
+            if (cart == null) return false;
+
+            // Xóa các item trong Items trùng ProductId
+            cart.Items.RemoveAll(item => productIds.Contains(item.ProductId.Trim()));
+
+            // Cập nhật MongoDB
+            await AddOrUpdateCartAsync(cart);
+
+            return true;
+        }
+        
     }
 }
