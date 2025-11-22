@@ -63,21 +63,19 @@
                             $(document).ready(function () {
                                 // Hàm để cập nhật số lượng trên giỏ hàng
                                 function updateCartCount(itemCount) {
-
-                                        $('#cart-item-1').text(itemCount).show(); // Hiển thị số lượng
-
+                                    $('#cart-item-1').text(itemCount).show(); // Hiển thị số lượng
                                 }
-                            // Lấy số lượng giỏ hàng khi tải trang
-                            $.ajax({
-                                url: '@Url.Action("GetCartItemCount", "Cart")',
-                                type: 'GET',
-                                success: function (response) {
-                                    updateCartCount(response.itemCount); // Cập nhật số lượng giỏ hàng
-                                },
-                                error: function () {
-                                    console.error('Không thể lấy số lượng giỏ hàng.');
-                                }
-                            });
+                                // Lấy số lượng giỏ hàng khi tải trang
+                                $.ajax({
+                                    url: '@Url.Action("GetCartItemCount", "Cart")',
+                                    type: 'GET',
+                                    success: function (response) {
+                                        updateCartCount(response.itemCount); // Cập nhật số lượng giỏ hàng
+                                    },
+                                    error: function () {
+                                        console.error('Không thể lấy số lượng giỏ hàng.');
+                                    }
+                                });
 
                                 // Lắng nghe sự kiện cập nhật từ trang chi tiết sản phẩm
                                 $(document).on('cartUpdated', function (event, itemCount) {
@@ -112,7 +110,19 @@
                     <div id="userDropdownMenu" class="user-dropdown hidden">
                         <!-- Mục thông tin cá nhân và đăng xuất (hiển thị nếu người dùng đã đăng nhập) -->
                         <a id="profileLink" href="@Url.Action("Index", "DetailUser")" class="hidden">Thông tin cá nhân</a>
-                        <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đăng kí shop</a>
+                        
+                        <!-- Kênh người bán với submenu -->
+                        <div id="sellerChannelContainer" class="dropdown-item-container hidden">
+                            <a href="#" id="sellerChannelLink" class="dropdown-item-with-arrow">
+                                Kênh người bán
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                            <div id="sellerSubmenu" class="submenu hidden">
+                                <a href="@Url.Action("ManageShop", "Shop")">Quản lý shop</a>
+                                <a href="@Url.Action("Index", "Shop_register")">Đăng ký shop</a>
+                            </div>
+                        </div>
+                        
                         <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đơn mua</a>
                         <form id="logoutForm" onsubmit="return handleLogout(event)">
                             <button type="submit" id="logoutButton">Đăng xuất</button>
@@ -128,6 +138,9 @@
                             var userIcon = document.getElementById("userIcon");
                             var userDropdownMenu = document.getElementById("userDropdownMenu");
                             var profileLink = document.getElementById("profileLink");
+                            var sellerChannelContainer = document.getElementById("sellerChannelContainer");
+                            var sellerChannelLink = document.getElementById("sellerChannelLink");
+                            var sellerSubmenu = document.getElementById("sellerSubmenu");
                             var orderLink = document.getElementById("orderLink");
                             var logoutForm = document.getElementById("logoutForm");
                             var loginLink = document.getElementById("loginLink");
@@ -138,19 +151,39 @@
 
                             // Khi nhấn vào userIcon, toggle dropdown menu
                             userIcon.addEventListener('click', function (e) {
-                                e.preventDefault(); // Ngừng sự kiện mặc định (nếu có)
+                                e.preventDefault();
                                 userDropdownMenu.classList.toggle("hidden");
+                            });
+
+                            // Toggle submenu khi click vào "Kênh người bán"
+                            if (sellerChannelLink) {
+                                sellerChannelLink.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    sellerSubmenu.classList.toggle("hidden");
+                                });
+                            }
+
+                            // Đóng menu khi click bên ngoài
+                            document.addEventListener('click', function(e) {
+                                if (!userIcon.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                                    userDropdownMenu.classList.add("hidden");
+                                    if (sellerSubmenu) {
+                                        sellerSubmenu.classList.add("hidden");
+                                    }
+                                }
                             });
 
                             // Kiểm tra trạng thái đăng nhập và hiển thị các mục phù hợp
                             if (isLoggedIn) {
                                 profileLink.classList.remove("hidden");
+                                sellerChannelContainer.classList.remove("hidden");
                                 orderLink.classList.remove("hidden");
                                 logoutForm.classList.remove("hidden");
                                 loginLink.classList.add("hidden");
                                 registerLink.classList.add("hidden");
                             } else {
                                 profileLink.classList.add("hidden");
+                                sellerChannelContainer.classList.add("hidden");
                                 orderLink.classList.add("hidden");
                                 logoutForm.classList.add("hidden");
                                 loginLink.classList.remove("hidden");
@@ -191,6 +224,63 @@
                         /* Đảm bảo không có margin-right khi là "Đăng nhập" */
                         .login-text {
                             margin-right: 0;
+                        }
+
+                        /* Style cho dropdown item với arrow */
+                        .dropdown-item-with-arrow {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 10px 15px;
+                            text-decoration: none;
+                            color: #333;
+                            cursor: pointer;
+                            transition: background-color 0.2s ease;
+                        }
+
+                        .dropdown-item-with-arrow:hover {
+                            background-color: #f5f5f5;
+                        }
+
+                        .dropdown-item-with-arrow i {
+                            font-size: 12px;
+                            margin-left: 10px;
+                        }
+
+                        /* Style cho submenu */
+                        .dropdown-item-container {
+                            position: relative;
+                        }
+
+                        .submenu {
+                            position: absolute;
+                            left: 100%;
+                            top: 0;
+                            background-color: white;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            min-width: 160px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                            z-index: 1001;
+                            margin-left: 5px;
+                        }
+
+                        .submenu a {
+                            display: block;
+                            padding: 10px 15px;
+                            text-decoration: none;
+                            color: #333;
+                            white-space: nowrap;
+                            transition: background-color 0.2s ease;
+                        }
+
+                        .submenu a:hover {
+                            background-color: #f5f5f5;
+                        }
+
+                        /* Hidden class */
+                        .hidden {
+                            display: none !important;
                         }
                     </style>
                 </div>
@@ -264,7 +354,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-                    document.querySelector('form[role="search"]').addEventListener('submit', function (e) {
+        document.querySelector('form[role="search"]').addEventListener('submit', function (e) {
             e.preventDefault(); // Ngăn form thực hiện submit mặc định
 
             var searchQuery = document.querySelector('input[name="name"]').value; // Lấy giá trị tìm kiếm từ input
