@@ -1,0 +1,178 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Quản lý Sản phẩm";
+}
+
+<div class="product-management-content p-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div class="input-group" style="max-width: 400px;">
+            <input type="text" class="form-control" placeholder="Search product..." aria-label="Search product">
+        </div>
+
+        <div>
+            <button class="btn btn-outline-primary mr-2">
+                <i class="fa-solid fa-file-export mr-1"></i> Export
+            </button>
+            <a href="@Url.Action("AddProduct", "Seller")" class="btn btn-primary">
+                <i class="fa-solid fa-plus mr-1"></i> Add Product
+            </a>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary active">All Product</button>
+            <button type="button" class="btn btn-primary">Published</button>
+            <button type="button" class="btn btn-primary">Low Stock</button>
+            <button type="button" class="btn btn-primary">Draft</button>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-secondary mr-2">Select Date</button>
+            <button class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-filter"></i> Filters
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover product-list-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;"><input type="checkbox"></th>
+                    <th style="width: 25%;">Product</th>
+                    <th style="width: 15%;">Category</th>
+                    <th style="width: 10%;">Stock <i class="fa-solid fa-sort"></i></th>
+                    <th style="width: 10%;">Price <i class="fa-solid fa-sort"></i></th>
+                    <th style="width: 10%;">Status</th>
+                    <th style="width: 15%;">Added <i class="fa-solid fa-sort"></i></th>
+                    <th style="width: 10%;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox" checked></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> Sách... <br>
+                        </div>
+                    </td>
+                    <td>Bag & Pouch</td>
+                    <td><span>10</span></td>
+                    <td>$121.00</td>
+                    <td><span class="badge badge-danger">Low Stock</span></td>
+                    <td>29 Dec 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" checked></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> Novel... <br>
+                        </div>
+                    </td>
+                    <td>Watch</td>
+                    <td>204</td>
+                    <td>$590.00</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td>24 Dec 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> A little life <br>
+                        </div>
+                    </td>
+                    <td>Watch</td>
+                    <td>48</td>
+                    <td>$125.00</td>
+                    <td><span class="badge badge-secondary">Draft</span></td>
+                    <td>12 Dec 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> Take note <br>
+                        </div>
+                    </td>
+                    <td>Audio</td>
+                    <td>401</td>
+                    <td>$348.00</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td>21 Oct 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> Sách ấm thanh <br>
+                        </div>
+                    </td>
+                    <td>Smartphone</td>
+                    <td>120</td>
+                    <td>$607.00</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td>21 Oct 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-book mr-2"></i> Puma <br>
+                        </div>
+                    </td>
+                    <td>Shoes</td>
+                    <td>432</td>
+                    <td>$234.00</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td>21 Oct 2022</td>
+                    <td>
+                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                <li class="page-item"><a class="page-link" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
