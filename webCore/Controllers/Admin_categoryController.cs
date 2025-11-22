@@ -23,7 +23,7 @@ namespace webCore.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string filter = "parent", int page = 1)
         {
             var adminName = HttpContext.Session.GetString("AdminName");
             ViewBag.AdminName = adminName;
@@ -45,18 +45,37 @@ namespace webCore.Controllers
                 // Sort categories based on position
                 var sortedCategories = categories.OrderBy(c => c.Position).ToList();
 
+                // Filter categories based on filter parameter
+                List<Category_admin> filteredCategories;
+                if (filter == "parent")
+                {
+                    // Chỉ lấy danh mục cha (không có ParentId hoặc ParentId rỗng)
+                    filteredCategories = sortedCategories.Where(c => string.IsNullOrEmpty(c.ParentId)).ToList();
+                }
+                else if (filter == "child")
+                {
+                    // Chỉ lấy danh mục con (có ParentId)
+                    filteredCategories = sortedCategories.Where(c => !string.IsNullOrEmpty(c.ParentId)).ToList();
+                }
+                else
+                {
+                    // Lấy tất cả
+                    filteredCategories = sortedCategories;
+                }
+
                 // Pagination logic
                 int itemsPerPage = 5;
                 int skip = (page - 1) * itemsPerPage;
-                var pagedCategories = sortedCategories.Skip(skip).Take(itemsPerPage).ToList();
+                var pagedCategories = filteredCategories.Skip(skip).Take(itemsPerPage).ToList();
 
                 // Total number of categories to calculate total pages
-                int totalCategories = sortedCategories.Count();
+                int totalCategories = filteredCategories.Count();
                 int totalPages = (int)Math.Ceiling(totalCategories / (double)itemsPerPage);
 
-                // Pass pagination information to the view
+                // Pass pagination and filter information to the view
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
+                ViewBag.FilterType = filter;
 
                 return View(pagedCategories);
             }
@@ -79,7 +98,7 @@ namespace webCore.Controllers
             ViewBag.Categories = hierarchicalCategories;
             return View();
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category_admin category, string parentId)
@@ -114,7 +133,7 @@ namespace webCore.Controllers
                         category.ParentTitle = parentCategory?.Title;
 
                         // Cập nhật lại danh mục đã lưu với ParentTitle
-                        await _CategoryProductCollection.UpdateCategoryAsync(category); 
+                        await _CategoryProductCollection.UpdateCategoryAsync(category);
                     }
                 }
                 catch (Exception ex)
@@ -183,6 +202,7 @@ namespace webCore.Controllers
             ViewBag.Categories = await _CategoryProductCollection.GetCategory();
             return View(category);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
@@ -257,6 +277,7 @@ namespace webCore.Controllers
             return result;
         }
 
+        //phân cấp bậc
         //phân cấp bậc
         private List<Category_admin> GetHierarchicalCategories(List<Category_admin> categories, string parentId = null, int level = 0)
         {

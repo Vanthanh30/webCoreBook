@@ -1,19 +1,22 @@
-﻿@model List<webCore.Models.Account_admin>
-
-@{
+﻿@{
     ViewData["Title"] = "Danh sách tài khoản";
     Layout = "Admin";
+
+    int page = ViewBag.Page;
+    int pageSize = ViewBag.PageSize;
 }
 <link rel="stylesheet" href="/css/Account_admin.css" />
 
-<div class="container">
-    <h1>Danh sách tài khoản</h1>
-    <div class="button-container">
-        <a href="@Url.Action("Create", "Account")" class="add-btn">
-            <i class="fas fa-user-plus icon"></i> Thêm
+<div class="container mt-4">
+    <h1 class="mb-3">Danh sách tài khoản</h1>
+
+    <div class="button-container mb-3">
+        <a href="/Account/Create" class="add-btn">
+            <i class="fas fa-user-plus"></i> Thêm
         </a>
     </div>
 
+    <!-- TABLE -->
     <table class="account-table">
         <thead>
             <tr>
@@ -22,93 +25,200 @@
                 <th>Email</th>
                 <th>Quyền</th>
                 <th>Trạng thái</th>
-                <th class="actions-header">Hành động</th>
+                <th>Hành động</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var account in Model)
-            {
-                <tr>
-                    <td>@account.FullName</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(account.Avatar))
-                        {
-                            <img src="@account.Avatar" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%;" />
-                        }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
-                    </td>
-                    <td>@account.Email</td>
-                    <td>@account.RoleId</td>
-                    <td class="status-@account.Status.ToLower()">
-                        @if (account.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
-                        {
-                            <span class="status-active">Hoạt động</span>
-                        }
-                        else
-                        {
-                            <span class="status-inactive">Dừng hoạt động</span>
-                        }
-                    </td>
-                    <td class="actions-cell">
-                        <a href="@Url.Action("Edit", "Account", new { id = account.Id })" class="icon-btn edit-btn" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form action="@Url.Action("DeleteConfirmed", "Account", new { id = account.Id })" method="post" style="display:inline-block;" onsubmit="return confirmDelete();">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="icon-btn delete-btn" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            }
+
+        <tbody id="accountBody">
+            <tr><td colspan="6">Đang tải dữ liệu...</td></tr>
         </tbody>
     </table>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            @if (ViewBag.CurrentPage > 1)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })">Trước</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item disabled">
-                    <a class="page-link" tabindex="-1">Trước</a>
-                </li>
-            }
+    <!-- TEMPLATE ROW -->
+    <template id="accountRowTemplate">
+        <tr>
+            <td class="col-name"></td>
 
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
-                </li>
-            }
+            <td class="col-avatar">
+                <img class="avatar-img"
+                     style="width:50px;height:50px;border-radius:50%;object-fit:cover;display:none;">
+                <i class="fas fa-user-circle default-avatar"
+                   style="font-size:40px;color:#888;display:none;"></i>
+            </td>
 
-            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-            {
-                <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">Tiếp theo</a>
+            <td class="col-email"></td>
+            <td class="col-role"></td>
+
+            <td class="col-status">
+                <span class="status-active d-none">Hoạt động</span>
+                <span class="status-inactive d-none">Dừng hoạt động</span>
+            </td>
+
+            <td class="col-actions">
+                <a class="edit-btn icon-btn">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a class="delete-btn icon-btn" data-id="">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+
+            </td>
+        </tr>
+    </template>
+
+    <!-- PAGINATION HTML -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center" id="paginationContainer">
+
+            <li class="page-item" id="prevPage">
+                <a class="page-link" href="#" id="prevLink">Trước</a>
+            </li>
+
+            <!-- TEMPLATE FOR PAGE NUMBERS -->
+            <template id="pageNumberTemplate">
+                <li class="page-item page-number">
+                    <a class="page-link"></a>
                 </li>
-            }
-            else
-            {
-                <li class="page-item disabled">
-                    <a class="page-link" tabindex="-1">Tiếp theo</a>
-                </li>
-            }
+            </template>
+
+            <li class="page-item" id="nextPage">
+                <a class="page-link" href="#" id="nextLink">Tiếp theo</a>
+            </li>
+
         </ul>
     </nav>
 </div>
 
 <script>
-    function confirmDelete() {
-        return confirm("Bạn có chắc chắn muốn xóa tài khoản này?");
+    const page = @ViewBag.Page;
+    const pageSize = @ViewBag.PageSize;
+
+    async function loadAccounts() {
+        const response = await fetch(`/api/account/index?page=${page}&pageSize=${pageSize}`);
+        const result = await response.json();
+
+        const body = document.getElementById("accountBody");
+
+        if (!result.success) {
+            body.innerHTML = "<tr><td colspan='6'>Không thể tải dữ liệu</td></tr>";
+            return;
+        }
+
+        body.innerHTML = "";
+        const template = document.getElementById("accountRowTemplate");
+
+        result.data.forEach(item => {
+            const row = template.content.cloneNode(true);
+
+            row.querySelector(".col-name").textContent = item.name ?? "N/A";
+
+            const img = row.querySelector(".avatar-img");
+            const icon = row.querySelector(".default-avatar");
+
+            if (item.profileImage && item.profileImage !== "default-image-url") {
+                img.src = item.profileImage;
+                img.style.display = "block";
+                icon.style.display = "none";
+            } else {
+                img.style.display = "none";
+                icon.style.display = "block";
+            }
+
+            row.querySelector(".col-email").textContent = item.email;
+            row.querySelector(".col-role").textContent = item.roleName?.join(", ") ?? "";
+            const active = row.querySelector(".status-active");
+            const inactive = row.querySelector(".status-inactive");
+
+            if (item.status == 1) {
+                active.classList.remove("d-none");
+                inactive.classList.add("d-none");
+            } else {
+                inactive.classList.remove("d-none");
+                active.classList.add("d-none");
+            }
+
+            row.querySelector(".edit-btn").href = `/Account/Edit?id=${item.id}`;
+            row.querySelector(".delete-btn").setAttribute("data-id", item.id);
+
+            body.appendChild(row);
+        });
+
+        renderPagination(result.total);
     }
+
+    // RENDER PAGINATION
+    function renderPagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        const prevPage = document.getElementById("prevPage");
+        const nextPage = document.getElementById("nextPage");
+        const prevLink = document.getElementById("prevLink");
+        const nextLink = document.getElementById("nextLink");
+
+        // PREVIOUS
+        if (page <= 1) {
+            prevPage.classList.add("disabled");
+            prevLink.href = "#";
+        } else {
+            prevPage.classList.remove("disabled");
+            prevLink.href = `/Account?page=${page - 1}`;
+        }
+
+        // NEXT
+        if (page >= totalPages) {
+            nextPage.classList.add("disabled");
+            nextLink.href = "#";
+        } else {
+            nextPage.classList.remove("disabled");
+            nextLink.href = `/Account?page=${page + 1}`;
+        }
+
+        // Remove old page numbers
+        document.querySelectorAll(".page-number").forEach(el => el.remove());
+
+        const template = document.getElementById("pageNumberTemplate");
+
+        // Add page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const node = template.content.cloneNode(true);
+            const li = node.querySelector("li");
+            const a = node.querySelector("a");
+
+            a.textContent = i;
+            a.href = `/Account?page=${i}`;
+
+            if (i === page) li.classList.add("active");
+
+            nextPage.before(li);
+        }
+    }
+    // DELETE ACCOUNT
+    document.addEventListener("click", async function (e) {
+        if (!e.target.closest(".delete-btn")) return;
+
+        const btn = e.target.closest(".delete-btn");
+        const id = btn.getAttribute("data-id");
+
+        if (!id) return;
+
+        const confirmDelete = confirm("Bạn có chắc chắn muốn xóa tài khoản này?");
+        if (!confirmDelete) return;
+
+        const res = await fetch(`/api/account/deleteconfirmed/${id}`, {
+            method: "DELETE"
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            alert("Xóa thất bại!");
+            return;
+        }
+
+        alert("Xóa tài khoản thành công!");
+
+        loadAccounts();
+    });
+
+    document.addEventListener("DOMContentLoaded", loadAccounts);
 </script>

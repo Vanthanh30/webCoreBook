@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @{
-    var userRoleId = HttpContextAccessor?.HttpContext?.Session?.GetString("RoleId") ?? string.Empty;
+    var roleName = Context.Session.GetString("RoleName");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -73,12 +73,13 @@
                     <a href="/Dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-home"></i> Trang Chủ
                     </a>
-                    @if (!string.IsNullOrEmpty(userRoleId) && userRoleId.Trim().Equals("Quản trị viên", StringComparison.OrdinalIgnoreCase))
+                    @if (!string.IsNullOrEmpty(roleName) && roleName.Contains("Admin"))
                     {
                         <a href="/Account" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Tài khoản admin
                         </a>
                     }
+
                     <a href="/Admin_user" class="list-group-item list-group-item-action">
                         <i class="fas fa-list"></i> Người dùng
                     </a>
@@ -118,7 +119,7 @@
             
             try {
                 // Gọi API để lấy thông tin admin
-                const response = await fetch(`/Admin_singin/GetAdminInfo?adminId=${adminId}`);
+                const response = await fetch(`/api/adminSignin/info?adminId=${adminId}`);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -159,7 +160,7 @@
             
             try {
                 // Gọi API logout để xóa session
-                await fetch('/Admin_singin/Logout', {
+                await fetch('/api/adminSignin/logout', {
                     method: 'POST'
                 });
             } catch (error) {

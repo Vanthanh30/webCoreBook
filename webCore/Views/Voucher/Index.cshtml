@@ -4,7 +4,6 @@
     Layout = "Admin";
 }
 <link rel="stylesheet" href="/css/Voucher.css" />
-
 <div class="container">
     <h1 class="title" style="font-size: 28px; color: #333; text-align: center;">Danh sách Voucher</h1>
     <div class="button-container">
@@ -12,7 +11,6 @@
             <i class="fas fa-plus icon"></i> Thêm Voucher
         </a>
     </div>
-
     <table class="voucher-table">
         <thead>
             <tr>
@@ -29,19 +27,41 @@
         <tbody>
             @foreach (var voucher in Model)
             {
+                var currentDate = DateTime.Now.Date;
+                var isActive = voucher.StartDate.Date <= currentDate && voucher.EndDate.Date >= currentDate && voucher.IsActive;
+                var statusText = "";
+                var statusClass = "";
+
+                if (voucher.EndDate.Date < currentDate)
+                {
+                    statusText = "Hết hạn";
+                    statusClass = "status-inactive";
+                }
+                else if (voucher.StartDate.Date > currentDate)
+                {
+                    statusText = voucher.IsActive ? "Chưa bắt đầu" : "Dừng hoạt động";
+                    statusClass = voucher.IsActive ? "status-pending" : "status-inactive";
+                }
+                else
+                {
+                    statusText = isActive ? "Hoạt động" : "Dừng hoạt động";
+                    statusClass = isActive ? "status-active" : "status-inactive";
+                }
+
                 <tr>
                     <td>@voucher.Code</td>
-                    <td>@voucher.DiscountValue % </td>
+                    <td>@voucher.DiscountValue %</td>
                     <td>@voucher.StartDate.ToString("dd/MM/yyyy")</td>
                     <td>@voucher.EndDate.ToString("dd/MM/yyyy")</td>
                     <td>@voucher.UsageLimit</td>
                     <td>@voucher.UsageCount</td>
-                    <td class="@(voucher.IsActive ? "status-active" : "status-inactive")">@((voucher.IsActive && voucher.EndDate >= DateTime.Now) ? "Hoạt động" : "Hết hạn")</td>
+                    <td class="@statusClass">@statusText</td>
                     <td class="actions-cell">
                         <a href="@Url.Action("Edit", "Voucher", new { id = voucher.Id })" class="icon-btn edit-btn" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
                         <form asp-action="DeleteConfirmed" method="post" style="display:inline;" asp-route-id="@voucher.Id" onsubmit="return confirm('Bạn có chắc chắn muốn xóa voucher này?');">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="icon-btn delete-btn" title="Delete">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -52,8 +72,6 @@
         </tbody>
     </table>
 
-    <!-- Pagination -->
-    <!-- Your existing table code -->
     <!-- Pagination -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
@@ -91,5 +109,4 @@
             }
         </ul>
     </nav>
-
 </div>

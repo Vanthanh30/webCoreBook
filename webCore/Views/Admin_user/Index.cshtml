@@ -1,12 +1,9 @@
 ﻿@model List<webCore.Models.User>
-
 @{
     ViewData["Title"] = "Index";
     Layout = "Admin";
 }
-
 <link rel="stylesheet" href="/css/Account_admin.css" />
-
 <div class="container">
     <h1>Danh sách người dùng</h1>
     <table class="account-table">
@@ -39,14 +36,15 @@
                     <td>@user.Email</td>
                     <td>@user.Phone</td>
                     <td>@user.Address</td>
-                    <td><strong>
-                        @if (user.Status == 1)
-                        {
-                            <span style="color: green;">Hoạt động</span>
-                        }
-                        else if (user.Status == 0)
-                        {
-                            <span style="color: red;">Bị khóa</span>
+                    <td>
+                        <strong>
+                            @if (user.Status == 1)
+                            {
+                                <span style="color: green;">Hoạt động</span>
+                            }
+                            else if (user.Status == 0)
+                            {
+                                <span style="color: red;">Bị khóa</span>
                             }
                         </strong>
                     </td>
@@ -60,17 +58,36 @@
                                     onclick="toggleStatus('@user.Id')">
                                 <i class="fa-solid @(user.Status == 1 ? "fa-unlock" : "fa-lock")"></i>
                             </button>
-                            <div class="button-group">
+                        </div>
                     </td>
-
                 </tr>
             }
         </tbody>
     </table>
 
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" style="display: flex; justify-content: center; margin-top: 20px;">
+            <ul class="pagination">
+                <li class="page-item @((ViewBag.CurrentPage == 1) ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Admin_user", new { page = ViewBag.CurrentPage - 1 })" tabindex="-1">Trước</a>
+                </li>
+                @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", "Admin_user", new { page = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @((ViewBag.CurrentPage == ViewBag.TotalPages) ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Admin_user", new { page = ViewBag.CurrentPage + 1 })">Tiếp theo</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
 <script>
-                 function toggleStatus(id) {
+    function toggleStatus(id) {
         fetch(`/Admin_user/ToggleStatus/${id}`, {
             method: 'POST'
         })
@@ -87,6 +104,4 @@
             alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
         });
     }
-
-
 </script>

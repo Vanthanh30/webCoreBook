@@ -13,40 +13,60 @@ namespace webCore.Controllers
     public class Admin_userController : Controller
     {
         private readonly User_adminService _useradminService;
-
+        private const int PageSize = 5; // Số lượng người dùng trên mỗi trang
 
         public Admin_userController(User_adminService useadminService)
         {
             _useradminService = useadminService;
         }
 
-        // Hiển thị danh sách tất cả đơn hàng
-        public async Task<IActionResult> Index()
+        // Hiển thị danh sách tất cả người dùng với phân trang
+        public async Task<IActionResult> Index(int page = 1)
         {
             try
             {
                 var adminName = HttpContext.Session.GetString("AdminName");
                 ViewBag.AdminName = adminName;
+
                 // Lấy tất cả người dùng từ service
-                var user = await _useradminService.GetAllUsersAsync();
+                var allUsers = await _useradminService.GetAllUsersAsync();
+
+                // Tính toán phân trang
+                var totalUsers = allUsers.Count;
+                var totalPages = (int)Math.Ceiling(totalUsers / (double)PageSize);
+
+                // Đảm bảo page hợp lệ
+                if (page < 1) page = 1;
+                if (page > totalPages && totalPages > 0) page = totalPages;
+
+                // Lấy dữ liệu cho trang hiện tại
+                var usersOnPage = allUsers
+                    .Skip((page - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
+
+                // Truyền thông tin phân trang vào ViewBag
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
 
                 // Kiểm tra nếu không có người dùng nào
-                if (user == null || user.Count == 0)
+                if (totalUsers == 0)
                 {
                     TempData["ErrorMessage"] = "Không có người dùng nào để hiển thị.";
-                    return View(new List<User>()); // Trả về danh sách trống nếu không có người dùng
+                    return View(new List<User>());
                 }
 
-                // Nếu có người dùng, trả về view với danh sách người dùng
-                return View(user);
+                // Trả về view với danh sách người dùng của trang hiện tại
+                return View(usersOnPage);
             }
             catch (Exception ex)
             {
                 // Xử lý khi có lỗi xảy ra
                 TempData["ErrorMessage"] = "Lỗi khi tải . " + ex.Message;
-                return RedirectToAction("Error"); // Chuyển hướng đến trang lỗi
+                return RedirectToAction("Error");
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Detail(string id)
         {
@@ -74,6 +94,7 @@ namespace webCore.Controllers
                 return RedirectToAction("Error");
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(string id)
         {
@@ -118,7 +139,5 @@ namespace webCore.Controllers
                 return RedirectToAction("Index"); // Redirect đến trang Index nếu có lỗi
             }
         }
-
-
     }
 }

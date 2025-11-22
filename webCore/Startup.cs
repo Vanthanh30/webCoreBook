@@ -68,6 +68,7 @@ namespace webCore
             services.AddScoped<Order_adminService>();
             services.AddScoped<User_adminService>();
             services.AddScoped<ForgotPasswordService>();
+            services.AddScoped<RoleService>();
 
             // Add session management
             services.AddDistributedMemoryCache();

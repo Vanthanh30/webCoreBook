@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using webCore.Helpers;
 using webCore.Models;
 using webCore.MongoHelper;
 using webCore.Services;
@@ -103,15 +104,7 @@ public class DetailUserController : Controller
             // Cập nhật mật khẩu nếu có thay đổi
             if (!string.IsNullOrEmpty(model.Password))
             {
-                if (long.TryParse(model.Password, out long numericPassword))
-                {
-                    currentUser.Password = numericPassword.ToString(); // Lưu mật khẩu dưới dạng chuỗi số
-                }
-                else
-                {
-                    var passwordHasher = new PasswordHasher<User>();
-                    currentUser.Password = passwordHasher.HashPassword(currentUser, model.Password); // Mã hóa mật khẩu
-                }
+                currentUser.Password = PasswordHasher.HashPassword(model.Password);
             }
 
             // Xử lý ảnh đại diện

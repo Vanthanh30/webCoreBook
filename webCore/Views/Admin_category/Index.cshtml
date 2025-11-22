@@ -1,22 +1,69 @@
 ﻿@model List<webCore.Models.Category_admin>
-
 @{
     ViewData["Title"] = "Index";
     Layout = "Admin";
+    var filterType = ViewBag.FilterType ?? "parent"; // Mặc định là parent
 }
 <link rel="stylesheet" href="/css/Account_admin.css" />
+<style>
+    .filter-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
 
+    .filter-btn {
+        padding: 10px 20px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        color: #333;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .filter-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .filter-btn i {
+            font-size: 14px;
+        }
+</style>
 <div class="container">
     <h1>Danh sách danh mục</h1>
+
+    <!-- Filter Buttons -->
+    <div class="filter-buttons">
+        <a href="@Url.Action("Index", "Admin_category", new { filter = "parent", page = 1 })"
+           class="filter-btn @(filterType == "parent" ? "active" : "")">
+            <i class="fas fa-folder"></i> Danh mục cha
+        </a>
+        <a href="@Url.Action("Index", "Admin_category", new { filter = "child", page = 1 })"
+           class="filter-btn @(filterType == "child" ? "active" : "")">
+            <i class="fas fa-folder-open"></i> Danh mục con
+        </a>
+    </div>
+
     <div class="button-container">
         <a href="@Url.Action("Create", "Admin_category")" class="add-btn">
             <i class="fas fa-user-plus icon"></i> Thêm
         </a>
     </div>
-
     <table class="account-table">
         <thead>
             <tr>
+                <th>STT</th>
                 <th>Tên danh mục</th>
                 <th>Danh mục cha</th>
                 <th>Trạng thái</th>
@@ -26,9 +73,13 @@
             </tr>
         </thead>
         <tbody>
+            @{
+                int stt = (ViewBag.CurrentPage - 1) * 5 + 1;
+            }
             @foreach (var category in Model)
             {
                 <tr>
+                    <td>@stt</td>
                     <td>@category.Title</td>
                     <td>@category.ParentTitle</td>
                     <td class="status-@category.Status.ToLower()">
@@ -55,17 +106,17 @@
                         </form>
                     </td>
                 </tr>
+                stt++;
             }
         </tbody>
     </table>
-
     <!-- Pagination -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             @if (ViewBag.CurrentPage > 1)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { page = ViewBag.CurrentPage - 1 })" tabindex="-1">Trước</a>
+                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { filter = filterType, page = ViewBag.CurrentPage - 1 })" tabindex="-1">Trước</a>
                 </li>
             }
             else
@@ -74,18 +125,16 @@
                     <a class="page-link" href="#" tabindex="-1">Trước</a>
                 </li>
             }
-
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { page = i })">@i</a>
+                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { filter = filterType, page = i })">@i</a>
                 </li>
             }
-
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { page = ViewBag.CurrentPage + 1 })">Tiếp theo</a>
+                    <a class="page-link" href="@Url.Action("Index", "Admin_category", new { filter = filterType, page = ViewBag.CurrentPage + 1 })">Tiếp theo</a>
                 </li>
             }
             else
@@ -96,5 +145,4 @@
             }
         </ul>
     </nav>
-
 </div>
