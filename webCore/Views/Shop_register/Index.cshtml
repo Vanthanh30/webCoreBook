@@ -1,0 +1,190 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Đăng ký Shop";
+}
+
+<link rel="stylesheet" href="~/css/shop-register.css" asp-append-version="true">
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Welcome Page -->
+    <div id="welcomePage" class="welcome-page">
+        <div class="welcome-icon"></div>
+        <h1 class="welcome-title">Chào mừng đến với TYB BOOK!</h1>
+        <p class="welcome-text">
+            Vui lòng cung cấp thông tin để thành lập tài khoản người bán<br>
+            Hãy điền đầy đủ thông tin để bắt đầu kinh doanh trên nền tảng của chúng tôi
+        </p>
+        <button class="btn-start" onclick="showRegistrationForm()">Bắt đầu đăng ký</button>
+    </div>
+
+    <!-- Registration Form -->
+    <div id="registrationForm" class="registration-form">
+        <div class="form-header">
+            <h2>Đăng ký thông tin Shop</h2>
+            <p>Vui lòng điền đầy đủ thông tin bên dưới</p>
+        </div>
+
+        <!-- Form -->
+        <form id="shopForm" method="post" asp-action="SubmitShopInfo" asp-controller="Shop_register" enctype="multipart/form-data">
+
+            <!-- Avatar Section -->
+            <div class="avatar-section">
+                <div class="avatar-upload-wrapper">
+                    <label for="avatarInput" class="avatar-preview">
+                        <img id="avatarPreview" src="" alt="" style="display: none;">
+                        <div id="avatarPlaceholder" class="avatar-placeholder">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div class="avatar-overlay">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                    </label>
+                    <input type="file" id="avatarInput" name="Avatar" accept="image/*">
+                </div>
+                <label class="avatar-label">Logo/Avatar Shop của bạn</label>
+            </div>
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-info-circle"></i>
+                    Thông tin cơ bản
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>
+                        Tên Shop
+                    </label>
+                    <input type="text" class="form-control" id="shopName" name="ShopName" placeholder="Nhập tên shop của bạn" maxlength="50" required>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/50
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>
+                        Mô tả Shop
+                    </label>
+                    <textarea class="form-control" id="description" name="Description" placeholder="Mô tả ngắn gọn về shop của bạn..." maxlength="500" required></textarea>
+                    <div class="char-count">
+                        <span id="descCharCount">0</span>/500
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>
+                        Loại hình kinh doanh
+                    </label>
+                    <select class="form-control" id="businessType" name="BusinessType" required>
+                        <option value="">Chọn loại hình</option>
+                        <option value="individual">Cá nhân</option>
+                        <option value="company">Công ty</option>
+                        <option value="household">Hộ kinh doanh</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Contact Information Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-address-book"></i>
+                    Thông tin liên hệ
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="required">*</span>
+                            Email
+                        </label>
+                        <input type="email" class="form-control" id="email" name="Email" placeholder="example@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="required">*</span>
+                            Số điện thoại
+                        </label>
+                        <input type="tel" class="form-control" id="phone" name="Phone" placeholder="0123456789" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Website/Fanpage (Nếu có)
+                    </label>
+                    <input type="url" class="form-control" id="website" name="Website" placeholder="https://yourshop.com">
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                    Địa chỉ lấy hàng
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>
+                        Địa chỉ chi tiết
+                    </label>
+                    <input type="text" class="form-control" id="address" name="Address" placeholder="Số nhà, tên đường..." required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="required">*</span>
+                            Tỉnh/Thành phố
+                        </label>
+                        <select class="form-control" id="province" name="Province" required>
+                            <option value="">Chọn Tỉnh/TP</option>
+                            <option value="hanoi">Hà Nội</option>
+                            <option value="hcm">TP. Hồ Chí Minh</option>
+                            <option value="danang">Đà Nẵng</option>
+                            <option value="haiphong">Hải Phòng</option>
+                            <option value="cantho">Cần Thơ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="required">*</span>
+                            Quận/Huyện
+                        </label>
+                        <select class="form-control" id="district" name="District" required>
+                            <option value="">Chọn Quận/Huyện</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>
+                        Phường/Xã
+                    </label>
+                    <select class="form-control" id="ward" name="Ward" required>
+                        <option value="">Chọn Phường/Xã</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="saveForm()">
+                    <i class="fa-solid fa-save"></i> Lưu nháp
+                </button>
+                <button type="submit" class="btn-primary">
+                    Đăng ký Shop <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/js/shop-register.js" asp-append-version="true"></script>
