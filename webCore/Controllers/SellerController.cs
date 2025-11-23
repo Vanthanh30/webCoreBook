@@ -20,5 +20,21 @@ namespace webCore.Controllers
         {
             return View();
         }
+        public IActionResult EditProduct()
+        {
+            return View();
+        }
+        public IActionResult OrderManagement()
+        {
+            return View();
+        }
+        public IActionResult OrderDetail()
+        {
+            return View();
+        }
+        public IActionResult CancelDetail()
+        {
+            return View();
+        }
     }
 }

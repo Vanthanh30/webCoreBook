@@ -1,0 +1,156 @@
+﻿@{
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+    ViewData["Title"] = "Chi tiết đơn hàng đã hủy / Trả hàng & hoàn tiền";
+}
+
+<link rel="stylesheet" href="~/css/SellerOrderReturn.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<div class="container-fluid py-4">
+
+    <div class="order-cancel-card">
+
+        <!-- Header trạng thái hủy/trả hàng -->
+        <div class="order-header-cancel">
+            <h4>
+                <i class="fas fa-times-circle fa-lg me-2"></i>
+                Đơn hàng đã bị hủy / Yêu cầu trả hàng & hoàn tiền
+            </h4>
+            <p class="mb-0">Mã đơn hàng: <strong>FERDKG8JDVEJ</strong></p>
+        </div>
+
+        <!-- Thông tin ngắn gọn -->
+        <div class="info-bar">
+            <div class="container">
+                <div class="row small text-muted">
+                    <div class="col-md-4"><strong>Khách hàng:</strong> Nguyễn Thị Thảo</div>
+                    <div class="col-md-4"><strong>SĐT:</strong> 0901 234 567</div>
+                    <div class="col-md-4">
+                        <strong>Lý do:</strong>
+                        <span class="text-danger fw-bold">Nhận sai sách (tiếng Việt thay vì tiếng Anh)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="bg-white">
+            <div class="px-4 pt-4">
+                <h6 class="mb-0 text-secondary">
+                    <i class="fas fa-shopping-bag me-2"></i> Sản phẩm trong đơn hàng
+                </h6>
+            </div>
+
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr class="border-bottom">
+                            <td class="py-3 ps-4" width="100">
+                                <img src="/image/book_cover_placeholder.png" class="rounded shadow-sm"
+                                     style="width:80px;height:80px;object-fit:cover;">
+                            </td>
+                            <td class="py-3 align-middle">
+                                <div class="fw-bold text-dark">Take note - Ghi chép thông minh</div>
+                                <small class="text-muted">Phân loại: Bìa cứng, Màu xanh</small>
+                            </td>
+                            <td class="py-3 qty-col align-middle">
+                                <div class="text-muted small">Số lượng</div>
+                                <strong class="text-dark">×1</strong>
+                            </td>
+                            <td class="py-3 price-col align-middle pe-4">
+                                <div class="text-muted small">Thành tiền</div>
+                                <strong class="text-danger h6">200.000đ</strong>
+                            </td>
+                        </tr>
+
+                        <tr class="border-bottom">
+                            <td class="py-3 ps-4">
+                                <img src="/image/book_cover_placeholder.png" class="rounded shadow-sm"
+                                     style="width:80px;height:80px;object-fit:cover;">
+                            </td>
+                            <td class="py-3 align-middle">
+                                <div class="fw-bold text-dark">Atomic Habits (English Edition)</div>
+                                <small class="text-muted">Tác giả: James Clear</small>
+                            </td>
+                            <td class="py-3 qty-col align-middle">
+                                <div class="text-muted small">Số lượng</div>
+                                <strong class="text-dark">×1</strong>
+                            </td>
+                            <td class="py-3 price-col align-middle pe-4">
+                                <div class="text-muted small">Thành tiền</div>
+                                <strong class="text-danger h6">320.000đ</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-light border-top p-4">
+                <div class="d-flex justify-content-end">
+                    <div class="me-5">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tổng tiền hàng:</span>
+                            <span class="text-dark fw-bold">520.000đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Phí vận chuyển:</span>
+                            <span class="text-success fw-bold">Miễn phí</span>
+                        </div>
+
+                        <!-- Dòng Tổng thanh toán: căn lề đều, chữ đậm, màu đỏ, cách đều như hình -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <span class="h5 mb-0 fw-bold text-dark">Tổng thanh toán:</span>
+                            <span class="h4 mb-0 fw-bold text-danger">520.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lý do chi tiết -->
+        <div class="reason-box">
+            <strong>Lý do trả hàng từ khách hàng:</strong><br><br>
+            Tôi đã đặt sách <strong>Atomic Habits bản tiếng Anh</strong> nhưng nhận được sách tiếng Việt.<br>
+            Shop có chính sách đổi trả trong 7 ngày nên tôi yêu cầu hoàn tiền đầy đủ.<br>
+            Cảm ơn shop xem xét!
+        </div>
+
+        <!-- Bằng chứng -->
+        <div class="container">
+            <h6 class="mx-3 mt-4 mb-3 text-secondary">
+                <i class="fas fa-paperclip me-2"></i> Bằng chứng khách hàng cung cấp
+            </h6>
+            <div class="evidence-grid">
+                <div class="evidence-item">
+                    <i class="fas fa-image fa-3x text-muted mb-2"></i><br>
+                    Hình ảnh sách nhận được (4)
+                </div>
+                <div class="evidence-item">
+                    <i class="fas fa-video fa-3x text-muted mb-2"></i><br>
+                    Video unbox (1)
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="text-center py-4 bg-light border-top">
+            <button class="btn btn-danger btn-lg btn-refund">
+                <i class="fas fa-undo me-2"></i>
+                Chấp nhận trả hàng & hoàn tiền ngay
+            </button>
+            <div class="mt-3">
+                <small class="text-muted">
+                    Hoàn tiền sẽ được chuyển về ví khách trong vòng <strong>24 giờ</strong> sau khi xác nhận
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quay lại -->
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Index", "Order")" class="btn btn-outline-secondary px-5">
+            <i class="fas fa-arrow-left me-2"></i> Quay lại danh sách đơn hàng
+        </a>
+    </div>
+</div>

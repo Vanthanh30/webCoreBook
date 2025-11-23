@@ -1,178 +1,169 @@
-﻿
-@{
+﻿@{
+    ViewData["Title"] = "Sản phẩm của tôi";
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
-    ViewData["Title"] = "Quản lý Sản phẩm";
 }
+<link rel="stylesheet" href="/css/Account_admin.css" />
 
-<div class="product-management-content p-3">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div class="input-group" style="max-width: 400px;">
-            <input type="text" class="form-control" placeholder="Search product..." aria-label="Search product">
-        </div>
-
-        <div>
-            <button class="btn btn-outline-primary mr-2">
-                <i class="fa-solid fa-file-export mr-1"></i> Export
-            </button>
-            <a href="@Url.Action("AddProduct", "Seller")" class="btn btn-primary">
-                <i class="fa-solid fa-plus mr-1"></i> Add Product
-            </a>
-        </div>
+<div class="container">
+    <h1>Danh sách sản phẩm của tôi</h1>
+    <div class="button-container">
+        <a href="@Url.Action("AddProduct", "Seller")" class="add-btn">
+            <i class="fas fa-plus icon"></i> Thêm sản phẩm mới
+        </a>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <table class="account-table">
+        <thead>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Hình ảnh</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Trạng thái</th>
+                <th>Vị trí</th>
+                <th class="actions-header">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dữ liệu giả - Sản phẩm 1 -->
+            <tr>
+                <td>Đắc Nhân Tâm</td>
+                <td>
+                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/3e/ae/52/99a4867cd5d27c84af5e1018653eda9e.jpg" alt="Image" style="width: 50px; height: 50px" />
+                </td>
+                <td>Sách Kỹ Năng Sống</td>
+                <td>86,000đ</td>
+                <td>50</td>
+                <td class="status-hoạt động">
+                    <span class="status-active">Hoạt động</span>
+                </td>
+                <td>Nổi bật</td>
+                <td class="actions-cell">
+                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
 
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary active">All Product</button>
-            <button type="button" class="btn btn-primary">Published</button>
-            <button type="button" class="btn btn-primary">Low Stock</button>
-            <button type="button" class="btn btn-primary">Draft</button>
-        </div>
+            <!-- Dữ liệu giả - Sản phẩm 2 -->
+            <tr>
+                <td>Nhà Giả Kim</td>
+                <td>
+                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/45/3b/fc/aa81d0a534b45706ae1f8ffbf83a0f29.jpg" alt="Image" style="width: 50px; height: 50px" />
+                </td>
+                <td>Văn học nước ngoài</td>
+                <td>69,000đ</td>
+                <td>30</td>
+                <td class="status-hoạt động">
+                    <span class="status-active">Hoạt động</span>
+                </td>
+                <td>Mới</td>
+                <td class="actions-cell">
+                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
 
-        <div class="d-flex align-items-center">
-            <button class="btn btn-sm btn-outline-secondary mr-2">Select Date</button>
-            <button class="btn btn-sm btn-outline-secondary">
-                <i class="fa-solid fa-filter"></i> Filters
-            </button>
-        </div>
-    </div>
+            <!-- Dữ liệu giả - Sản phẩm 3 -->
+            <tr>
+                <td>Sapiens - Lược Sử Loài Người</td>
+                <td>
+                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg" alt="Image" style="width: 50px; height: 50px" />
+                </td>
+                <td>Lịch sử</td>
+                <td>189,000đ</td>
+                <td>15</td>
+                <td class="status-hoạt động">
+                    <span class="status-active">Hoạt động</span>
+                </td>
+                <td>Gợi ý</td>
+                <td class="actions-cell">
+                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
 
-    <div class="table-responsive">
-        <table class="table table-hover product-list-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;"><input type="checkbox"></th>
-                    <th style="width: 25%;">Product</th>
-                    <th style="width: 15%;">Category</th>
-                    <th style="width: 10%;">Stock <i class="fa-solid fa-sort"></i></th>
-                    <th style="width: 10%;">Price <i class="fa-solid fa-sort"></i></th>
-                    <th style="width: 10%;">Status</th>
-                    <th style="width: 15%;">Added <i class="fa-solid fa-sort"></i></th>
-                    <th style="width: 10%;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="checkbox" checked></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> Sách... <br>
-                        </div>
-                    </td>
-                    <td>Bag & Pouch</td>
-                    <td><span>10</span></td>
-                    <td>$121.00</td>
-                    <td><span class="badge badge-danger">Low Stock</span></td>
-                    <td>29 Dec 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" checked></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> Novel... <br>
-                        </div>
-                    </td>
-                    <td>Watch</td>
-                    <td>204</td>
-                    <td>$590.00</td>
-                    <td><span class="badge badge-success">Published</span></td>
-                    <td>24 Dec 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> A little life <br>
-                        </div>
-                    </td>
-                    <td>Watch</td>
-                    <td>48</td>
-                    <td>$125.00</td>
-                    <td><span class="badge badge-secondary">Draft</span></td>
-                    <td>12 Dec 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> Take note <br>
-                        </div>
-                    </td>
-                    <td>Audio</td>
-                    <td>401</td>
-                    <td>$348.00</td>
-                    <td><span class="badge badge-success">Published</span></td>
-                    <td>21 Oct 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> Sách ấm thanh <br>
-                        </div>
-                    </td>
-                    <td>Smartphone</td>
-                    <td>120</td>
-                    <td>$607.00</td>
-                    <td><span class="badge badge-success">Published</span></td>
-                    <td>21 Oct 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fa-solid fa-book mr-2"></i> Puma <br>
-                        </div>
-                    </td>
-                    <td>Shoes</td>
-                    <td>432</td>
-                    <td>$234.00</td>
-                    <td><span class="badge badge-success">Published</span></td>
-                    <td>21 Oct 2022</td>
-                    <td>
-                        <a href="#"><i class="fa-solid fa-pencil text-primary mr-2"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash text-danger"></i></a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            <!-- Dữ liệu giả - Sản phẩm 4 -->
+            <tr>
+                <td>Atomic Habits</td>
+                <td>
+                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/7f/bb/6c/3b43b2c31b3ebb9fc3e445e1d1c6e37e.jpg" alt="Image" style="width: 50px; height: 50px" />
+                </td>
+                <td>Sách Kỹ Năng Sống</td>
+                <td>179,000đ</td>
+                <td>0</td>
+                <td class="status-không hoạt động">
+                    <span class="status-inactive">Dừng hoạt động</span>
+                </td>
+                <td>Không nổi bật</td>
+                <td class="actions-cell">
+                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
 
-    <div class="d-flex justify-content-between align-items-center mt-4">
+            <!-- Dữ liệu giả - Sản phẩm 5 -->
+            <tr>
+                <td>Tuổi Trẻ Đáng Giá Bao Nhiêu</td>
+                <td>
+                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/25/69/f8/6db139a89d57c1d5f5d1538293bbddd2.jpg" alt="Image" style="width: 50px; height: 50px" />
+                </td>
+                <td>Sách Kỹ Năng Sống</td>
+                <td>80,000đ</td>
+                <td>25</td>
+                <td class="status-hoạt động">
+                    <span class="status-active">Hoạt động</span>
+                </td>
+                <td>Nổi bật</td>
+                <td class="actions-cell">
+                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-        <nav>
-            <ul class="pagination pagination-sm mb-0">
-                <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                <li class="page-item"><a class="page-link" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-            </ul>
-        </nav>
-    </div>
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Page -->
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">Trước</a>
+            </li>
+            <!-- Page Numbers -->
+            <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#">3</a>
+            </li>
+            <!-- Next Page -->
+            <li class="page-item">
+                <a class="page-link" href="#">Tiếp theo</a>
+            </li>
+        </ul>
+    </nav>
 </div>

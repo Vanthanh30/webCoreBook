@@ -1,0 +1,97 @@
+﻿
+@{
+    ViewData["Title"] = "Cập nhật sản phẩm";
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+}
+<link rel="stylesheet" href="/css/create_account.css" />
+
+<div class="form-container">
+    <h2>Cập nhật sản phẩm</h2>
+
+    <!-- Alert giả -->
+    <div class="alert alert-danger" style="display: none;" id="errorAlert">
+        <ul id="errorList">
+            <!-- Errors will be inserted here -->
+        </ul>
+    </div>
+
+    <div class="alert alert-success" style="display: none;" id="successAlert">
+        Sản phẩm đã được cập nhật thành công!
+    </div>
+
+    <form id="updateProductForm" onsubmit="handleSubmit(event)">
+        <!-- Hidden ID field -->
+        <input type="hidden" id="Id" name="Id" value="1" />
+
+        <label for="Title">Tên sản phẩm *</label>
+        <input type="text" id="Title" name="Title" required value="Đắc Nhân Tâm" />
+
+        <label for="Image">Hình ảnh</label>
+        <input type="file" id="Image" name="Image" accept="image/*" onchange="previewImage(event)" />
+
+        <!-- Hiển thị ảnh hiện tại -->
+        <div style="margin: 10px 0;">
+            <p style="font-size: 14px; color: #666;">Ảnh hiện tại:</p>
+            <img id="currentImage" src="https://salt.tikicdn.com/cache/280x280/ts/product/3e/ae/52/99a4867cd5d27c84af5e1018653eda9e.jpg"
+                 alt="Current Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;" />
+        </div>
+
+        <!-- Preview ảnh mới -->
+        <div style="margin: 10px 0;">
+            <p style="font-size: 14px; color: #666; display: none;" id="previewLabel">Ảnh mới (xem trước):</p>
+            <img id="imagePreview" alt="Image Preview"
+                 style="max-width: 200px; max-height: 200px; display: none; border: 1px solid #ddd; padding: 5px;" />
+        </div>
+
+        <label for="Description">Mô tả</label>
+        <textarea id="Description" name="Description" style="width: 100%; height: 200px;">Đắc Nhân Tâm của Dale Carnegie là quyển sách nổi tiếng nhất, bán chạy nhất và có tầm ảnh hưởng nhất của mọi thời đại. Tác phẩm đã được chuyển ngữ sang hầu hết các thứ tiếng trên thế giới và có mặt ở hàng trăm quốc gia.</textarea>
+
+        <div class="status">
+            <label>Đặc trưng</label>
+            <input type="radio" id="editFeatured" name="featured" value="0" checked />
+            <label for="editFeatured" class="active">Nổi bật</label>
+            <input type="radio" id="editNew" name="featured" value="1" />
+            <label for="editNew" class="new">Mới</label>
+            <input type="radio" id="editSuggest" name="featured" value="2" />
+            <label for="editSuggest" class="suggest">Gợi ý</label>
+            <input type="radio" id="editNo" name="featured" value="3" />
+            <label for="editNo" class="no">Không nổi bật</label>
+        </div>
+
+        <label for="CategoryId">Danh mục *</label>
+        <select id="CategoryId" name="CategoryId" class="form-control" required>
+            <option value="">-- Chọn danh mục --</option>
+            <option value="1">Văn học Việt Nam</option>
+            <option value="2">Văn học nước ngoài</option>
+            <option value="3" selected>Sách Kỹ Năng Sống</option>
+            <option value="4">Kinh tế</option>
+            <option value="5">Lịch sử</option>
+            <option value="6">Khoa học - Công nghệ</option>
+            <option value="7">Tiểu thuyết</option>
+            <option value="8">Sách thiếu nhi</option>
+        </select>
+
+        <label for="Price">Giá bán (VNĐ) *</label>
+        <input type="number" id="Price" name="Price" required value="86000" min="0" />
+
+        <label for="DiscountPercentage">Giảm giá (%)</label>
+        <input type="number" id="DiscountPercentage" name="DiscountPercentage" value="10" min="0" max="100" />
+
+        <label for="Stock">Số lượng trong kho *</label>
+        <input type="number" id="Stock" name="Stock" required value="50" min="0" />
+
+        <div class="status">
+            <label>Trạng thái</label>
+            <input type="radio" id="editActive" name="Status" value="Hoạt động" checked />
+            <label for="editActive" class="active">Hoạt động</label>
+            <input type="radio" id="editInactive" name="Status" value="Không hoạt động" />
+            <label for="editInactive" class="inactive">Dừng hoạt động</label>
+        </div>
+
+        <button type="submit">Cập nhật</button>
+        <button type="button" onclick="window.history.back()" style="background-color: #6c757d; margin-top: 20px;">Hủy</button>
+    </form>
+</div>
+
+<script>
+</script>
