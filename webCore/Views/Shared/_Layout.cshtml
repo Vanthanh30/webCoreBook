@@ -1,5 +1,4 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@using Microsoft.AspNetCore.Http
+﻿@using Microsoft.AspNetCore.Http
 
 <!DOCTYPE html>
 <html lang="en">
@@ -91,16 +90,13 @@
                                 </a>
                             </div>
                             <div class="user-name">
-                                @{
-                                    var userName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
-                                    if (!string.IsNullOrEmpty(userName))
-                                    {
-                                        <span class="username">@userName</span> <!-- Hiển thị tên người dùng -->
-                                    }
-                                    else
-                                    {
-                                        <p class="login-text">Đăng nhập</p>
-                                    }
+                                @if (ViewBag.IsLoggedIn == true)
+                                {
+                                    <span class="username">@ViewBag.UserName</span>
+                                }
+                                else
+                                {
+                                    <a class="login-text" href="@Url.Action("Sign_in", "User")">Đăng nhập</a>
                                 }
                             </div>
                         </div>
@@ -147,7 +143,8 @@
                             var registerLink = document.getElementById("registerLink");
 
                             // Lấy trạng thái đăng nhập từ ViewBag
-                            var isLoggedIn = '@ViewBag.IsLoggedIn' === 'True';
+                            var isLoggedIn = '@ViewBag.IsLoggedIn'.toLowerCase() === 'true';
+
 
                             // Khi nhấn vào userIcon, toggle dropdown menu
                             userIcon.addEventListener('click', function (e) {
@@ -193,19 +190,15 @@
                     </script>
                     <script>
                         async function handleLogout(event) {
-                            event.preventDefault(); // ❗ chặn form submit kiểu MVC
+                            event.preventDefault();
 
-                            // Xóa localStorage
-                            localStorage.removeItem("token");
-                            localStorage.removeItem("userName");
-                            localStorage.removeItem("userRoles");
-
-                            // Gọi API logout (nếu backend có)
                             await fetch('/api/UserApi/logout', {
-                                method: 'POST'
+                                method: 'POST',
+                                credentials: "include"
                             });
 
-                            // Chuyển về trang chủ
+                            localStorage.clear();
+
                             window.location.href = "/Home/Index";
                         }
                     </script>

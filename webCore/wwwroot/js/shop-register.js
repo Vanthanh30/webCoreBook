@@ -47,7 +47,7 @@ if (descriptionInput && descCharCountSpan) {
 }
 
 // Save form to localStorage
-function saveForm() {
+/*function saveForm() {
     const formData = {
         shopName: document.getElementById('shopName').value,
         description: document.getElementById('description').value,
@@ -65,10 +65,10 @@ function saveForm() {
 
     // Show success notification
     alert('✅ Đã lưu nháp thành công!');
-}
+}*/
 
 // Load draft from localStorage
-function loadDraft() {
+/*function loadDraft() {
     const draft = localStorage.getItem('shopRegistrationDraft');
     if (draft) {
         const formData = JSON.parse(draft);
@@ -88,10 +88,10 @@ function loadDraft() {
         if (charCountSpan) charCountSpan.textContent = formData.shopName?.length || 0;
         if (descCharCountSpan) descCharCountSpan.textContent = formData.description?.length || 0;
     }
-}
+}*/
 
 // Load draft when page loads
-document.addEventListener('DOMContentLoaded', function () {
+/*document.addEventListener('DOMContentLoaded', function () {
     // Ask user if they want to load draft
     const draft = localStorage.getItem('shopRegistrationDraft');
     if (draft) {
@@ -102,9 +102,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-
+*/
 // Form submission
-const shopForm = document.getElementById('shopForm');
+/*const shopForm = document.getElementById('shopForm');
 if (shopForm) {
     shopForm.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -164,7 +164,7 @@ if (shopForm) {
             submitBtn.disabled = false;
         }, 2000);
     });
-}
+}*/
 
 // Province/District/Ward dropdown (Vietnamese location data)
 const locationData = {
@@ -317,6 +317,51 @@ if (districtSelect) {
                 option.textContent = ward;
                 wardSelect.appendChild(option);
             });
+        }
+    });
+}
+
+const apiShopForm = document.getElementById("shopForm");
+
+if (apiShopForm) {
+    apiShopForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(apiShopForm);
+
+        // Lấy UserId từ localStorage
+        const userId = localStorage.getItem("UserId");
+        if (!userId) {
+            alert("Bạn chưa đăng nhập! Không thể tạo shop.");
+            return;
+        }
+
+        // Gửi lên API
+        try {
+            const response = await fetch("/api/shop/register", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "UserId": userId
+                }
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                alert("❌ " + (result.message || "Đăng ký shop thất bại!"));
+                return;
+            }
+
+            alert("🎉 Đăng ký shop thành công!");
+            localStorage.removeItem("shopRegistrationDraft");
+
+            // Redirect seller dashboard hoặc trang bạn muốn
+            window.location.href = "/Shop/Dashboard";
+
+        } catch (err) {
+            console.error("Lỗi API:", err);
+            alert("⚠️ Lỗi khi gọi API!");
         }
     });
 }

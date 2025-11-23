@@ -9,7 +9,7 @@ using webCore.Services;
 
 namespace webCore.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         public IActionResult Sign_in() => View();
 

@@ -10,7 +10,7 @@ using webCore.Services;
 
 namespace webCore.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly MongoDBService _mongoDBService;
         private readonly ProductService _productService;
