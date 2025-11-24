@@ -11,7 +11,7 @@ namespace webCore.Models
         public string Id { get; set; }
 
         [BsonElement("UserId")]
-        public string UserId { get; set; } // Mỗi giỏ hàng gắn với 1 người dùng
+        public string UserId { get; set; } 
 
         [BsonElement("Items")]
         public List<CartItem> Items { get; set; } = new List<CartItem>();
@@ -27,7 +27,8 @@ namespace webCore.Models
     {
         [BsonElement("ProductId")]
         public string ProductId { get; set; }
-
+        [BsonElement("SellerId")]
+        public string SellerId { get; set; }
         [BsonElement("Title")]
         public string Title { get; set; }
 

@@ -11,7 +11,7 @@ namespace webCore.Controllers.ApiControllers
 {
     [ApiController]
     [Route("api/adminSignin")]
-    public class Admin_signinApiController : Controller
+    public class Admin_signinApiController : ControllerBase
     {
         private readonly AccountService _accountService;
         private readonly RoleService _roleService;

@@ -12,7 +12,7 @@ namespace webCore.Controllers.ApiControllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserApiController : Controller
+    public class UserApiController : ControllerBase
     {
         private readonly UserService _userService;
         private readonly RoleService _roleService;
@@ -95,27 +95,6 @@ namespace webCore.Controllers.ApiControllers
                 roles = roleNames,
                 token = user.Token
             });
-        }
-
-
-        [HttpPost("upgrade-seller")]
-        public async Task<IActionResult> UpgradeSeller([FromBody] User req)
-        {
-            var user = await _userService.GetUserByIdAsync(req.Id);
-            if (user == null)
-                return BadRequest(new { success = false, message = "Không tìm thấy user" });
-
-            var sellerRole = await _roleService.GetRoleByNameAsync("Seller");
-            if (sellerRole == null)
-                return StatusCode(500, new { success = false, message = "Role Seller chưa tồn tại trong DB" });
-
-            if (!user.RoleId.Contains(sellerRole.Id))
-            {
-                user.RoleId.Add(sellerRole.Id);
-                await _userService.UpdateUserAsync(user);
-            }
-
-            return Ok(new { success = true, message = "Bạn đã là người bán" });
         }
 
         [HttpPost("logout")]

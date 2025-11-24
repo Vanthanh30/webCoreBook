@@ -9,7 +9,7 @@ namespace webCore.Models
 {
     public class Order
     {
-        [BsonId] // Đánh dấu trường này là trường _id của MongoDB
+        [BsonId]
         public ObjectId Id { get; set; }
         public string UserId { get; set; }
         public string FullName { get; set; }

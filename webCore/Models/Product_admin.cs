@@ -23,8 +23,8 @@ namespace webCore.Models
         [BsonRepresentation(BsonType.String)]
         [Key]
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string SellerId { get; set; }
 
-        private string title;
         [Required]
         [MaxLength(100)]
         public string Title

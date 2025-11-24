@@ -43,31 +43,54 @@ namespace webCore.Controllers
         }
         // Thêm sản phẩm vào giỏ hàng
         [HttpPost]
-        public async Task<IActionResult> AddToCart(string productId, string title, decimal price, decimal discountpercentage, int quantity, string image)
+        public async Task<IActionResult> AddToCart(
+            string productId,
+            string title,
+            decimal price,
+            decimal discountpercentage,
+            int quantity,
+            string image)
         {
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            // 1️⃣ KIỂM TRA ĐĂNG NHẬP BẰNG TOKEN
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, trả về thông báo lỗi
                 return Json(new { success = false, message = "Bạn cần đăng nhập để thêm vào giỏ hàng." });
             }
 
-            // Lấy giỏ hàng từ dịch vụ hoặc tạo mới nếu chưa tồn tại
-            var cart = await _cartService.GetCartByUserIdAsync(userId) ?? new Cart { UserId = userId };
-            var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
+            // 2️⃣ LẤY USER ID THẬT TỪ SESSION (dùng để lưu cart)
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "Không lấy được UserId. Vui lòng đăng nhập lại." });
+            }
+
+            // 3️⃣ LẤY SẢN PHẨM
+            var product = await _productService.GetProductByIdAsync(productId);
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy sản phẩm!" });
+            }
+
+            string sellerId = product.SellerId;
+
+            // 4️⃣ LẤY CART = UserId thật
+            var cart = await _cartService.GetCartByUserIdAsync(userId)
+                       ?? new Cart { UserId = userId };
+
+            // 5️⃣ TÌM ITEM
+            var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == productId);
 
             if (existingItem != null)
             {
-                // Nếu sản phẩm đã có trong giỏ, tăng số lượng
                 existingItem.Quantity += quantity;
             }
             else
             {
-                // Nếu chưa có, thêm mới sản phẩm vào giỏ
                 cart.Items.Add(new CartItem
                 {
                     ProductId = productId,
+                    SellerId = sellerId,
                     Title = title,
                     Price = price,
                     DiscountPercentage = discountpercentage,
@@ -76,37 +99,42 @@ namespace webCore.Controllers
                 });
             }
 
-            // Cập nhật thời gian sửa đổi giỏ hàng
             cart.UpdatedAt = DateTime.UtcNow;
 
-            // Lưu giỏ hàng vào MongoDB
+            // 6️⃣ LƯU CART
             await _cartService.AddOrUpdateCartAsync(cart);
-            int itemCount = cart.Items.Count;
-            // Trả về kết quả thành công
-            return Json(new { success = true, itemCount = itemCount, message = "Sản phẩm đã được thêm vào giỏ hàng!" });
+
+            return Json(new
+            {
+                success = true,
+                itemCount = cart.Items.Count,
+                message = "Sản phẩm đã được thêm vào giỏ hàng!"
+            });
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCartItemCount()
         {
-            // Lấy userId từ session hoặc claim
-            var userId = HttpContext.Session.GetString("UserToken");  // Giả sử bạn lưu token trong Session sau khi đăng nhập
+            // 1️⃣ KIỂM TRA ĐĂNG NHẬP BẰNG TOKEN
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
+            {
+                return Json(new { itemCount = 0 });
+            }
 
-            // Nếu userId không tồn tại (người dùng chưa đăng nhập)
+            var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
             {
                 return Json(new { itemCount = 0 });
             }
 
-            // Lấy giỏ hàng của người dùng từ database
+            // 3️⃣ LẤY CART TỪ UserId
             var cart = await _cartService.GetCartByUserIdAsync(userId);
 
-            // Kiểm tra giỏ hàng và lấy số lượng sản phẩm
-            int itemCount = cart?.Items.Count ?? 0; // Nếu không có giỏ hàng thì trả về 0
+            int itemCount = cart?.Items.Count ?? 0;
 
             return Json(new { itemCount = itemCount });
         }
-
 
 
         [ServiceFilter(typeof(SetLoginStatusFilter))]
@@ -119,13 +147,14 @@ namespace webCore.Controllers
 
             // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
             ViewBag.IsLoggedIn = isLoggedIn;
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");
             }
+            // 2️⃣ LẤY USERID ĐỂ LOAD CART
+            var userId = HttpContext.Session.GetString("UserId");
 
             // Lấy giỏ hàng của người dùng từ dịch vụ
             var cart = await _cartService.GetCartByUserIdAsync(userId);
@@ -195,12 +224,13 @@ namespace webCore.Controllers
         public async Task<IActionResult> DeleteProduct(string productId)
         {
             // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, trả về thông báo lỗi
-                return Json(new { success = false, message = "Bạn cần đăng nhập để xóa sản phẩm." });
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Sign_in", "User");
             }
+            var userId = HttpContext.Session.GetString("UserId");
 
             // Lấy giỏ hàng của người dùng
             var cart = await _cartService.GetCartByUserIdAsync(userId);
@@ -230,14 +260,14 @@ namespace webCore.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateQuantity(string productId, int quantity)
         {
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Nếu chưa đăng nhập, trả về thông báo lỗi
-                return Json(new { success = false, message = "Bạn cần đăng nhập để cập nhật số lượng." });
-            }
 
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
+            {
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Sign_in", "User");
+            }
+            var userId = HttpContext.Session.GetString("UserId");
             // Lấy giỏ hàng của người dùng
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             if (cart == null)
@@ -272,14 +302,12 @@ namespace webCore.Controllers
 
             // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
             ViewBag.IsLoggedIn = isLoggedIn;
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");
             }
-
+            var userId = HttpContext.Session.GetString("UserId");
             // Lấy giỏ hàng của người dùng từ dịch vụ
             var cart = await _cartService.GetCartByUserIdAsync(userId);
 
@@ -341,8 +369,8 @@ namespace webCore.Controllers
             ViewBag.IsLoggedIn = isLoggedIn;
 
             // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
                 // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");

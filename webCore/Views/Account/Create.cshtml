@@ -92,6 +92,7 @@
                 method: "POST",
                 body: fd
             });
+            console.log(await response.text());
 
             const result = await res.json();
             if (!result.success) {

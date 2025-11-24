@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using System.Linq;
 using webCore.Helpers;
 
 namespace webCore.Helpers.Attributes
@@ -8,11 +9,11 @@ namespace webCore.Helpers.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeRoleAttribute : Attribute, IAuthorizationFilter
     {
-        private readonly string _role;
+        private readonly string[] _roles;
 
-        public AuthorizeRoleAttribute(string role)
+        public AuthorizeRoleAttribute(params string[] roles)
         {
-            _role = role;
+            _roles = roles;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
@@ -20,18 +21,33 @@ namespace webCore.Helpers.Attributes
             var http = context.HttpContext;
 
             // 1) Kiểm tra đăng nhập
-            if (!AuthHelper.IsLoggedIn(http))
+            if (!UserAuthHelper.IsLoggedIn(http))
             {
                 context.Result = new RedirectToActionResult("Sign_in", "User", null);
                 return;
             }
 
-            // 2) Kiểm tra role
-            var roles = AuthHelper.GetUserRoles(http);
+            // 2) Lấy danh sách role từ session
+            var userRolesString = UserAuthHelper.GetUserRoles(http);
 
-            if (string.IsNullOrEmpty(roles) || !roles.Contains(_role, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(userRolesString))
             {
-                // Không đủ quyền → chuyển sang trang 403
+                context.Result = new RedirectToActionResult("AccessDenied", "Error", null);
+                return;
+            }
+
+            // Roles lưu dạng JSON → tách ra
+            var userRoles = userRolesString.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                           .Select(r => r.Trim().ToLower())
+                                           .ToList();
+
+            // 3) Kiểm tra user có ít nhất 1 role hợp lệ không
+            bool allowed = _roles.Any(requiredRole =>
+                userRoles.Contains(requiredRole.ToLower())
+            );
+
+            if (!allowed)
+            {
                 context.Result = new RedirectToActionResult("AccessDenied", "Error", null);
                 return;
             }

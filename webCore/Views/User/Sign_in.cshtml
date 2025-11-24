@@ -89,11 +89,6 @@
                     return;
                 }
 
-                // SAVE TO LOCALSTORAGE
-                localStorage.setItem("userName", data.name);
-                localStorage.setItem("userRoles", JSON.stringify(data.roles));
-                localStorage.setItem("token", data.token);
-
                 // Redirect
                 window.location.href = "/Home/Index";
 

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using webCore.Helpers.Attributes;
 
 namespace webCore.Controllers
 {
-    public class Shop_registerController : Controller
+    [AuthorizeRole("Buyer")]
+    public class Shop_registerController : BaseController
     {
         public IActionResult Index()
         {

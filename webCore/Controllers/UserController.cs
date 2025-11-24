@@ -9,15 +9,11 @@ using webCore.Services;
 
 namespace webCore.Controllers
 {
-    public class UserController : BaseController
+    public class UserController : Controller
     {
         public IActionResult Sign_in() => View();
 
         public IActionResult Sign_up() => View();
-
-        public IActionResult SellerChannel() => View();
-
-
 
     }
 }

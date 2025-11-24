@@ -2,11 +2,12 @@
 
 namespace webCore.Helpers
 {
-    public static class AuthHelper
+    public static class UserAuthHelper
     {
         public static string GetUserId(HttpContext context)
             => context.Session.GetString("UserId");
-
+        public static string GetUserToken(HttpContext context)
+            => context.Session.GetString("UserToken");
         public static string GetUserName(HttpContext context)
             => context.Session.GetString("UserName");
 

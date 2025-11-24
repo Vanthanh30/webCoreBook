@@ -9,9 +9,10 @@ namespace webCore.Controllers
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             // Gửi login info sang View
-            ViewBag.IsLoggedIn = AuthHelper.IsLoggedIn(HttpContext);
-            ViewBag.UserName = AuthHelper.GetUserName(HttpContext);
-            ViewBag.UserRoles = AuthHelper.GetUserRoles(HttpContext);
+            ViewBag.IsLoggedIn = UserAuthHelper.IsLoggedIn(HttpContext);
+            ViewBag.UserName = UserAuthHelper.GetUserName(HttpContext);
+            ViewBag.UserToken = UserAuthHelper.GetUserToken(HttpContext);
+            ViewBag.UserRoles = UserAuthHelper.GetUserRoles(HttpContext);
 
             base.OnActionExecuting(context);
         }

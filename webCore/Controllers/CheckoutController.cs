@@ -35,13 +35,12 @@ namespace webCore.Controllers
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
             ViewBag.IsLoggedIn = isLoggedIn;
 
-            // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");
             }
+            var userId = HttpContext.Session.GetString("UserId");
 
             // Kiểm tra xem có CartItem được lưu trong session (dành cho BuyNow)
             var cartItemSession = HttpContext.Session.GetString("CartItem");
@@ -98,11 +97,12 @@ namespace webCore.Controllers
             ViewBag.IsLoggedIn = isLoggedIn;
 
             // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
                 return RedirectToAction("Sign_in", "User");
             }
+            var userId = HttpContext.Session.GetString("UserId");
 
             // Xử lý luồng BuyNow
             var cartItemSession = HttpContext.Session.GetString("CartItem");
@@ -221,12 +221,12 @@ namespace webCore.Controllers
             ViewBag.IsLoggedIn = isLoggedIn;
 
             // Lấy UserId từ session
-            var userId = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userId))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");
             }
+            var userId = HttpContext.Session.GetString("UserId");
 
             // Lấy danh sách đơn hàng từ MongoDB theo UserId
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);

@@ -81,9 +81,9 @@
                     </label>
                     <select class="form-control" id="businessType" name="BusinessType" required>
                         <option value="">Chọn loại hình</option>
-                        <option value="individual">Cá nhân</option>
-                        <option value="company">Công ty</option>
-                        <option value="household">Hộ kinh doanh</option>
+                        <option value="Cá nhân">Cá nhân</option>
+                        <option value="Công ty">Công ty</option>
+                        <option value="Hộ kinh doanh">Hộ kinh doanh</option>
                     </select>
                 </div>
             </div>
@@ -96,22 +96,28 @@
                 </div>
 
                 <div class="form-row">
+                    <!-- EMAIL -->
                     <div class="form-group">
                         <label class="form-label">
-                            <span class="required">*</span>
-                            Email
+                            <span class="required">*</span> Email
                         </label>
-                        <input type="email" class="form-control" id="email" name="Email" placeholder="example@email.com" required>
+
+                        <input type="email" id="emailDisplay" class="form-control" disabled>
+                        <input type="hidden" id="email" name="Email">
                     </div>
 
+                    <!-- PHONE -->
                     <div class="form-group">
                         <label class="form-label">
-                            <span class="required">*</span>
-                            Số điện thoại
+                            <span class="required">*</span> Số điện thoại
                         </label>
-                        <input type="tel" class="form-control" id="phone" name="Phone" placeholder="0123456789" required>
+
+                        <input type="tel" id="phoneDisplay" class="form-control" disabled>
+                        <input type="hidden" id="phone" name="Phone">
                     </div>
                 </div>
+
+
             </div>
 
             <!-- Address Section -->
@@ -127,43 +133,6 @@
                         Địa chỉ chi tiết
                     </label>
                     <input type="text" class="form-control" id="address" name="Address" placeholder="Số nhà, tên đường..." required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <span class="required">*</span>
-                            Tỉnh/Thành phố
-                        </label>
-                        <select class="form-control" id="province" name="Province" required>
-                            <option value="">Chọn Tỉnh/TP</option>
-                            <option value="hanoi">Hà Nội</option>
-                            <option value="hcm">TP. Hồ Chí Minh</option>
-                            <option value="danang">Đà Nẵng</option>
-                            <option value="haiphong">Hải Phòng</option>
-                            <option value="cantho">Cần Thơ</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">
-                            <span class="required">*</span>
-                            Quận/Huyện
-                        </label>
-                        <select class="form-control" id="district" name="District" required>
-                            <option value="">Chọn Quận/Huyện</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <span class="required">*</span>
-                        Phường/Xã
-                    </label>
-                    <select class="form-control" id="ward" name="Ward" required>
-                        <option value="">Chọn Phường/Xã</option>
-                    </select>
                 </div>
             </div>
 

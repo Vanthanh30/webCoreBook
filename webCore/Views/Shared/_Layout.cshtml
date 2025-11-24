@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Http
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +19,7 @@
     <link rel="stylesheet" href="/css/home.css" asp-append-version="true" />
 
 </head>
-<body>
+<body data-logged-in="@ViewBag.IsLoggedIn">
     <!-- header -->
     <header>
         <div class="container">
@@ -58,30 +59,6 @@
                             </div>
                         </div>
                         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                        <script>
-                            $(document).ready(function () {
-                                // Hàm để cập nhật số lượng trên giỏ hàng
-                                function updateCartCount(itemCount) {
-                                    $('#cart-item-1').text(itemCount).show(); // Hiển thị số lượng
-                                }
-                                // Lấy số lượng giỏ hàng khi tải trang
-                                $.ajax({
-                                    url: '@Url.Action("GetCartItemCount", "Cart")',
-                                    type: 'GET',
-                                    success: function (response) {
-                                        updateCartCount(response.itemCount); // Cập nhật số lượng giỏ hàng
-                                    },
-                                    error: function () {
-                                        console.error('Không thể lấy số lượng giỏ hàng.');
-                                    }
-                                });
-
-                                // Lắng nghe sự kiện cập nhật từ trang chi tiết sản phẩm
-                                $(document).on('cartUpdated', function (event, itemCount) {
-                                    updateCartCount(itemCount); // Cập nhật số lượng trên icon giỏ hàng
-                                });
-                            });
-                        </script>
                         <!-- Icon User -->
                         <div>
                             <div class="inner-user" id="userIcon">
@@ -90,13 +67,16 @@
                                 </a>
                             </div>
                             <div class="user-name">
-                                @if (ViewBag.IsLoggedIn == true)
-                                {
-                                    <span class="username">@ViewBag.UserName</span>
-                                }
-                                else
-                                {
-                                    <a class="login-text" href="@Url.Action("Sign_in", "User")">Đăng nhập</a>
+                                @{
+                                    var userName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+                                    if (!string.IsNullOrEmpty(userName))
+                                    {
+                                        <span class="username">@userName</span> <!-- Hiển thị tên người dùng -->
+                                    }
+                                    else
+                                    {
+                                        <p class="login-text">Đăng nhập</p>
+                                    }
                                 }
                             </div>
                         </div>
@@ -106,19 +86,14 @@
                     <div id="userDropdownMenu" class="user-dropdown hidden">
                         <!-- Mục thông tin cá nhân và đăng xuất (hiển thị nếu người dùng đã đăng nhập) -->
                         <a id="profileLink" href="@Url.Action("Index", "DetailUser")" class="hidden">Thông tin cá nhân</a>
-                        
+
                         <!-- Kênh người bán với submenu -->
                         <div id="sellerChannelContainer" class="dropdown-item-container hidden">
                             <a href="#" id="sellerChannelLink" class="dropdown-item-with-arrow">
                                 Kênh người bán
-                                <i class="fa-solid fa-chevron-right"></i>
                             </a>
-                            <div id="sellerSubmenu" class="submenu hidden">
-                                <a href="@Url.Action("ManageShop", "Shop")">Quản lý shop</a>
-                                <a href="@Url.Action("Index", "Shop_register")">Đăng ký shop</a>
-                            </div>
                         </div>
-                        
+
                         <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đơn mua</a>
                         <form id="logoutForm" onsubmit="return handleLogout(event)">
                             <button type="submit" id="logoutButton">Đăng xuất</button>
@@ -129,153 +104,7 @@
                         <a id="registerLink" href="@Url.Action("Sign_up", "User")" class="hidden">Đăng ký</a>
                     </div>
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            var userIcon = document.getElementById("userIcon");
-                            var userDropdownMenu = document.getElementById("userDropdownMenu");
-                            var profileLink = document.getElementById("profileLink");
-                            var sellerChannelContainer = document.getElementById("sellerChannelContainer");
-                            var sellerChannelLink = document.getElementById("sellerChannelLink");
-                            var sellerSubmenu = document.getElementById("sellerSubmenu");
-                            var orderLink = document.getElementById("orderLink");
-                            var logoutForm = document.getElementById("logoutForm");
-                            var loginLink = document.getElementById("loginLink");
-                            var registerLink = document.getElementById("registerLink");
 
-                            // Lấy trạng thái đăng nhập từ ViewBag
-                            var isLoggedIn = '@ViewBag.IsLoggedIn'.toLowerCase() === 'true';
-
-
-                            // Khi nhấn vào userIcon, toggle dropdown menu
-                            userIcon.addEventListener('click', function (e) {
-                                e.preventDefault();
-                                userDropdownMenu.classList.toggle("hidden");
-                            });
-
-                            // Toggle submenu khi click vào "Kênh người bán"
-                            if (sellerChannelLink) {
-                                sellerChannelLink.addEventListener('click', function (e) {
-                                    e.preventDefault();
-                                    sellerSubmenu.classList.toggle("hidden");
-                                });
-                            }
-
-                            // Đóng menu khi click bên ngoài
-                            document.addEventListener('click', function(e) {
-                                if (!userIcon.contains(e.target) && !userDropdownMenu.contains(e.target)) {
-                                    userDropdownMenu.classList.add("hidden");
-                                    if (sellerSubmenu) {
-                                        sellerSubmenu.classList.add("hidden");
-                                    }
-                                }
-                            });
-
-                            // Kiểm tra trạng thái đăng nhập và hiển thị các mục phù hợp
-                            if (isLoggedIn) {
-                                profileLink.classList.remove("hidden");
-                                sellerChannelContainer.classList.remove("hidden");
-                                orderLink.classList.remove("hidden");
-                                logoutForm.classList.remove("hidden");
-                                loginLink.classList.add("hidden");
-                                registerLink.classList.add("hidden");
-                            } else {
-                                profileLink.classList.add("hidden");
-                                sellerChannelContainer.classList.add("hidden");
-                                orderLink.classList.add("hidden");
-                                logoutForm.classList.add("hidden");
-                                loginLink.classList.remove("hidden");
-                                registerLink.classList.remove("hidden");
-                            }
-                        });
-                    </script>
-                    <script>
-                        async function handleLogout(event) {
-                            event.preventDefault();
-
-                            await fetch('/api/UserApi/logout', {
-                                method: 'POST',
-                                credentials: "include"
-                            });
-
-                            localStorage.clear();
-
-                            window.location.href = "/Home/Index";
-                        }
-                    </script>
-                    <!-- Username -->
-
-                    <style>
-                        /* Áp dụng margin-right cho tên người dùng */
-                        .username {
-                            margin-right: 15px;
-                            display: inline-block;
-                            text-align: center;
-                            white-space: nowrap;
-                            word-wrap: break-word;
-                        }
-
-                        /* Đảm bảo không có margin-right khi là "Đăng nhập" */
-                        .login-text {
-                            margin-right: 0;
-                        }
-
-                        /* Style cho dropdown item với arrow */
-                        .dropdown-item-with-arrow {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 10px 15px;
-                            text-decoration: none;
-                            color: #333;
-                            cursor: pointer;
-                            transition: background-color 0.2s ease;
-                        }
-
-                        .dropdown-item-with-arrow:hover {
-                            background-color: #f5f5f5;
-                        }
-
-                        .dropdown-item-with-arrow i {
-                            font-size: 12px;
-                            margin-left: 10px;
-                        }
-
-                        /* Style cho submenu */
-                        .dropdown-item-container {
-                            position: relative;
-                        }
-
-                        .submenu {
-                            position: absolute;
-                            left: 100%;
-                            top: 0;
-                            background-color: white;
-                            border: 1px solid #ddd;
-                            border-radius: 4px;
-                            min-width: 160px;
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                            z-index: 1001;
-                            margin-left: 5px;
-                        }
-
-                        .submenu a {
-                            display: block;
-                            padding: 10px 15px;
-                            text-decoration: none;
-                            color: #333;
-                            white-space: nowrap;
-                            transition: background-color 0.2s ease;
-                        }
-
-                        .submenu a:hover {
-                            background-color: #f5f5f5;
-                        }
-
-                        /* Hidden class */
-                        .hidden {
-                            display: none !important;
-                        }
-                    </style>
                 </div>
             </div>
         </div>
@@ -346,22 +175,6 @@
     </footer>
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.querySelector('form[role="search"]').addEventListener('submit', function (e) {
-            e.preventDefault(); // Ngăn form thực hiện submit mặc định
-
-            var searchQuery = document.querySelector('input[name="name"]').value; // Lấy giá trị tìm kiếm từ input
-
-            // Gửi yêu cầu AJAX đến controller
-            fetch(`/Home/Search?searchQuery=${encodeURIComponent(searchQuery)}`)
-                .then(response => response.text()) // Nhận HTML từ PartialView
-                .then(html => {
-                    // Thay thế nội dung danh sách sản phẩm
-                    document.querySelector('.product-list').innerHTML = html;
-                })
-                .catch(error => console.error('Có lỗi xảy ra khi tìm kiếm:', error));
-        });
-    </script>
-
+    <script src="~/js/layout.js" asp-append-version="true"></script>
 </body>
 </html>

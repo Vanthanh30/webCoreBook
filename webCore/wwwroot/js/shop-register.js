@@ -323,30 +323,41 @@ if (districtSelect) {
 
 const apiShopForm = document.getElementById("shopForm");
 
+// Load email/phone từ API
+async function loadUserInfo() {
+    const res = await fetch("/api/shop/info", { credentials: "include" });
+    const data = await res.json();
+
+    if (!data.success) return;
+
+    document.getElementById("emailDisplay").value = data.email;
+    document.getElementById("phoneDisplay").value = data.phone;
+
+    // Hidden values
+    document.getElementById("email").value = data.email;
+    document.getElementById("phone").value = data.phone;
+}
+
+loadUserInfo();
+
+// SUBMIT REGISTER
 if (apiShopForm) {
     apiShopForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const formData = new FormData(apiShopForm);
 
-        // Lấy UserId từ localStorage
-        const userId = localStorage.getItem("UserId");
-        if (!userId) {
-            alert("Bạn chưa đăng nhập! Không thể tạo shop.");
-            return;
-        }
-
-        // Gửi lên API
         try {
             const response = await fetch("/api/shop/register", {
                 method: "POST",
                 body: formData,
-                headers: {
-                    "UserId": userId
-                }
+                credentials: "include"
             });
 
-            const result = await response.json();
+            const text = await response.text();
+            console.log("RAW:", text);
+
+            let result = JSON.parse(text);
 
             if (!result.success) {
                 alert("❌ " + (result.message || "Đăng ký shop thất bại!"));
@@ -354,10 +365,7 @@ if (apiShopForm) {
             }
 
             alert("🎉 Đăng ký shop thành công!");
-            localStorage.removeItem("shopRegistrationDraft");
-
-            // Redirect seller dashboard hoặc trang bạn muốn
-            window.location.href = "/Shop/Dashboard";
+            window.location.href = "/SellerDashboard/Dashboard";
 
         } catch (err) {
             console.error("Lỗi API:", err);
@@ -365,3 +373,4 @@ if (apiShopForm) {
         }
     });
 }
+

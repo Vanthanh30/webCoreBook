@@ -13,7 +13,7 @@ namespace webCore.Controllers.ApiControllers
 {
     [ApiController]
     [Route("api/account")]
-    public class AccountApiController : Controller
+    public class AccountApiController : ControllerBase
     {
         private readonly AccountService _accountService;
         private readonly CloudinaryService _cloudinaryService;

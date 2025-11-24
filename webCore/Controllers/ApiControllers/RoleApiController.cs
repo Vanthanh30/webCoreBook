@@ -8,7 +8,7 @@ namespace webCore.Controllers.ApiControllers
 {
     [ApiController]
     [Route("api/role")]
-    public class RoleApiController : Controller
+    public class RoleApiController : ControllerBase
     {
         private readonly RoleService _roleService;
 

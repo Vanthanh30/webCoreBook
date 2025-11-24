@@ -70,6 +70,17 @@ namespace webCore.MongoHelper
                 return false;
             }
         }
+        public async Task<bool> AddRoleToUserAsync(string userId, string roleId)
+        {
+            var update = Builders<User>.Update.AddToSet(u => u.RoleId, roleId);
+
+            var result = await _userCollection.UpdateOneAsync(
+                u => u.Id == userId,
+                update
+            );
+
+            return result.ModifiedCount > 0;
+        }
         // Xóa người dùng (thay đổi trạng thái thay vì xóa cứng)
         public async Task DeleteUserAsync(string email)
         {
