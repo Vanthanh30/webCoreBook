@@ -50,15 +50,15 @@ namespace webCore.Controllers.ApiControllers
                                                     [FromForm] string type,
                                                     IFormFile file)
         {
-            string url = await _cloud.UploadFileAsync(file);
+/*            string url = await _cloud.UploadFileAsync(file);*/
             var msg = new ChatMessage
             {
                 SenderId = senderId,
                 ReceiverId = receiverId,
-                OrderId = orderId,
-                Type = type == "image" ? MessageType.Image : MessageType.Video,
+                OrderId = orderId
+/*                Type = type == "image" ? MessageType.Image : MessageType.Video,
                 ImageUrl = type == "image" ? url : null,
-                VideoUrl = type == "video" ? url : null
+                VideoUrl = type == "video" ? url : null*/
             };
 
             await _db._chatCollection.InsertOneAsync(msg);

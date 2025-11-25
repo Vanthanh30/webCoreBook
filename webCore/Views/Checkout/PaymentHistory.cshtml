@@ -71,7 +71,10 @@
 
             @foreach (var s in statuses)
             {
-                <button type="button" class="btn btn-outline-secondary btn-sm @(s=="Tất cả"?"active":"")" data-status="@s">@s</button>
+                <a href="#" data-status="@s"
+                   class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentStatus == s ? "active" : "")">
+                    @s
+                </a>
             }
         </div>
     </div>
@@ -130,7 +133,9 @@
                         </div>
 
                         <div>
-                            <a class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
+                            <!-- Common Button: View Details -->
+                            <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
 
                             <!-- Dynamic Action Buttons -->
                             @if (order.Status == "Chờ xác nhận")
@@ -140,12 +145,15 @@
                             }
                             else if (order.Status == "Chờ vận chuyển")
                             {
-                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                             }
                             else if (order.Status == "Chờ giao hàng")
                             {
-                                <a class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
-                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                                <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
+                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                             }
                             else if (order.Status == "Đã giao")
                             {
@@ -164,12 +172,7 @@
                                 <a class="btn btn-sm btn-outline-danger action-btn"
                                    href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
                             }
-                            else if (order.Status == "Đã hủy")
-                            {
-                                <a class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
 
-
-                            }
                             else if (order.Status == "Trả hàng/Hoàn tiền")
                             {
                                 <a href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })"
@@ -244,7 +247,7 @@
         <input type="file" id="reviewMedia" multiple style="display:none;">
 
         <div class="dialog-actions">
-</html>
+            <button class="btn-submit-review" id="btnSubmitReview">Gửi đánh giá</button>
         </div>
     </div>
     <script src="~/js/PaymentHistory.js"></script>
