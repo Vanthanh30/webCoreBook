@@ -59,9 +59,12 @@ namespace webCore.Controllers
                         product.CategoryTitle = categoryDictionary[product.CategoryId];
                     }
                 }
+                var validStatuses = new[] { "Hoạt động", "Chờ duyệt", "Không duyệt" };
+                var filteredProducts = products
+                    .Where(p => !string.IsNullOrEmpty(p.Status) &&
+                                validStatuses.Contains(p.Status.Trim(), StringComparer.OrdinalIgnoreCase))
+                    .ToList();
 
-                // Lọc sản phẩm theo trạng thái
-                List<Product_admin> filteredProducts;
                 if (filter == "active")
                 {
                     filteredProducts = products.Where(p =>
@@ -83,10 +86,7 @@ namespace webCore.Controllers
                                     p.Status.Equals("Chờ duyệt", StringComparison.OrdinalIgnoreCase))
                         .ToList();
                 }
-                else // all
-                {
-                    filteredProducts = products.ToList();
-                }
+
 
                 // Sắp xếp theo Position
                 var sortedProducts = filteredProducts.OrderBy(c => c.Position).ToList();

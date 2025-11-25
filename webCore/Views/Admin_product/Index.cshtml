@@ -38,7 +38,7 @@
     </a>
     <a href="@Url.Action("Index", "Admin_product", new { filter = "inactive" })"
        class="filter-btn @(ViewBag.CurrentFilter == "inactive" ? "active" : "")">
-        <i class="fas fa-pause-circle"></i> Không duyệt
+        <i class="fas fa-times-circle"></i> Không duyệt
     </a>
 </div>
 
@@ -108,10 +108,10 @@
                                     <i class="fas fa-pause-circle"></i> Chờ duyệt
                                 </span>
                             }
-                            else
+                            else if (product.Status == "Không duyệt")
                             {
                                 <span class="status-badge status-inactive">
-                                    <i class="fas fa-pause-circle"></i> Không duyệt
+                                    <i class="fas fa-times-circle"></i> Không duyệt
                                 </span>
                             }
                         </td>
