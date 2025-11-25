@@ -3,57 +3,7 @@
     ViewData["Title"] = "Dashboard Người Bán";
 }
 
-<style>
-    .task-card {
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        background: #fff;
-        min-height: 120px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-        .task-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-
-        .task-card h2 {
-            font-size: 2.5rem;
-            margin: 10px 0;
-        }
-
-    .stat-card {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-    }
-
-    .chart-area {
-        border-radius: 8px;
-        background: #fff;
-    }
-
-    .pulse {
-        animation: pulse 2s infinite;
-    }
-
-    @@keyframes pulse {
-        0% {
-            opacity: 0.8;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.8;
-        }
-    }
-</style>
+<link rel="stylesheet" href="~/css/SellerDashboard.css" />
 
 <div class="seller-dashboard-content p-3">
     <div id="loadingSpinner" style="text-align: center; padding: 40px;">
@@ -133,7 +83,6 @@
                         </div>
                     </div>
 
-                    <!-- Bộ lọc tùy chỉnh -->
                     <div class="row mb-3">
                         <div class="col-md-5">
                             <input type="date" class="form-control form-control-sm" id="startDate">
@@ -156,7 +105,6 @@
 
             <div class="col-lg-5 mb-4">
                 <div class="row stats-group">
-                    <!-- Xóa 2 stat card: lượt xem shop và lượt xem sản phẩm -->
                     <div class="col-6 mb-3">
                         <div class="stat-card text-center">
                             <p class="text-muted mb-1">Tổng đơn hàng</p>
@@ -176,9 +124,10 @@
         </div>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
+    // JS code giữ nguyên, bạn chỉ cần đặt vào đây
     let revenueChart = null;
     let currentPeriod = 7;
     let allOrdersData = [];
