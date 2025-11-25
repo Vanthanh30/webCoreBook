@@ -218,7 +218,7 @@
                     <!-- Payment Button -->
                     <div class="btn_pay mt-3">
                         <form action="@Url.Action("Checkout", "Cart")" method="get">
-                            <button type="submit" class="btn btn-success btn-block">Thanh toán</button>
+                            <button type="submit" class="btn btn-success btn-block btn-pay">Thanh toán</button>
                         </form>
                     </div>
 
@@ -226,70 +226,77 @@
             </div>
         </div>
     </div>
- <script>
-     $(document).ready(function () {
+    <script>
+        $(document).ready(function () {
 
-         // Bấm Sửa -> hiện nút xóa, nút hủy
-         $("#btn-edit").click(function () {
-             $("#btn-delete-selected").show();
-             $("#btn-cancel-edit").show();
-             $(this).hide();
-         });
+            // ================== Chế độ Sửa / Hủy ==================
+            $("#btn-edit").click(function () {
+                $("#btn-delete-selected").show();
+                $("#btn-cancel-edit").show();
+                $(this).hide();
+                $(".btn-pay").hide(); // Ẩn nút thanh toán khi sửa
+            });
 
-         // Bấm Hủy -> ẩn nút xóa, nút hủy
-         $("#btn-cancel-edit").click(function () {
-             $("#btn-delete-selected").hide();
-             $("#btn-cancel-edit").hide();
-             $("#btn-edit").show();
-             $(".select-item").prop("checked", false); // bỏ chọn tất cả
-             $(".select-all").prop("checked", false);
-         });
+            $("#btn-cancel-edit").click(function () {
+                $("#btn-delete-selected").hide();
+                $("#btn-cancel-edit").hide();
+                $("#btn-edit").show();
+                $(".btn-pay").show(); // Hiện lại nút thanh toán
+                $(".select-item").prop("checked", false);
+                $(".select-all").prop("checked", false);
+            });
 
-         // Chọn tất cả checkbox
-         $(".select-all").change(function () {
-             $(".select-item").prop("checked", $(this).prop("checked"));
-         });
+            // ================== Checkbox hành vi chung ==================
+            $(".select-all").change(function () {
+                $(".select-item").prop("checked", $(this).prop("checked"));
+            });
 
-         // Nếu bỏ chọn 1 checkbox, bỏ chọn select-all
-         $(".select-item").change(function () {
-             if (!$(this).prop("checked")) {
-                 $(".select-all").prop("checked", false);
-             }
-         });
+            $(".select-item").change(function () {
+                if (!$(this).prop("checked")) {
+                    $(".select-all").prop("checked", false);
+                }
+            });
 
-         // Xóa sản phẩm đã chọn
-         $("#btn-delete-selected").click(function () {
-             var selectedIds = [];
-             $(".select-item:checked").each(function () {
-                 selectedIds.push($(this).data("id"));
-             });
+            // ================== Xử lý Xóa sản phẩm đã chọn ==================
+            $("#btn-delete-selected").click(function () {
+                var selectedIds = [];
+                $(".select-item:checked").each(function () {
+                    selectedIds.push($(this).data("id"));
+                });
 
-             if (selectedIds.length === 0) {
-                 alert("Vui lòng chọn sản phẩm cần xóa.");
-                 return;
-             }
+                if (selectedIds.length === 0) {
+                    alert("Vui lòng chọn sản phẩm cần xóa.");
+                    return;
+                }
 
-             $.ajax({
-                 url: '/Cart/DeleteMultiple',
-                 type: 'POST',
-                 data: JSON.stringify(selectedIds),
-                 contentType: 'application/json',
-                 success: function (response) {
-                     if (response.success) {
-                         selectedIds.forEach(function (id) {
-                             $('tr[data-product-id="' + id + '"]').remove();
-                         });
-                         alert("Đã xóa thành công!");
-                         $("#cart-item-count").text($(".cart-item").length);
-                     } else {
-                         alert("Không thể xóa sản phẩm.");
-                     }
-                 }
-             });
-         });
+                $.ajax({
+                    url: '/Cart/DeleteMultiple',
+                    type: 'POST',
+                    data: JSON.stringify(selectedIds),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                            selectedIds.forEach(function (id) {
+                                $('tr[data-product-id="' + id + '"]').remove();
+                            });
+                            alert("Đã xóa thành công!");
+                            $("#cart-item-count").text($(".cart-item").length);
+                        } else {
+                            alert("Không thể xóa sản phẩm.");
+                        }
+                    }
+                });
+            });
 
-     });
-</script>
+            // ================== Kiểm tra chọn trước khi thanh toán ==================
+            $(".btn-pay").click(function (e) {
+                if ($(".select-item:checked").length === 0) {
+                    e.preventDefault(); // Ngăn chuyển trang
+                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>

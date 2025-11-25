@@ -177,7 +177,7 @@ namespace webCore.Controllers
                 TotalAmount = totalAmountCheckout,
                 DiscountAmount = discountAmount,
                 FinalAmount = finalAmountCheckout,
-                Status = "Đang chờ duyệt",
+                Status = "Chờ xác nhận",
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -214,44 +214,23 @@ namespace webCore.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(SetLoginStatusFilter))]
-        public async Task<IActionResult> PaymentHistory(string ? status = null)
+        public async Task<IActionResult> PaymentHistory(string? status = null)
         {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
-            var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
-            ViewBag.IsLoggedIn = isLoggedIn;
-
-            // Lấy UserId từ session
             var userId = HttpContext.Session.GetString("UserToken");
             if (string.IsNullOrEmpty(userId))
-            {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Sign_in", "User");
-            }
 
-            // Lấy danh sách đơn hàng từ MongoDB theo UserId
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
-            // Lọc danh sách đơn hàng theo trạng thái nếu trạng thái không null
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
-                if (status == "Đang chờ duyệt")
-                {
-                    orders = orders.Where(o => o.Status == "Đang chờ duyệt").ToList();
-                }
-                else if (status == "Đã duyệt")
-                {
-                    orders = orders.Where(o => o.Status == "Đã duyệt").ToList();
-                }
-                else if (status == "Đã hủy")
-                {
-                    orders = orders.Where(o => o.Status == "Đã hủy").ToList();
-                }
+                orders = orders.Where(o => o.Status == status).ToList();
             }
 
-            // Truyền trạng thái hiện tại và danh sách đơn hàng vào View
-            ViewBag.CurrentStatus = status ?? "All";
-            return View(orders);
+            ViewBag.CurrentStatus = status ?? "Tất cả";
+            return View(orders.OrderByDescending(o => o.CreatedAt).ToList());
         }
+
 
 
         [HttpGet]
@@ -281,6 +260,9 @@ namespace webCore.Controllers
 
             return View(order);
         }
-
+        public IActionResult ReturnReason()
+        {
+            return View(); // Mở View ReturnReason.cshtml
+        }
     }
 }

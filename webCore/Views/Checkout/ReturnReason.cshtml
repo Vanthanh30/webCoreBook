@@ -1,0 +1,148 @@
+﻿@{
+    Layout = "_Layout";
+
+    var orderId = "234567oiuthgfdzxf";
+    var productImage = "https://via.placeholder.com/80";
+    var productTitle = "Take note";
+    var price = 200000;
+    var quantity = 2;
+    var total = price * quantity;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="~/css/checkout.css" />
+<style>
+    .return-container {
+        max-width: 550px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 25px;
+    }
+
+    .product-box {
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+    }
+
+    .media-upload {
+        width: 120px;
+        height: 110px;
+        border: 1px dashed #bbb;
+        border-radius: 10px;
+        padding: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .media-upload:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .media-upload i {
+            color: #555;
+        }
+
+    textarea {
+        border-radius: 10px !important;
+        border: 1px solid #ccc !important;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        border-radius: 10px;
+        padding: 10px 22px;
+    }
+</style>
+<div class="container ">
+    <div class="row">
+        <div class="col">
+            <div class="cart-title">
+                <h2 class="title">TRẢ HÀNG/HOÀN TIỀN</h2>
+            </div>
+        </div>
+    </div>
+    <div class="return-container">
+
+        <h5 class="text-madonhang">
+            <strong>Mã đơn hàng:</strong> @orderId
+        </h5>
+
+        <!-- Sản phẩm -->
+        <div class="product-box d-flex p-3 mb-4 shadow-sm">
+            <img src="@productImage"
+                 style="width:80px;height:80px;border-radius:12px;margin-right:15px;" />
+
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>@productTitle</strong>
+                        <div class="text-danger mt-1" style="font-size:15px;">
+                            @price.ToString("N0")đ
+                        </div>
+                    </div>
+
+                    <div style="font-weight:bold;">
+                        X@quantity
+                    </div>
+                </div>
+
+                <div class="text-right mt-2" style="font-size:16px;font-weight:bold;color:#d9534f;">
+                    Tổng tiền: @total.ToString("N0")đ
+                </div>
+            </div>
+        </div>
+
+        <!-- Mô tả -->
+        <label><strong>Nhập mô tả</strong></label>
+        <textarea class="form-control mb-3"
+                  id="returnDescription"
+                  rows="4"
+                  placeholder="Vui lòng mô tả lý do trả hàng..."></textarea>
+
+        <!-- Upload -->
+        <div class="d-flex justify-content-around text-center mt-4 mb-3">
+            <div class="media-upload" id="addImage">
+                <i class="fa fa-camera" style="font-size:32px;"></i>
+                <div>Thêm ảnh</div>
+            </div>
+
+            <div class="media-upload" id="addVideo">
+                <i class="fa fa-video" style="font-size:32px;"></i>
+                <div>Thêm video</div>
+            </div>
+        </div>
+
+        <input type="file" id="mediaInput" style="display:none;" multiple />
+
+        <!-- Nút gửi -->
+        <div class="text-center mt-4">
+            <button id="btnSubmitReturn" class="btn btn-primary">Gửi yêu cầu</button>
+        </div>
+
+    </div>
+    </div>
+    <script>
+        $("#addImage").on("click", function () {
+            $("#mediaInput").attr("accept", "image/*").click();
+        });
+
+        $("#addVideo").on("click", function () {
+            $("#mediaInput").attr("accept", "video/*").click();
+        });
+
+        $("#btnSubmitReturn").on("click", function () {
+            let desc = $("#returnDescription").val().trim();
+
+            if (desc === "") {
+                alert("Vui lòng nhập lý do trả hàng!");
+                return;
+            }
+
+            alert("Đã gửi yêu cầu trả hàng!");
+        });
+    </script>

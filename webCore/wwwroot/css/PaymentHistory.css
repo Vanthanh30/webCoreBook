@@ -35,3 +35,239 @@
     align-content: center;
     width: 150px;
 }
+.order-card {
+    border-radius: 12px;
+    transition: 0.3s ease;
+}
+
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+
+.btn-status {
+    border-radius: 10px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-filter button {
+    border-radius: 10px;
+    margin: 3px;
+    cursor: pointer;
+}
+
+.status-filter .active {
+    background: #007bff !important;
+    color: white !important;
+    border-color: #007bff !important;
+}
+/*css dialog*/
+.custom-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+}
+
+.custom-dialog {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    width: 95%;
+    max-width: 650px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1055;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Header sản phẩm */
+.dialog-product-info {
+    display: flex;
+    position: relative;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.dialog-product-img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+
+.product-details {
+    flex-grow: 1;
+}
+
+.product-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+}
+
+.product-qty {
+    float: right;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+}
+
+.total-price-row {
+    text-align: right;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.btn-close-custom {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+}
+
+    .btn-close-custom:hover {
+        color: #333;
+    }
+
+/* Đánh giá sao */
+.rating-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.rating-label {
+    width: 180px;
+    font-size: 15px;
+    color: #333;
+}
+
+.star-rating .star {
+    font-size: 24px;
+    color: #ddd;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+    .star-rating .star.selected {
+        color: #ffc107;
+    }
+
+/* Textarea có dòng kẻ (giống vở) */
+.lined-textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    outline: none;
+    background-image: repeating-linear-gradient(transparent, transparent 39px, #ccc 40px);
+    background-size: 100% 40px;
+    line-height: 40px;
+    font-size: 16px;
+    padding: 0 10px;
+    margin-top: 10px;
+    resize: none;
+}
+
+/* Media Upload Buttons */
+.media-upload-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.media-box {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #333;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #fff;
+    transition: 0.2s;
+}
+
+    .media-box:hover {
+        background: #f8f9fa;
+    }
+
+    .media-box i {
+        font-size: 32px;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .media-box span {
+        font-size: 13px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .media-box.active {
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+        .media-box.active i, .media-box.active span {
+            color: #007bff;
+        }
+
+/* Nút Gửi */
+.dialog-actions {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.btn-submit-review {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+    .btn-submit-review:hover {
+        background-color: #1565c0;
+    }
+
+.section-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 15px;
+    display: block;
+}
+
+.text-madonhang{
+    text-align:left;
+}
