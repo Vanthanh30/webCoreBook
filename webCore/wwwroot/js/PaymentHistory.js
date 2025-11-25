@@ -1,17 +1,18 @@
-﻿const buttons = document.querySelectorAll(".status-filter button");
+﻿const filters = document.querySelectorAll(".status-filter a");
 const orderCards = document.querySelectorAll(".order-card");
 
-// Logic lọc đơn hàng khi nhấn nút trạng thái
-buttons.forEach(btn => {
-    btn.addEventListener("click", function () {
-        // Bỏ active tất cả
-        buttons.forEach(b => b.classList.remove("active"));
+filters.forEach(btn => {
+    btn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        filters.forEach(f => f.classList.remove("active"));
         this.classList.add("active");
 
         const status = this.getAttribute("data-status");
 
         orderCards.forEach(card => {
-            if (status === "Tất cả" || card.getAttribute("data-status") === status) {
+            const cardStatus = card.getAttribute("data-status");
+            if (status === "Tất cả" || cardStatus === status) {
                 card.style.display = "block";
             } else {
                 card.style.display = "none";
