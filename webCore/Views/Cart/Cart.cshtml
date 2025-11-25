@@ -3,6 +3,12 @@
 @{
     Layout = "_Layout";
 }
+@functions {
+    string FormatVND(decimal value)
+    {
+        return String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:#,##0.###} đ", value);
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +38,11 @@
                 <div class="cart-title">
                     <h2 class="title">GIỎ HÀNG</h2>
                 </div>
+                <div class="edit-controls text-right mb-3">
+                    <button id="btn-edit" class="btn btn-primary btn-sm">Sửa</button>
+                    <button id="btn-delete-selected" class="btn btn-danger btn-sm" style="display:none;">Xóa đã chọn</button>
+                    <button id="btn-cancel-edit" class="btn btn-secondary btn-sm" style="display:none;">Hủy</button>
+                </div>
             </div>
         </div>
     </div>
@@ -44,7 +55,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th><input type="checkbox" class="select-all"> Chọn tất cả (<span id="cart-item-count">@Model.Count</span> sản phẩm)</th>
+                                <th><input type="checkbox" class="select-all">Chọn tất cả (<span id="cart-item-count">@Model.Count</span> sản phẩm)</th>
                                 <th>Đơn giá</th> <!-- Cột mới cho đơn giá -->
                                 <th>Số lượng</th>
                                 <th>Thành tiền</th>
@@ -59,70 +70,69 @@
                                     var discountedPrice = item.Price * (1 - item.DiscountPercentage / 100);
                                     var productId = item.ProductId.ToString();  // Chuyển ID sản phẩm thành string
 
-                        <tr class="cart-item" data-product-id="@productId">
-                            <td class="d-flex">
-                                <input type="checkbox" class="select-item"
-                                       data-price="@discountedPrice"
-                                       data-quantity="@item.Quantity"
-                                       data-id="@productId"
-                                       @if (ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId)) { @: checked
-                                       }
-                                       />
+                                    <tr class="cart-item" data-product-id="@productId">
+                                        <td class="d-flex">
+                                            <input type="checkbox" class="select-item edit-checkbox"
+                                                   data-price="@discountedPrice"
+                                                   data-quantity="@item.Quantity"
+                                                   data-id="@productId"
+                                                   @if (ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId)) { @: checked
+                                                   } />
 
-                                <img src="@item.Image" alt="@item.Title" class="cart-image" />
-                                <div class="cart-item-details">
-                                    <span>@item.Title</span>
-                                </div>
-                            </td>
-                            <td class="price-column" data-price="@item.Price.ToString("G", System.Globalization.CultureInfo.InvariantCulture)"
-                                data-discount="@item.DiscountPercentage.ToString("G", System.Globalization.CultureInfo.InvariantCulture)">
-                                <span>@discountedPrice.ToString("C")</span>
-                                <div class="price">
-                                    <small>@item.Price.ToString("C")</small> <!-- Giá gốc -->
-                                </div>
-                            </td>
-                            <td class="quantity-column">
-                                <div class="d-flex quantity">
-                                    <div class="input-group mb-3">
-                                        <button class="btn btn-outline-secondary btn-minus" type="button">
-                                            <i class="bi bi-dash"></i>
-                                        </button>
-                                        <input type="text" class="form-control text-center quantity-input" value="@item.Quantity" min="1" max="10">
-                                        <button class="btn btn-outline-secondary btn-plus" type="button">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-column2" data-total="@((discountedPrice * item.Quantity).ToString("G", System.Globalization.CultureInfo.InvariantCulture))">
-                                @((discountedPrice * item.Quantity).ToString("C"))
-                            </td>
+                                            <img src="@item.Image" alt="@item.Title" class="cart-image" />
+                                            <div class="cart-item-details">
+                                                <span>@item.Title</span>
+                                            </div>
+                                        </td>
+                                        <td class="price-column" data-price="@item.Price.ToString("G", System.Globalization.CultureInfo.InvariantCulture)"
+                                            data-discount="@item.DiscountPercentage.ToString("G", System.Globalization.CultureInfo.InvariantCulture)">
+                                            <span>@discountedPrice.ToString("#,##0") đ</span>
+                                            <div class="price">
+                                                <small>@item.Price.ToString("#,##0") đ</small>
+                                            </div>
+                                        </td>
+                                        <td class="quantity-column">
+                                            <div class="d-flex quantity">
+                                                <div class="input-group mb-3">
+                                                    <button class="btn btn-outline-secondary btn-minus" type="button">
+                                                        <i class="bi bi-dash"></i>
+                                                    </button>
+                                                    <input type="text" class="form-control text-center quantity-input" value="@item.Quantity" min="1" max="10">
+                                                    <button class="btn btn-outline-secondary btn-plus" type="button">
+                                                        <i class="bi bi-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="price-column2" data-total="@((discountedPrice * item.Quantity).ToString("G", System.Globalization.CultureInfo.InvariantCulture))">
+                                            @((discountedPrice * item.Quantity).ToString("C"))
+                                        </td>
 
 
-                            <td>
-                                <button class="btn btn-danger btn-sm delete-product">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                        <tr>
-                            <td colspan="5" class="text-center">Giỏ hàng trống</td>
-                        </tr>
-                    }
+                                        <td>
+                                            <button class="btn btn-danger btn-sm delete-product">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">Giỏ hàng trống</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Cart Summary Section -->
-    
+
             <div class="col-md-4 section_2">
                 <div class="cart-summary">
-                    
+
                     <!-- Discount Section -->
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
@@ -208,7 +218,7 @@
                     <!-- Payment Button -->
                     <div class="btn_pay mt-3">
                         <form action="@Url.Action("Checkout", "Cart")" method="get">
-                            <button type="submit" class="btn btn-success btn-block">Thanh toán</button>
+                            <button type="submit" class="btn btn-success btn-block btn-pay">Thanh toán</button>
                         </form>
                     </div>
 
@@ -216,6 +226,77 @@
             </div>
         </div>
     </div>
-     
+    <script>
+        $(document).ready(function () {
+
+            // ================== Chế độ Sửa / Hủy ==================
+            $("#btn-edit").click(function () {
+                $("#btn-delete-selected").show();
+                $("#btn-cancel-edit").show();
+                $(this).hide();
+                $(".btn-pay").hide(); // Ẩn nút thanh toán khi sửa
+            });
+
+            $("#btn-cancel-edit").click(function () {
+                $("#btn-delete-selected").hide();
+                $("#btn-cancel-edit").hide();
+                $("#btn-edit").show();
+                $(".btn-pay").show(); // Hiện lại nút thanh toán
+                $(".select-item").prop("checked", false);
+                $(".select-all").prop("checked", false);
+            });
+
+            // ================== Checkbox hành vi chung ==================
+            $(".select-all").change(function () {
+                $(".select-item").prop("checked", $(this).prop("checked"));
+            });
+
+            $(".select-item").change(function () {
+                if (!$(this).prop("checked")) {
+                    $(".select-all").prop("checked", false);
+                }
+            });
+
+            // ================== Xử lý Xóa sản phẩm đã chọn ==================
+            $("#btn-delete-selected").click(function () {
+                var selectedIds = [];
+                $(".select-item:checked").each(function () {
+                    selectedIds.push($(this).data("id"));
+                });
+
+                if (selectedIds.length === 0) {
+                    alert("Vui lòng chọn sản phẩm cần xóa.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Cart/DeleteMultiple',
+                    type: 'POST',
+                    data: JSON.stringify(selectedIds),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                            selectedIds.forEach(function (id) {
+                                $('tr[data-product-id="' + id + '"]').remove();
+                            });
+                            alert("Đã xóa thành công!");
+                            $("#cart-item-count").text($(".cart-item").length);
+                        } else {
+                            alert("Không thể xóa sản phẩm.");
+                        }
+                    }
+                });
+            });
+
+            // ================== Kiểm tra chọn trước khi thanh toán ==================
+            $(".btn-pay").click(function (e) {
+                if ($(".select-item:checked").length === 0) {
+                    e.preventDefault(); // Ngăn chuyển trang
+                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

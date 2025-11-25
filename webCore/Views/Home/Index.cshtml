@@ -17,6 +17,54 @@
         .ToList();
 }
 
+<style>
+    aside .list-group > .list-group-item {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+
+        aside .list-group > .list-group-item:hover {
+            background-color: #f0f7ff;
+            transform: scale(1.03);
+        }
+
+    /* Hover danh mục con */
+    .subcategories .list-group-item {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+
+        .subcategories .list-group-item:hover {
+            background-color: #ffe7d4;
+            transform: scale(1.03);
+        }
+
+    /* Ẩn bullet và dọn CSS */
+    .subcategories {
+        list-style-type: none;
+        padding-left: 10px;
+    }
+        /* ACTIVE cho danh mục con */
+        .subcategories .list-group-item.active {
+            background-color: #67B2D8 !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+
+    /* Hover sản phẩm */
+    .product-item .card {
+        transition: 0.25s ease;
+        border-radius: 12px;
+    }
+
+        .product-item .card:hover {
+            transform: scale(1.05);
+            background-color: #f6faff;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        }
+</style>
 
 <div class="container">
     <div class="row">
@@ -35,9 +83,9 @@
                             <ul class="list-group subcategories" style="display: none;">
                                 @foreach (var sub in categories.Where(c => c.ParentId == parent._id))
                                 {<!-- Call loadProductsByCategoryId with the categoryId -->
-                                    <li class="list-group-item" onclick="loadProductsByCategoryId('@sub._id')">
-                                        <a>@sub.Title</a>
-                                    </li>
+                                <li class="list-group-item" onclick="event.stopPropagation(); loadProductsByCategoryId('@sub._id')">
+                                    <a>@sub.Title</a>
+                                </li>
 }
                             </ul>
                         </li>
@@ -199,6 +247,21 @@
             behavior: 'smooth'
         });
     }
+
+    // Thêm hiệu ứng active khi click danh mục con
+    document.addEventListener("DOMContentLoaded", function () {
+        const subItems = document.querySelectorAll(".subcategories .list-group-item");
+
+        subItems.forEach(item => {
+            item.addEventListener("click", function () {
+                // Bỏ active ở tất cả danh mục con
+                subItems.forEach(i => i.classList.remove("active"));
+
+                // Active mục đang chọn
+                this.classList.add("active");
+            });
+        });
+    });
 </script>
 
 @functions { // Get the correct label based on the FeaturedStatus enum

@@ -224,12 +224,10 @@ namespace webCore.Controllers
             var userToken = HttpContext.Session.GetString("UserToken");
             if (string.IsNullOrEmpty(userToken))
             {
-                return RedirectToAction("Sign_in", "User");
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
             }
-            var userId = HttpContext.Session.GetString("UserId");
-
-            // Lấy danh sách đơn hàng từ MongoDB theo UserId
-            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            }
 
             // Lọc danh sách đơn hàng theo trạng thái nếu trạng thái không null
             if (!string.IsNullOrEmpty(status))
@@ -247,11 +245,13 @@ namespace webCore.Controllers
                     orders = orders.Where(o => o.Status == "Đã hủy").ToList();
                 }
             }
-
+            return View(orders.OrderByDescending(o => o.CreatedAt).ToList());
             // Truyền trạng thái hiện tại và danh sách đơn hàng vào View
             ViewBag.CurrentStatus = status ?? "All";
             return View(orders);
         }
+        }
+
 
 
         [HttpGet]
@@ -281,6 +281,9 @@ namespace webCore.Controllers
 
             return View(order);
         }
-
+        public IActionResult ReturnReason()
+        {
+            return View(); // Mở View ReturnReason.cshtml
+        }
     }
 }

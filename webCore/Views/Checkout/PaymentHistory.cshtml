@@ -1,21 +1,41 @@
-﻿@model List<webCore.Models.Order>
-
-@{
+﻿@{
     Layout = "_Layout";
+
+    // Dữ liệu ảo
+    var orders = new List<dynamic>
+{
+        new { Id="DH001", CreatedAt=DateTime.Now.AddDays(-1), Status="Chờ xác nhận", FinalAmount=1200000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm A", Price=1200000, Quantity=1, Image="https://via.placeholder.com/65" } } },
+        new { Id="DH002", CreatedAt=DateTime.Now.AddDays(-2), Status="Chờ vận chuyển", FinalAmount=800000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm B", Price=800000, Quantity=1, Image="https://via.placeholder.com/65" } } },
+        new { Id="DH003", CreatedAt=DateTime.Now.AddDays(-3), Status="Chờ giao hàng", FinalAmount=2000000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm C", Price=1000000, Quantity=2, Image="https://via.placeholder.com/65" } } },
+        new { Id="DH004", CreatedAt=DateTime.Now.AddDays(-5), Status="Đã giao", FinalAmount=1500000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm D", Price=1500000, Quantity=1, Image="https://via.placeholder.com/65" } } },
+        new { Id="DH005", CreatedAt=DateTime.Now.AddDays(-7), Status="Đã hủy", FinalAmount=500000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm E", Price=500000, Quantity=1, Image="https://via.placeholder.com/65" } } },
+        new { Id="DH006", CreatedAt=DateTime.Now.AddDays(-8), Status="Trả hàng/Hoàn tiền", FinalAmount=300000,
+              Items = new List<dynamic>{ new { Title="Sản phẩm F", Price=300000, Quantity=1, Image="https://via.placeholder.com/65" } } }
+    };
+
+    var statuses = new List<string> {
+        "Tất cả", "Chờ xác nhận", "Chờ vận chuyển", "Chờ giao hàng",
+        "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền"
+    };
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lịch sử Thanh Toán</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/PaymentHistory.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/PaymentHistory.css" />
+
 </head>
 <body>
-
-    <div class="container" >
+    <div class="container ">
         <div class="row">
             <div class="col">
                 <div class="cart-title">
@@ -23,85 +43,173 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="container mt-3">
-        <div class="row">
-            <div class="col-md-12 d-flex" style="margin-left :-9px">
-                <!-- Nút Tất cả -->
-                <a href="@Url.Action("PaymentHistory", "Checkout")"
-                   class="btn btn-secondary btn-sm mx-2 @(ViewBag.CurrentStatus == "All" ? "active" : "")">Tất cả</a>
 
-                <!-- Nút Chờ duyệt -->
-                <a href="@Url.Action("PaymentHistory", "Checkout", new { status = "Đang chờ duyệt" })"
-                   class="btn btn-warning btn-sm mx-2 @(ViewBag.CurrentStatus == "Đang chờ duyệt" ? "active" : "")">Chờ duyệt</a>
 
-                <!-- Nút Đã duyệt -->
-                <a href="@Url.Action("PaymentHistory", "Checkout", new { status = "Đã duyệt" })"
-                   class="btn btn-success btn-sm mx-2 @(ViewBag.CurrentStatus == "Đã duyệt" ? "active" : "")">Đã duyệt</a>
-
-                <!-- Nút Đã hủy -->
-                <a href="@Url.Action("PaymentHistory", "Checkout", new { status = "Đã hủy" })"
-                   class="btn btn-danger btn-sm mx-2 @(ViewBag.CurrentStatus == "Đã hủy" ? "active" : "")">Đã hủy</a>
-            </div>
+        <!-- Filter trạng thái -->
+        <div class="d-flex flex-wrap justify-content-center mb-4 status-filter">
+            @foreach (var s in statuses)
+            {
+                <button type="button" class="btn btn-outline-secondary btn-sm @(s=="Tất cả"?"active":"")" data-status="@s">@s</button>
+            }
         </div>
-    </div>
 
+        <!-- Orders container -->
+        <div id="orders-container">
+            @foreach (var order in orders)
+            {
+                <div class="order-card border p-4 mb-4 shadow-sm" data-status="@order.Status">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Mã đơn:</strong> @order.Id <br />
+                            <small>Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <div>
+                            <span class="badge btn-status
+                            @(order.Status == "Chờ xác nhận" ? "badge-warning" :
+                              order.Status == "Chờ vận chuyển" ? "badge-info" :
+                              order.Status == "Chờ giao hàng" ? "badge-primary" :
+                              order.Status == "Đã giao" ? "badge-success" :
+                              order.Status == "Đã hủy" ? "badge-danger" :
+                              order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
+                                @order.Status
+                            </span>
+                        </div>
+                    </div>
 
-    <div class="container mt-5" style="min-height: 250px;">
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="tbheader">
-                            <th>Ngày Đặt</th>
-                            <th>Sản phẩm</th>
-                            <th>Tổng Tiền</th>
-                            <th>Trạng Thái</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var order in Model)
-                        {
-                            <tr>
-                                <td class="col-content">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>
-                                    <ul class="list-unstyled">
-                                        @foreach (var item in order.Items)
-                                        {
-                                            <li class="d-flex align-items-center mb-2">
-                                                <!-- Hình ảnh -->
-                                                <img src="@item.Image" alt="Hình sản phẩm" style="width: 50px; height: 50px; margin-right: 10px;" />
+                    <hr />
 
-                                                <!-- Thông tin sản phẩm -->
-                                                <div>
-                                                    <strong>@item.Title</strong><br />
-                                                    Giá: @item.Price.ToString("C")<br />
-                                                    Số lượng: @item.Quantity<br />
-                                                </div>
-                                            </li>
-                                        }
-                                    </ul>
-                                </td>
-                                <td class="col-content">@order.FinalAmount.ToString("C")</td>
-                                <td class="col-content">
-                                    <span style="color: @(order.Status == "Đang chờ duyệt" ? "orange" :
-                                             order.Status == "Đã duyệt" ? "green" :
-                                             order.Status == "Đã hủy" ? "red" : "black");">
-                                        @order.Status
-                                    </span>
-                                </td>
-                                <td class="btn_select">
-                                    <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })" class="btn btn-primary btn-sm">
-                                        Xem Chi Tiết
+                    @foreach (var item in order.Items)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <img src="@item.Image" style="width:65px;height:65px;border-radius:8px;margin-right:12px;" />
+                                <div>
+                                    <strong>@item.Title</strong><br />
+                                    <small>Giá: @item.Price.ToString("N0")đ | X: @item.Quantity</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Tổng tiền:</strong>
+                            <span class="text-danger font-weight-bold">@order.FinalAmount.ToString("N0")đ</span>
+                        </div>
+                        <div>
+                            <a class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
+
+                            @if (order.Status == "Chờ xác nhận")
+                            {
+                                <a class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
+                            }
+                            else if (order.Status == "Chờ vận chuyển")
+                            {
+                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                            }
+                            else if (order.Status == "Chờ giao hàng")
+                            {
+                                <a class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
+                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                            }
+                            else if (order.Status == "Đã giao")
+                            {
+                                @foreach (var item in order.Items)
+                                {
+                                    <a class="btn btn-sm btn-outline-primary action-btn btnReview"
+                                       data-order-id="@order.Id"
+                                       data-product-title="@item.Title"
+                                       data-product-price="@item.Price"
+                                       data-product-image="@item.Image"
+                                       data-quantity="@item.Quantity"
+                                       data-total="@order.FinalAmount">
+                                        Đánh giá
                                     </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                }
+                                <a class="btn btn-sm btn-outline-danger action-btn" 
+                                   href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
+                            }
+                            else if (order.Status == "Đã hủy")
+                            {
+                                <a class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
+
+
+                            }
+                            else if (order.Status == "Trả hàng/Hoàn tiền")
+                            {
+                                <a class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
+    <div class="overlay" id="reviewOverlay"></div>
+
+    <div class="custom-dialog" id="reviewDialog">
+
+        <button class="btn-close-custom" id="btnCloseX">X</button>
+
+        <div class="dialog-product-info">
+            <img src="" alt="Product" class="dialog-product-img" id="dlgImg">
+            <div class="product-details">
+                <div class="product-title" id="dlgTitle">Tên sản phẩm</div>
+                <div class="product-price" id="dlgPrice">0đ</div>
+            </div>
+            <div class="product-qty" id="dlgQty">X1</div>
+
+            <div style="position: absolute; bottom: 15px; right: 15px;">
+                <span style="color: #d9534f; font-weight: bold; font-size: 16px;">Tổng tiền: <span id="dlgTotal">0đ</span></span>
+            </div>
+        </div>
+
+        <div class="rating-row">
+            <div class="rating-label">Chất lượng sản phẩm:</div>
+            <div class="star-rating" id="productRating">
+                <i class="fa fa-star star" data-value="1"></i>
+                <i class="fa fa-star star" data-value="2"></i>
+                <i class="fa fa-star star" data-value="3"></i>
+                <i class="fa fa-star star" data-value="4"></i>
+                <i class="fa fa-star star" data-value="5"></i>
+            </div>
+        </div>
+        <div class="rating-row">
+            <div class="rating-label">Dịch vụ của người bán:</div>
+            <div class="star-rating" id="serviceRating">
+                <i class="fa fa-star star" data-value="1"></i>
+                <i class="fa fa-star star" data-value="2"></i>
+                <i class="fa fa-star star" data-value="3"></i>
+                <i class="fa fa-star star" data-value="4"></i>
+                <i class="fa fa-star star" data-value="5"></i>
+            </div>
+        </div>
+
+        <label class="section-title">Nhận xét:</label>
+        <div style="border: 1px solid #ddd; padding: 5px;">
+            <textarea class="lined-textarea" id="reviewComment" rows="4"></textarea>
+        </div>
+
+        <div class="media-upload-container">
+            <div class="media-box" data-type="image">
+                <label class="section-title" style="margin-top:-20px;margin-bottom:5px">Thêm ảnh</label>
+                <i class="fa fa-camera"></i>
+                <i class="fa fa-plus" style="font-size: 14px; position: absolute; margin-left: 20px; margin-top: -10px;"></i>
+            </div>
+            <div class="media-box" data-type="video">
+                <label class="section-title" style="margin-top:-20px;margin-bottom:5px">Thêm video</label>
+                <i class="fa fa-video"></i>
+                <i class="fa fa-plus" style="font-size: 14px; position: absolute; margin-left: 20px; margin-top: -10px;"></i>
+            </div>
+        </div>
+        <input type="file" id="reviewMedia" multiple style="display:none;">
+
+        <div class="dialog-actions">
+            <button class="btn-submit-review" id="btnSubmitReview">Gửi đánh giá</button>
+        </div>
+    </div>
+    <script src="~/js/PaymentHistory.js"></script>
 </body>
 </html>

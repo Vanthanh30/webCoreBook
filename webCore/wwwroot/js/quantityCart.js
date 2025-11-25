@@ -150,9 +150,7 @@ $(document).ready(function () {
                     }
 
                     updateSummary();
-                    alert("Sản phẩm đã được xóa.");
-                } else {
-                    alert(response.message);
+                
                 }
             },
             error: function (error) {
