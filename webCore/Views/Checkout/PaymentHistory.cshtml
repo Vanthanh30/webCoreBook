@@ -88,101 +88,101 @@
         {
             foreach (var order in Model)
             {
-    <div class="order-card border p-4 mb-4 shadow-sm" data-status="@order.Status">
-        <div class="d-flex justify-content-between align-items-center">
+                <div class="order-card border p-4 mb-4 shadow-sm" data-status="@order.Status">
+                    <div class="d-flex justify-content-between align-items-center">
 
-            <div>
-                <strong>Mã đơn:</strong> @order.Id <br />
-                <small>Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-            </div>
+                        <div>
+                            <strong>Mã đơn:</strong> @order.Id <br />
+                            <small>Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
 
-            <div>
-                <span class="badge btn-status
+                        <div>
+                            <span class="badge btn-status
                             @(order.Status == "Chờ xác nhận" ? "badge-warning" :
                               order.Status == "Chờ vận chuyển" ? "badge-info" :
                               order.Status == "Chờ giao hàng" ? "badge-primary" :
                               order.Status == "Đã giao" ? "badge-success" :
                               order.Status == "Đã hủy" ? "badge-danger" :
                               order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
-                    @order.Status
-                </span>
-            </div>
-        </div>
-
-        <hr />
-
-        @foreach (var item in order.Items)
-        {
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <img src="@item.Image" alt="Product" style="width:65px;height:65px;border-radius:8px;margin-right:12px;" />
-                    <div>
-                        <strong>@item.Title</strong><br />
-                        <small>Giá: @item.Price.ToString("N0")đ | SL: @item.Quantity</small>
+                                @order.Status
+                            </span>
+                        </div>
                     </div>
-                </div>
-            </div>
-        }
 
-        <hr />
+                    <hr />
 
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <strong>Tổng tiền:</strong>
-                <span class="text-danger font-weight-bold">@order.FinalAmount.ToString("N0")đ</span>
-            </div>
-
-            <div>
-                <!-- Common Button: View Details -->
-                <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })"
-                   class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
-
-                <!-- Dynamic Action Buttons -->
-                @if (order.Status == "Chờ xác nhận")
-                {
-                    <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
-                }
-                else if (order.Status == "Chờ vận chuyển")
-                {
-                    <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                }
-                else if (order.Status == "Chờ giao hàng")
-                {
-                    <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
-                    <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                }
-                else if (order.Status == "Đã giao")
-                {
                     @foreach (var item in order.Items)
                     {
-                        <a class="btn btn-sm btn-outline-primary action-btn btnReview"
-                           data-order-id="@order.Id"
-                           data-product-title="@item.Title"
-                           data-product-price="@item.Price"
-                           data-product-image="@item.Image"
-                           data-quantity="@item.Quantity"
-                           data-total="@order.FinalAmount">
-                            Đánh giá
-                        </a>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <img src="@item.Image" alt="Product" style="width:65px;height:65px;border-radius:8px;margin-right:12px;" />
+                                <div>
+                                    <strong>@item.Title</strong><br />
+                                    <small>Giá: @item.Price.ToString("N0")đ | SL: @item.Quantity</small>
+                                </div>
+                            </div>
+                        </div>
                     }
-                    <a class="btn btn-sm btn-outline-danger action-btn"
-                       href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
-                }
 
-                else if (order.Status == "Trả hàng/Hoàn tiền")
-                {
-                    <a href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-secondary action-btn">Lý do trả hàng</a>
-                    <a href="@Url.Action("Reorder", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
-                }
-            </div>
-        </div>
-    </div>
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Tổng tiền:</strong>
+                            <span class="text-danger font-weight-bold">@order.FinalAmount.ToString("N0")đ</span>
+                        </div>
+
+                        <div>
+                            <!-- Common Button: View Details -->
+                            <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
+
+                            <!-- Dynamic Action Buttons -->
+                            @if (order.Status == "Chờ xác nhận")
+                            {
+                                <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
+                            }
+                            else if (order.Status == "Chờ vận chuyển")
+                            {
+                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                            }
+                            else if (order.Status == "Chờ giao hàng")
+                            {
+                                <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
+                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
+                            }
+                            else if (order.Status == "Đã giao")
+                            {
+                                @foreach (var item in order.Items)
+                                {
+                                    <a class="btn btn-sm btn-outline-primary action-btn btnReview"
+                                       data-order-id="@order.Id"
+                                       data-product-title="@item.Title"
+                                       data-product-price="@item.Price"
+                                       data-product-image="@item.Image"
+                                       data-quantity="@item.Quantity"
+                                       data-total="@order.FinalAmount">
+                                        Đánh giá
+                                    </a>
+                                }
+                                <a class="btn btn-sm btn-outline-danger action-btn"
+                                   href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
+                            }
+
+                            else if (order.Status == "Trả hàng/Hoàn tiền")
+                            {
+                                <a href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-secondary action-btn">Lý do trả hàng</a>
+                                <a href="@Url.Action("Reorder", "Checkout", new { orderId = order.Id })"
+                                   class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
+                            }
+                        </div>
+                    </div>
+                </div>
             }
         }
 
