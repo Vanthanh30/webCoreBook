@@ -65,12 +65,12 @@
                         </div>
                         <div>
                             <span class="badge btn-status
-                                @(order.Status == "Chờ xác nhận" ? "badge-warning" :
-                                                                order.Status == "Chờ vận chuyển" ? "badge-info" :
-                                                                order.Status == "Chờ giao hàng" ? "badge-primary" :
-                                                                order.Status == "Đã giao" ? "badge-success" :
-                                                                order.Status == "Đã hủy" ? "badge-danger" :
-                                                                order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
+                                    @(order.Status == "Chờ xác nhận" ? "badge-warning" :
+                                                                                                  order.Status == "Chờ vận chuyển" ? "badge-info" :
+                                                                                                  order.Status == "Chờ giao hàng" ? "badge-primary" :
+                                                                                                  order.Status == "Đã giao" ? "badge-success" :
+                                                                                                  order.Status == "Đã hủy" ? "badge-danger" :
+                                                                                                  order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
                             @order.Status
                         </span>
                     </div>
@@ -99,7 +99,6 @@
                             <span class="text-danger font-weight-bold">@order.FinalAmount.ToString("N0")đ</span>
                         </div>
                         <div>
-                            <a class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
                             <a href="@Url.Action("Index", "Chat_buyer")" class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
 
                             @if (order.Status == "Chờ xác nhận")
