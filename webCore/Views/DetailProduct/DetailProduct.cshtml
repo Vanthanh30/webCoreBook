@@ -105,11 +105,49 @@
                                         });
                                     });
                                 </script>
-                                <form method="get" action="@Url.Action("BuyNow", "Cart")">
-                                    <input type="hidden" name="productId" value="@Model.Id" />
-                                    <input type="hidden" id="quantityInput" name="quantity" value="1" />
-                                    <button class="btn buy_button ml-2">Mua ngay</button>
-                                </form>
+                                <button class="btn buy_button ml-2" id="btnBuyNow"
+                                        data-productid="@Model.Id">
+                                    Mua ngay
+                                </button>
+
+                                <input type="hidden" id="quantityInput" value="1" />
+
+                                <script>
+                                    $(document).ready(function () {
+
+                                        $("#btnBuyNow").click(function (e) {
+                                            e.preventDefault();
+
+                                            var productId = $(this).data("productid");
+                                            var quantity = $("#quantityInput").val();
+
+                                            $.ajax({
+                                                url: "/Cart/BuyNow",
+                                                type: "GET",
+                                                data: {
+                                                    productId: productId,
+                                                    quantity: quantity
+                                                },
+                                                success: function (response) {
+
+                                                    // 🟢  Nếu thành công và server trả về success = false → show lỗi
+                                                    if (response.success === false) {
+                                                        alert(response.message);
+                                                        return;
+                                                    }
+
+                                                    // 🟢 Khi BuyNow thành công → server trả view HTML
+                                                    // => Chuyển hướng sang trang Checkout
+                                                    window.location.href = "/Cart/BuyNow?productId=" + productId + "&quantity=" + quantity;
+                                                },
+                                                error: function () {
+                                                    alert("Có lỗi xảy ra khi thực hiện mua ngay!");
+                                                }
+                                            });
+                                        });
+
+                                    });
+                                </script>
                             </div>
                             <div class="d-flex quantity">
                                 <label for="quantity" class="mr-4">Số lượng</label>
