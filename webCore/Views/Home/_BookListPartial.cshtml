@@ -17,13 +17,13 @@
                                 {
                                     <span class="badge discount-badge">Giảm @product.DiscountPercentage%</span>
                                     <br />
-                                    <span class="text-muted old-price">@string.Format("{0:C}", product.Price)</span>
+                                    <span class="text-muted old-price">@string.Format("{0:C}đ", product.Price)</span>
                                     <br />
-                                    <span class="price new-price">@string.Format("{0:C}", product.Price * (1 - product.DiscountPercentage / 100))</span>
+                                    <span class="price new-price">@string.Format("{0:C}đ", product.Price * (1 - product.DiscountPercentage / 100))</span>
                                 }
                                 else
                                 {
-                                    <span class="price normal-price">@string.Format("{0:C}", product.Price)</span>
+                                    <span class="price normal-price">@string.Format("{0:C}đ", product.Price)</span>
                                 }
                             </p>
                         </div>
