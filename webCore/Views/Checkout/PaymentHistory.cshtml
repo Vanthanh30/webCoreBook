@@ -49,7 +49,7 @@
         <div class="d-flex flex-wrap justify-content-center mb-4 status-filter">
             @foreach (var s in statuses)
             {
-                <button type="button" class="btn btn-outline-secondary btn-sm @(s=="Tất cả"?"active":"")" data-status="@s">@s</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm @(s == "Tất cả" ? "active" : "")" data-status="@s">@s</button>
             }
         </div>
 
@@ -65,20 +65,20 @@
                         </div>
                         <div>
                             <span class="badge btn-status
-                            @(order.Status == "Chờ xác nhận" ? "badge-warning" :
-                              order.Status == "Chờ vận chuyển" ? "badge-info" :
-                              order.Status == "Chờ giao hàng" ? "badge-primary" :
-                              order.Status == "Đã giao" ? "badge-success" :
-                              order.Status == "Đã hủy" ? "badge-danger" :
-                              order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
-                                @order.Status
-                            </span>
-                        </div>
+                                @(order.Status == "Chờ xác nhận" ? "badge-warning" :
+                                                                order.Status == "Chờ vận chuyển" ? "badge-info" :
+                                                                order.Status == "Chờ giao hàng" ? "badge-primary" :
+                                                                order.Status == "Đã giao" ? "badge-success" :
+                                                                order.Status == "Đã hủy" ? "badge-danger" :
+                                                                order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
+                            @order.Status
+                        </span>
                     </div>
+                </div>
 
                     <hr />
 
-                    @foreach (var item in order.Items)
+                @foreach (var item in order.Items)
                     {
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="d-flex align-items-center">
@@ -100,19 +100,15 @@
                         </div>
                         <div>
                             <a class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
+                            <a href="@Url.Action("Index", "Chat_buyer")" class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
 
                             @if (order.Status == "Chờ xác nhận")
                             {
                                 <a class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
                             }
-                            else if (order.Status == "Chờ vận chuyển")
-                            {
-                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                            }
                             else if (order.Status == "Chờ giao hàng")
                             {
                                 <a class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
-                                <a class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                             }
                             else if (order.Status == "Đã giao")
                             {
@@ -128,16 +124,10 @@
                                         Đánh giá
                                     </a>
                                 }
-                                <a class="btn btn-sm btn-outline-danger action-btn" 
+                                <a class="btn btn-sm btn-outline-danger action-btn"
                                    href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
                             }
-                            else if (order.Status == "Đã hủy")
-                            {
-                                <a class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
-
-
-                            }
-                            else if (order.Status == "Trả hàng/Hoàn tiền")
+                            else if (order.Status == "Đã hủy" || order.Status == "Trả hàng/Hoàn tiền")
                             {
                                 <a class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
                             }

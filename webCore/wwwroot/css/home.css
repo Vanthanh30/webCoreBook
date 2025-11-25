@@ -1,173 +1,7 @@
 /* ===== HEADER STYLES ===== */
 header {
     background-color: #66C5FF;
-    padding: 15px 0;
-}
-
-    header .container .row {
-        display: flex;
-        align-items: center;
-    }
-
-/* Logo Styles */
-.inner-logo a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.inner-img img {
-    width: 150px; /* Kích thước logo 150px */
-    height: auto;
-}
-
-.inner-title {
-    margin-left: 10px;
-}
-
-.title-first, .title-second {
-    font-size: 24px;
-    line-height: 1;
-}
-
-.title-first {
-    color: #fff;
-}
-
-.title-second {
-    font-weight: bold;
-    color: #333;
-}
-
-.old-price {
-    color: gray;
-    text-decoration: line-through;
-    margin-right: 10px;
-    font-size: 14px; /* Kích thước font cho dễ nhìn */
-}
-
-.new-price {
-    color: #FF6347; /* Màu đỏ cam */
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.discount-percentage {
-    background-color: #ff5722; /* Màu nền cho % giảm giá */
-    color: #fff;
-    border-radius: 50%;
-    display: inline-block;
-    padding: 3px 6px;
-    font-size: 0.8rem;
-    margin-left: 10px; /* Khoảng cách giữa % giảm giá và giá mới */
-}
-
-/* Search Form Styles */
-.inner-search {
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-    .inner-search form {
-        display: flex;
-        width: 100%;
-    }
-
-    .inner-search input {
-        flex-grow: 1;
-        margin-right: 10px;
-        height: 40px;
-    }
-
-    .inner-search button {
-        height: 40px;
-    }
-
-/* Định dạng cho icon cart */
-.inner-cart i {
-    font-size: 1.5rem;
-    color: #000;
-}
-
-/* Đảm bảo rằng các icon và tên người dùng có khoảng cách hợp lý */
-.items-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    gap: 20px;
-    margin-top: 30px;
-}
-
-/* Icon Cart, User, Chat */
-.inner-cart,
-.inner-user {
-    margin-right: 20px;
-    background-color: #f9f1f5;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    transform: rotate(45deg);
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-    .inner-cart a,
-    .inner-user a {
-        font-size: 1.5em;
-        color: #333;
-        transform: rotate(-45deg);
-    }
-
-    .inner-cart:hover,
-    .inner-user:hover {
-        background-color: #c5c6c6;
-    }
-
-    .inner-cart a:hover,
-    .inner-user a:hover {
-        color: #28a745;
-    }
-
-
-/* Dropdown Styles */
-.user-dropdown {
-    position: absolute;
-    right: 20px; /* Đặt vị trí bên phải phù hợp */
-    top: 80px; /* Đặt vị trí bên dưới icon user */
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    min-width: 150px;
-}
-
-.user-dropdown a {
-    display: block;
-    padding: 10px 20px;
-    text-decoration: none;
-    color: #333;
-}
-
-.user-dropdown a:hover {
-    background-color: #f0f0f0;
-}
-.user-dropdown form:hover {
-    background-color: #f0f0f0;
-}
-
-.hidden {
-    display: none !important;
-}
-/* ===== HEADER STYLES ===== */
-header {
-    background-color: #66C5FF;
-    padding: 15px 0;
+    padding: 15px 0 25px 0;
 }
 
     header .container .row {
@@ -215,7 +49,7 @@ header {
 .new-price {
     color: #FF6347;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .discount-percentage {
@@ -250,14 +84,11 @@ header {
         height: 40px;
     }
 
-/* Định dạng cho icon cart */
-.inner-cart i {
-    font-size: 1.5rem;
-    color: #000;
-}
-
+/* Định dạng cho icon cart, chat, user */
+.inner-cart i,
+.inner-chat i,
 .inner-user i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: #000;
 }
 
@@ -267,64 +98,74 @@ header {
     justify-content: center;
     align-items: center;
     height: 100%;
-    gap: 20px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    gap: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
+/* Icon Cart, Chat, User - Style giống nhau */
 .inner-cart,
+.inner-chat,
 .inner-user {
-    margin-right: 20px;
     background-color: #f9f1f5;
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 8px;
     transform: rotate(45deg);
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
     .inner-cart a,
+    .inner-chat a,
     .inner-user a {
-        font-size: 1.5em;
+        font-size: 1.1em;
         color: #333;
         transform: rotate(-45deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .inner-cart:hover,
+    .inner-chat:hover,
     .inner-user:hover {
         background-color: #c5c6c6;
     }
 
     .inner-cart a:hover,
+    .inner-chat a:hover,
     .inner-user a:hover {
         color: #28a745;
     }
 
 .user-name {
+    position: absolute;
     margin-top: 10px;
-    font-size: 0.9rem;
+    margin-left: -13px;
+    font-size: 0.85rem;
     color: #000;
-   /* margin-right: 55px;*/
-   margin-left: -13px;
-   position:absolute;
+    text-align: center;
+    white-space: nowrap;
 }
 
+/* Dropdown Styles */
 /* Dropdown Styles */
 .user-dropdown {
     position: absolute;
     right: 20px;
-    top: 80px;
+    top: 50px;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     min-width: 150px;
-    margin-right:-50px;
+    margin-right: -50px;
 }
 
     .user-dropdown a {
@@ -337,6 +178,10 @@ header {
         .user-dropdown a:hover {
             background-color: #f0f0f0;
         }
+
+    .user-dropdown form:hover {
+        background-color: #f0f0f0;
+    }
 
 .hidden {
     display: none !important;
@@ -354,17 +199,19 @@ header {
 .cart-item-1 {
     display: none;
     position: absolute;
-    top: 17px;
-    margin-left: 35px;
+    top: -5px;
+    right: -5px;
     color: white;
     border-radius: 50%;
     background-color: red;
     padding: 3px 5px;
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
     text-align: center;
-    justify-content: center;
+    line-height: 15px;
+    font-size: 12px;
 }
+
 /* ===== SECTION STYLES ===== */
 #section-one {
     padding: 40px 0;
@@ -441,9 +288,9 @@ header {
 .card {
     margin-bottom: 20px;
     position: relative;
-    font-size: 19px; /* Chữ nhỏ lại */
-    height: 350px; /* Đảm bảo chiều cao cố định cho card */
-    overflow: hidden; /* Giúp card không thay đổi kích thước khi thay đổi nội dung */
+    font-size: 19px;
+    height: 350px;
+    overflow: hidden;
 }
 
     .card a {
@@ -451,27 +298,26 @@ header {
     }
 
 .card-title {
-    font-size: 16px; /* Chữ lớn hơn */
-    overflow: hidden; /* Tránh tình trạng tràn khi cỡ chữ thay đổi */
-    white-space: nowrap; /* Đảm bảo chữ không xuống dòng */
-    text-overflow: ellipsis; /* Thêm dấu ... nếu chữ quá dài */
+    font-size: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .card-text {
     font-weight: bold;
     color: #FF6347;
-    margin-bottom: 5px; /* Giảm khoảng cách với title */
+    margin-bottom: 5px;
 }
 
-/* Chỉnh kích thước chữ của .new-price mà không thay đổi kích thước card */
 .new-price {
     color: #FF6347;
     font-weight: bold;
-    font-size: 19px; /* Cỡ chữ tăng lên 19px */
-    line-height: 1.2; /* Điều chỉnh chiều cao dòng nếu cần */
-    max-width: 100%; /* Đảm bảo không làm card bị đẩy ra ngoài */
-    overflow: hidden; /* Giữ nội dung không bị tràn ra ngoài */
-    text-overflow: ellipsis; /* Thêm dấu ... nếu nội dung dài quá */
+    font-size: 19px;
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .discount-badge {
@@ -484,20 +330,19 @@ header {
 
 /* Phần Feature nổi bật hơn */
 .feature-title {
-    background-color: #ffdf00; /* Màu vàng nổi bật */
+    background-color: #ffdf00;
     color: #000;
     padding: 10px;
     border-radius: 5px;
     font-weight: bold;
     font-size: 20px;
 }
+
 /* ===== FOOTER STYLES ===== */
-/* Footer background */
 footer {
-    background-color: #66C5FF; /* Màu nền đen */
+    background-color: #66C5FF;
 }
 
-/* Logo trong footer */
 .footer-logo a {
     font-size: 44px;
     font-weight: bold;
@@ -508,26 +353,25 @@ footer {
 .footer-logo .title-second {
     font-size: 44px;
 }
-/* Icon Mạng xã hội */
+
 .social-icons a {
     font-size: 35px;
 }
 
     .social-icons a:hover {
-        color: #28a745; /* Màu khi hover */
+        color: #28a745;
     }
 
 .contact-info p:nth-child(1) {
     font-weight: bold;
     font-size: 20px;
 }
-/* Liên hệ */
+
 .contact-info p {
     margin: 0;
     font-size: 14px;
 }
 
-/* Dòng chữ bản quyền */
 footer p {
     font-size: 14px;
     color: #333;
@@ -541,11 +385,11 @@ footer p {
 .arrow {
     display: inline-block;
     transition: transform 0.3s ease;
-    transform: rotate(-90deg); /* Mặc định chỉ sang trái */
+    transform: rotate(-90deg);
 }
 
     .arrow.open {
-        transform: rotate(-1deg); /* Xoay xuống khi mở */
+        transform: rotate(-1deg);
     }
 
 .subcategories {
@@ -573,17 +417,16 @@ footer p {
     border: 2px solid #000000;
     border-radius: 5px;
 }
-/* Danh mục cha */
+
 .list-group-item {
-    border-bottom: 1px solid #ddd; /* Đường phân cách cha */
+    border-bottom: 1px solid #ddd;
 }
 
-/* Danh mục con */
 .subcategories {
     padding-left: 15px;
     position: relative;
-    display: none; /* Mặc định các mục con ẩn đi */
-    transition: all 0.3s ease; /* Hiệu ứng chuyển động */
+    display: none;
+    transition: all 0.3s ease;
 }
 
     .subcategories .list-group-item {
@@ -593,15 +436,14 @@ footer p {
         padding: 10px 15px;
     }
 
-        /* Gạch ngang trên và dưới mục con */
         .subcategories .list-group-item::before,
         .subcategories .list-group-item::after {
             content: '';
             position: absolute;
             left: 0;
             right: 0;
-            height: 0.5px; /* Giảm độ dày của gạch ngang */
-            background-color: #ddd; /* Màu sắc của gạch */
+            height: 0.5px;
+            background-color: #ddd;
         }
 
         .subcategories .list-group-item::before {
@@ -613,19 +455,19 @@ footer p {
         }
 
 .product-group-name {
-    color: red; /* Thay màu theo nhu cầu */
+    color: red;
 }
 
 .product-row {
-    display: flex; /* Xếp các phần tử con theo hàng ngang */
-    overflow-x: hidden; /* Ẩn cuộn ngang */
-    scroll-behavior: smooth; /* Cuộn mượt */
-    gap: 1rem; /* Khoảng cách giữa các sản phẩm */
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    gap: 1rem;
 }
 
 .product-item {
-    flex: 0 0 auto; /* Đảm bảo sản phẩm không bị co lại */
-    width: 250px; /* Đặt chiều rộng cố định cho mỗi sản phẩm */
+    flex: 0 0 auto;
+    width: 250px;
 }
 
 .position-relative {
@@ -657,21 +499,19 @@ footer p {
 .scroll-btn:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
-/* Áp dụng margin-right cho tên người dùng */
+
 .username {
-    margin-right: 15px;
+    margin-right: 0;
     display: inline-block;
     text-align: center;
     white-space: nowrap;
     word-wrap: break-word;
 }
 
-/* Đảm bảo không có margin-right khi là "Đăng nhập" */
 .login-text {
     margin-right: 0;
 }
 
-/* Style cho dropdown item với arrow */
 .dropdown-item-with-arrow {
     display: flex;
     justify-content: space-between;
@@ -692,7 +532,6 @@ footer p {
         margin-left: 10px;
     }
 
-/* Style cho submenu */
 .dropdown-item-container {
     position: relative;
 }
@@ -726,3 +565,4 @@ footer p {
 /* Hidden class */
 .hidden {
     display: none !important;
+}
