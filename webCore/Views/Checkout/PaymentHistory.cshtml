@@ -157,11 +157,22 @@
                 }
                 else if (order.Status == "Đã giao")
                 {
-                    <a href="@Url.Action("RateOrder", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-primary action-btn">Đánh giá</a>
-                    <a href="@Url.Action("ReturnOrder", "Checkout", new { orderId = order.Id })"
-                       class="btn btn-sm btn-outline-danger action-btn">Yêu cầu trả hàng</a>
+                    @foreach (var item in order.Items)
+                    {
+                        <a class="btn btn-sm btn-outline-primary action-btn btnReview"
+                           data-order-id="@order.Id"
+                           data-product-title="@item.Title"
+                           data-product-price="@item.Price"
+                           data-product-image="@item.Image"
+                           data-quantity="@item.Quantity"
+                           data-total="@order.FinalAmount">
+                            Đánh giá
+                        </a>
+                    }
+                    <a class="btn btn-sm btn-outline-danger action-btn"
+                       href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
                 }
+
                 else if (order.Status == "Trả hàng/Hoàn tiền")
                 {
                     <a href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })"
