@@ -214,7 +214,7 @@ namespace webCore.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(SetLoginStatusFilter))]
-        public async Task<IActionResult> PaymentHistory(string ? status = null)
+        public async Task<IActionResult> PaymentHistory(string? status = null)
         {
             // Kiểm tra xem người dùng đã đăng nhập hay chưa
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
@@ -224,10 +224,12 @@ namespace webCore.Controllers
             var userToken = HttpContext.Session.GetString("UserToken");
             if (string.IsNullOrEmpty(userToken))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Sign_in", "User");
             }
-            }
+            var userId = HttpContext.Session.GetString("UserId");
+
+            // Lấy danh sách đơn hàng từ MongoDB theo UserId
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
             // Lọc danh sách đơn hàng theo trạng thái nếu trạng thái không null
             if (!string.IsNullOrEmpty(status))
@@ -245,13 +247,11 @@ namespace webCore.Controllers
                     orders = orders.Where(o => o.Status == "Đã hủy").ToList();
                 }
             }
-            return View(orders.OrderByDescending(o => o.CreatedAt).ToList());
+
             // Truyền trạng thái hiện tại và danh sách đơn hàng vào View
             ViewBag.CurrentStatus = status ?? "All";
             return View(orders);
         }
-        }
-
 
 
         [HttpGet]
@@ -266,7 +266,7 @@ namespace webCore.Controllers
             {
                 return RedirectToAction("Sign_in", "User");
             }
-         
+
 
             // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
             ViewBag.IsLoggedIn = isLoggedIn;
@@ -283,7 +283,7 @@ namespace webCore.Controllers
         }
         public IActionResult ReturnReason()
         {
-            return View(); // Mở View ReturnReason.cshtml
+            return View(); 
         }
     }
 }
