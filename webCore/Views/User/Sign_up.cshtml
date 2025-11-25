@@ -123,6 +123,20 @@
                 document.getElementById("emailError").innerText = data.message;
             }
         }
+        function toggleEye(inputId, iconId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";          // Hiện mật khẩu
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash"); // Đổi icon sang mắt gạch chéo
+            } else {
+                input.type = "password";      // Ẩn mật khẩu
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye"); // Đổi icon sang mắt thường
+            }
+        }
     </script>
 
 </body>
