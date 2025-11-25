@@ -59,9 +59,12 @@ namespace webCore.Controllers
                         product.CategoryTitle = categoryDictionary[product.CategoryId];
                     }
                 }
+                var validStatuses = new[] { "Hoạt động", "Chờ duyệt", "Không duyệt" };
+                var filteredProducts = products
+                    .Where(p => !string.IsNullOrEmpty(p.Status) &&
+                                validStatuses.Contains(p.Status.Trim(), StringComparer.OrdinalIgnoreCase))
+                    .ToList();
 
-                // Lọc sản phẩm theo trạng thái
-                List<Product_admin> filteredProducts;
                 if (filter == "active")
                 {
                     filteredProducts = products.Where(p =>
@@ -71,16 +74,19 @@ namespace webCore.Controllers
                 }
                 else if (filter == "inactive")
                 {
-                    filteredProducts = products.Where(p =>
-                        p.Status != null &&
-                        (p.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase) ||
-                         p.Status.Equals("Dừng hoạt động", StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
+                    filteredProducts = products
+                        .Where(p => p.Status != null &&
+                                    p.Status.Equals("Không duyệt", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
-                else // all
+                else if (filter == "pending")
                 {
-                    filteredProducts = products.ToList();
+                    filteredProducts = products
+                        .Where(p => p.Status != null &&
+                                    p.Status.Equals("Chờ duyệt", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
+
 
                 // Sắp xếp theo Position
                 var sortedProducts = filteredProducts.OrderBy(c => c.Position).ToList();
@@ -103,13 +109,6 @@ namespace webCore.Controllers
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentFilter = filter;
-
-                // Kiểm tra nếu không có sản phẩm nào
-                if (totalProducts == 0)
-                {
-                    TempData["ErrorMessage"] = "Không có sản phẩm nào để hiển thị.";
-                    return View(new List<Product_admin>());
-                }
 
                 return View(productsToDisplay);
             }
@@ -220,7 +219,7 @@ namespace webCore.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                product.Status = "Không hoạt động";
+                product.Status = "Không duyệt";
                 product.UpdatedAt = DateTime.UtcNow;
 
                 await _CategoryProductCollection.UpdateProductAsync(product);

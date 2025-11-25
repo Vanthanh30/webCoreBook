@@ -123,7 +123,7 @@ namespace webCore.Controllers
                     TotalAmount = totalAmount,
                     DiscountAmount = 0,
                     FinalAmount = finalAmount,
-                    Status = "Đang chờ duyệt",
+                    Status = "Chờ xác nhận",
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -177,7 +177,7 @@ namespace webCore.Controllers
                 TotalAmount = totalAmountCheckout,
                 DiscountAmount = discountAmount,
                 FinalAmount = finalAmountCheckout,
-                Status = "Đang chờ duyệt",
+                Status = "Chờ xác nhận",
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -216,43 +216,28 @@ namespace webCore.Controllers
         [ServiceFilter(typeof(SetLoginStatusFilter))]
         public async Task<IActionResult> PaymentHistory(string? status = null)
         {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
-            var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
-            ViewBag.IsLoggedIn = isLoggedIn;
+            var userId = HttpContext.Session.GetString("UserId"); // Đúng UserId
 
-            // Lấy UserId từ session
-            var userToken = HttpContext.Session.GetString("UserToken");
-            if (string.IsNullOrEmpty(userToken))
-            {
+            if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Sign_in", "User");
-            }
-            var userId = HttpContext.Session.GetString("UserId");
 
-            // Lấy danh sách đơn hàng từ MongoDB theo UserId
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
-            // Lọc danh sách đơn hàng theo trạng thái nếu trạng thái không null
-            if (!string.IsNullOrEmpty(status))
+            if (orders == null || !orders.Any())
+                return View(new List<Order>());
+
+            // Lọc theo trạng thái nếu có
+            if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
-                if (status == "Đang chờ duyệt")
-                {
-                    orders = orders.Where(o => o.Status == "Đang chờ duyệt").ToList();
-                }
-                else if (status == "Đã duyệt")
-                {
-                    orders = orders.Where(o => o.Status == "Đã duyệt").ToList();
-                }
-                else if (status == "Đã hủy")
-                {
-                    orders = orders.Where(o => o.Status == "Đã hủy").ToList();
-                }
+                orders = orders.Where(o => o.Status == status).ToList();
             }
 
-            // Truyền trạng thái hiện tại và danh sách đơn hàng vào View
-            ViewBag.CurrentStatus = status ?? "All";
-            return View(orders);
-        }
+            // Gửi trạng thái hiện tại để hiển thị active nút lọc
+            ViewBag.CurrentStatus = status ?? "Tất cả";
 
+            // Sắp xếp đơn hàng mới nhất lên đầu
+            return View(orders.OrderByDescending(o => o.CreatedAt).ToList());
+        }
 
         [HttpGet]
         [ServiceFilter(typeof(SetLoginStatusFilter))]

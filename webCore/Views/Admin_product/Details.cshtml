@@ -107,16 +107,12 @@
                 }
                 else
                 {
-                    <span class="badge badge-danger"><i class="fas fa-pause-circle"></i> Không hoạt động</span>
+                    <span class="badge badge-danger"><i class="fas fa-pause-circle"></i> Chờ duyệt</span>
                 }
             </p>
         </div>
 
         <div class="detail-grid">
-            <div class="detail-row">
-                <label><i class="fas fa-sort"></i> Vị trí</label>
-                <p><strong>#@Model.Position</strong></p>
-            </div>
 
             <div class="detail-row">
                 <label><i class="fas fa-calendar-plus"></i> Ngày tạo</label>
@@ -142,7 +138,7 @@
             </form>
         }
 
-        @if (Model.Status != "Không hoạt động")
+        @if (Model.Status != "Chờ duyệt")
         {
             <form action="@Url.Action("Reject", "Admin_product", new { id = Model.Id })" method="post" style="display: inline-block;">
                 @Html.AntiForgeryToken()

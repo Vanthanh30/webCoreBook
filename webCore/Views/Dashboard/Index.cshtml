@@ -43,7 +43,6 @@
                     <th>Giá</th>
                     <th>Ngày Tạo</th>
                     <th>Trạng Thái</th>
-                    <th>Thao Tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,43 +60,7 @@
                             <td>@product.Price.ToString("N0") VNĐ</td>
                             <td>@product.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>
-                                @if (string.IsNullOrEmpty(product.Status))
-                                {
-                                    <span class="badge badge-secondary">Chưa xác định</span>
-                                }
-                                else if (product.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="badge badge-success">Hoạt động</span>
-                                }
-                                else if (product.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase) ||
-                                product.Status.Equals("Dừng hoạt động", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <span class="badge badge-danger">Không hoạt động</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-warning">@product.Status</span>
-                                }
-                            </td>
-                            <td>
-                                @if (!product.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <form method="post" action="/Admin_product/Approve/@product.Id" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bạn có chắc muốn duyệt sản phẩm này?')">
-                                            <i class="fas fa-check"></i> Duyệt
-                                        </button>
-                                    </form>
-                                }
-                                @if (!product.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <form method="post" action="/Admin_product/Reject/@product.Id" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn từ chối sản phẩm này?')">
-                                            <i class="fas fa-times"></i> Từ chối
-                                        </button>
-                                    </form>
-                                }
+                                <span class="badge badge-warning">@product.Status</span>
                             </td>
                         </tr>
                     }
