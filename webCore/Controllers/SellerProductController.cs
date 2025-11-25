@@ -14,12 +14,8 @@ namespace webCore.Controllers
         {
             return View();
         }
-        public IActionResult EditProduct(string id)
+        public IActionResult EditProduct()
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                return RedirectToAction("ProductManagement");
-            }
             return View();
         }
         public IActionResult AddProduct()
