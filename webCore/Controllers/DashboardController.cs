@@ -38,10 +38,9 @@ namespace webCore.Controllers
             var allProducts = await _categoryProductCollection.GetProduct();
             var totalProducts = allProducts.Count;
 
-            // Lấy danh sách sản phẩm cần duyệt (Status khác "Hoạt động")
             var pendingProducts = allProducts
-                .Where(p => string.IsNullOrEmpty(p.Status) ||
-                           !p.Status.Equals("Hoạt động", StringComparison.OrdinalIgnoreCase))
+                .Where(p => p.Status != null &&
+                            p.Status.Equals("Chờ duyệt", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(5)
                 .ToList();

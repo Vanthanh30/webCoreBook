@@ -71,11 +71,17 @@ namespace webCore.Controllers
                 }
                 else if (filter == "inactive")
                 {
-                    filteredProducts = products.Where(p =>
-                        p.Status != null &&
-                        (p.Status.Equals("Không hoạt động", StringComparison.OrdinalIgnoreCase) ||
-                         p.Status.Equals("Dừng hoạt động", StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
+                    filteredProducts = products
+                        .Where(p => p.Status != null &&
+                                    p.Status.Equals("Không duyệt", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+                else if (filter == "pending")
+                {
+                    filteredProducts = products
+                        .Where(p => p.Status != null &&
+                                    p.Status.Equals("Chờ duyệt", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
                 else // all
                 {
@@ -103,13 +109,6 @@ namespace webCore.Controllers
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentFilter = filter;
-
-                // Kiểm tra nếu không có sản phẩm nào
-                if (totalProducts == 0)
-                {
-                    TempData["ErrorMessage"] = "Không có sản phẩm nào để hiển thị.";
-                    return View(new List<Product_admin>());
-                }
 
                 return View(productsToDisplay);
             }
@@ -220,7 +219,7 @@ namespace webCore.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                product.Status = "Không hoạt động";
+                product.Status = "Không duyệt";
                 product.UpdatedAt = DateTime.UtcNow;
 
                 await _CategoryProductCollection.UpdateProductAsync(product);

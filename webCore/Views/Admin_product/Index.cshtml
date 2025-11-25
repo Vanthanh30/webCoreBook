@@ -23,20 +23,24 @@
     }
 
     <!-- Bộ lọc trạng thái -->
-    <div class="filter-container">
-        <a href="@Url.Action("Index", "Admin_product", new { filter = "all" })"
-           class="filter-btn @(ViewBag.CurrentFilter == "all" ? "active" : "")">
-            <i class="fas fa-list"></i> Tất cả
-        </a>
-        <a href="@Url.Action("Index", "Admin_product", new { filter = "active" })"
-           class="filter-btn @(ViewBag.CurrentFilter == "active" ? "active" : "")">
-            <i class="fas fa-check-circle"></i> Đang hoạt động
-        </a>
-        <a href="@Url.Action("Index", "Admin_product", new { filter = "inactive" })"
-           class="filter-btn @(ViewBag.CurrentFilter == "inactive" ? "active" : "")">
-            <i class="fas fa-pause-circle"></i> Không hoạt động
-        </a>
-    </div>
+<div class="filter-container">
+    <a href="@Url.Action("Index", "Admin_product", new { filter = "all" })"
+       class="filter-btn @(ViewBag.CurrentFilter == "all" ? "active" : "")">
+        <i class="fas fa-list"></i> Tất cả
+    </a>
+    <a href="@Url.Action("Index", "Admin_product", new { filter = "active" })"
+       class="filter-btn @(ViewBag.CurrentFilter == "active" ? "active" : "")">
+        <i class="fas fa-check-circle"></i> Đang hoạt động
+    </a>
+    <a href="@Url.Action("Index", "Admin_product", new { filter = "pending" })"
+       class="filter-btn @(ViewBag.CurrentFilter == "pending" ? "active" : "")">
+        <i class="fas fa-pause-circle"></i> Chờ duyệt
+    </a>
+    <a href="@Url.Action("Index", "Admin_product", new { filter = "inactive" })"
+       class="filter-btn @(ViewBag.CurrentFilter == "inactive" ? "active" : "")">
+        <i class="fas fa-pause-circle"></i> Không duyệt
+    </a>
+</div>
 
     <table class="account-table">
         <thead>
@@ -98,10 +102,16 @@
                                     <i class="fas fa-check-circle"></i> Hoạt động
                                 </span>
                             }
+                            else if (product.Status == "Chờ duyệt")
+                            {
+                                <span class="status-badge status-pending">
+                                    <i class="fas fa-pause-circle"></i> Chờ duyệt
+                                </span>
+                            }
                             else
                             {
                                 <span class="status-badge status-inactive">
-                                    <i class="fas fa-pause-circle"></i> Không hoạt động
+                                    <i class="fas fa-pause-circle"></i> Không duyệt
                                 </span>
                             }
                         </td>
@@ -113,7 +123,7 @@
                                 <i class="fas fa-eye"></i>
                             </button>
 
-                            @if (product.Status != "Hoạt động")
+                            @if (product.Status == "Chờ duyệt")
                             {
                                 <!-- Nút duyệt -->
                                 <form action="@Url.Action("Approve", "Admin_product", new { id = product.Id })"
@@ -124,11 +134,6 @@
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
-                            }
-
-                            @if (product.Status != "Không hoạt động")
-                            {
-                                <!-- Nút từ chối -->
                                 <form action="@Url.Action("Reject", "Admin_product", new { id = product.Id })"
                                       method="post" style="display: inline-block;">
                                     @Html.AntiForgeryToken()
@@ -138,6 +143,7 @@
                                     </button>
                                 </form>
                             }
+
                         </td>
                     </tr>
                 }
