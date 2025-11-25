@@ -3,6 +3,9 @@
 }
 
 <link rel="stylesheet" href="~/css/chat.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<input type="hidden" id="sellerId" value="@User.Identity.Name" />
 
 <div class="chat-container">
     <!-- Sidebar - Danh sách khách hàng -->
@@ -10,13 +13,11 @@
         <div class="sidebar-header">
             <h5>💬 Tin nhắn khách hàng</h5>
 
-            <!-- Search Input -->
             <div class="search-wrapper">
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Tìm theo tên, SĐT...">
             </div>
 
-            <!-- Filter Select -->
             <select class="filter-select">
                 <option value="all">Tất cả tin nhắn</option>
                 <option value="unread">Chưa đọc</option>
@@ -26,7 +27,7 @@
         </div>
 
         <div class="chat-list" id="chatList">
-            <!-- Chat items will be loaded here -->
+            <!-- Danh sách khách hàng sẽ load ở đây -->
         </div>
     </div>
 
@@ -50,12 +51,8 @@
         </div>
 
         <div class="chat-input-area">
-            <!-- File Preview Area -->
-            <div class="file-preview-area" id="filePreviewArea">
-                <!-- File previews will be shown here -->
-            </div>
+            <div class="file-preview-area" id="filePreviewArea"></div>
 
-            <!-- Input Wrapper -->
             <div class="chat-input-wrapper">
                 <button class="btn btn-light btn-sm" type="button" id="btnEmoji" title="Emoji">
                     <i class="bi bi-emoji-smile"></i>
@@ -74,8 +71,5 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <script src="~/js/chat_seller.js"></script>

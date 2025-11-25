@@ -24,17 +24,18 @@ namespace webCore.Services
             _cloudinary = new Cloudinary(account);
         }
 
-        public async Task<string> UploadImageAsync(IFormFile imageFile)
+        public async Task<string> UploadFileAsync(IFormFile file)
         {
-            using (var stream = imageFile.OpenReadStream())
+            using (var stream = file.OpenReadStream())
             {
-                var uploadParams = new ImageUploadParams()
+                var uploadParams = new RawUploadParams()
                 {
-                    File = new FileDescription(imageFile.FileName, stream)
+                    File = new FileDescription(file.FileName, stream)
                 };
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
                 return uploadResult.SecureUrl.ToString();
             }
         }
+
     }
 }
