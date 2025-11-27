@@ -1,27 +1,20 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using webCore.Models;
 
 namespace webCore.Hubs
 {
     public class ChatHub : Hub
     {
-        public override Task OnConnectedAsync()
+        public async Task SendMessage(string orderId, string senderId, string message)
         {
-            var userId = Context.GetHttpContext().Request.Query["userId"];
-            if (!string.IsNullOrEmpty(userId))
-                Groups.AddToGroupAsync(Context.ConnectionId, userId);
-            return base.OnConnectedAsync();
+            await Clients.Group(orderId).SendAsync("ReceiveMessage", senderId, message);
         }
 
-        public async Task SendMessage(ChatMessage msg)
+        public override async Task OnConnectedAsync()
         {
-            // Gửi cho cả sender & receiver
-            await Clients.Group(msg.ReceiverId).SendAsync("ReceiveMessage", msg);
-            await Clients.Group(msg.SenderId).SendAsync("ReceiveMessage", msg);
+            var orderId = Context.GetHttpContext().Request.Query["orderId"];
+            await Groups.AddToGroupAsync(Context.ConnectionId, orderId);
+            await base.OnConnectedAsync();
         }
     }
 }

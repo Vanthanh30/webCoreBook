@@ -1,71 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using webCore.Services;
-using webCore.Models;
-using Microsoft.AspNetCore.SignalR;
-using webCore.Hubs;
+using System;
 using System.Threading.Tasks;
-using MongoDB.Driver;
-using Microsoft.AspNetCore.Http;
+using webCore.Models;
+using webCore.MongoHelper;
 
 namespace webCore.Controllers.ApiControllers
 {
-    [Route("api/chat")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ChatApiController : ControllerBase
     {
-        private readonly MongoDBService _db;
-        private readonly IHubContext<ChatHub> _hub;
-        private readonly CloudinaryService _cloud;
+        private readonly ChatService _chatService;
 
-        public ChatApiController(MongoDBService db, IHubContext<ChatHub> hub, CloudinaryService cloud)
+        public ChatApiController(ChatService chatService)
         {
-            _db = db;
-            _hub = hub;
-            _cloud = cloud;
+            _chatService = chatService;
         }
 
-        [HttpGet("history/{orderId}")]
-        public async Task<IActionResult> GetHistory(string orderId)
+        [HttpGet("GetMessages")]
+        public async Task<IActionResult> GetMessages(string orderId, string buyerId, string sellerId)
         {
-            var msgs = await _db._chatCollection
-                                .Find(x => x.OrderId == orderId)
-                                .SortBy(x => x.CreatedAt)
-                                .ToListAsync();
-            return Ok(msgs);
+            var messages = await _chatService.GetMessagesAsync(orderId, buyerId, sellerId);
+            return Ok(messages);
         }
 
-        [HttpPost("send-text")]
-        public async Task<IActionResult> SendText([FromBody] ChatMessage msg)
+        [HttpPost("SendMessage")]
+        public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
         {
-            await _db._chatCollection.InsertOneAsync(msg);
-            await _hub.Clients.Group(msg.ReceiverId).SendAsync("ReceiveMessage", msg);
-            await _hub.Clients.Group(msg.SenderId).SendAsync("ReceiveMessage", msg);
-            return Ok();
-        }
-
-        [HttpPost("upload-file")]
-        public async Task<IActionResult> UploadFile([FromForm] string senderId,
-                                                    [FromForm] string receiverId,
-                                                    [FromForm] string orderId,
-                                                    [FromForm] string type,
-                                                    IFormFile file)
-        {
-/*            string url = await _cloud.UploadFileAsync(file);*/
-            var msg = new ChatMessage
+            if (string.IsNullOrEmpty(message.OrderId) ||
+                string.IsNullOrEmpty(message.SenderId) ||
+                string.IsNullOrEmpty(message.ReceiverId))
             {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                OrderId = orderId
-/*                Type = type == "image" ? MessageType.Image : MessageType.Video,
-                ImageUrl = type == "image" ? url : null,
-                VideoUrl = type == "video" ? url : null*/
-            };
+                return BadRequest("OrderId, SenderId, ReceiverId phải có giá trị");
+            }
 
-            await _db._chatCollection.InsertOneAsync(msg);
-            await _hub.Clients.Group(receiverId).SendAsync("ReceiveMessage", msg);
-            await _hub.Clients.Group(senderId).SendAsync("ReceiveMessage", msg);
-            return Ok(msg);
+            // <-- sửa ở đây: dùng SentAt thay vì Timestamp
+            message.SentAt = DateTime.UtcNow;
+
+            await _chatService.AddMessageAsync(message);
+
+            return Ok(message);
         }
     }
-
 }

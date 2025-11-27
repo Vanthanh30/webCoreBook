@@ -266,6 +266,22 @@ namespace webCore.Controllers
 
             return View(order);
         }
+        public async Task<IActionResult> ContactSeller(string orderId)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            string sellerId = order.Items.First().SellerId;
+
+            return RedirectToAction("Index", "Chat", new
+            {
+                orderId = orderId,
+                buyerId = userId,
+                sellerId = sellerId
+            });
+        }
+
+
         public IActionResult ReturnReason()
         {
             return View(); 

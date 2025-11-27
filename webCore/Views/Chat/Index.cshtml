@@ -1,0 +1,66 @@
+﻿<div class="chat-box" style="height: 300px; overflow-y: auto; border:1px solid #ddd; padding:10px">
+    @foreach (var msg in Model)
+    {
+        <div class="msg @(msg.SenderId == ViewBag.BuyerId ? "my-msg" : "their-msg")">
+            @msg.Message
+        </div>
+    }
+</div>
+
+<input type="text" id="msgInput" class="form-control mt-2" placeholder="Nhập tin nhắn..." />
+<button id="btnSend" class="btn btn-primary mt-2">Gửi</button>
+
+<!-- CDN SignalR (bắt buộc) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+<script>
+    const orderId = "@ViewBag.OrderId";
+    const senderId = "@ViewBag.BuyerId";
+    const receiverId = "@ViewBag.SellerId";
+
+    const conn = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub?orderId=" + orderId)
+        .build();
+
+    conn.on("ReceiveMessage", function (sender, message) {
+        $(".chat-box").append(
+            `<div class="msg ${sender == senderId ? 'my-msg' : 'their-msg'}">${message}</div>`
+        );
+    });
+
+    conn.start();
+
+    $("#btnSend").click(() => {
+        const msg = $("#msgInput").val();
+        if (!msg) return;
+
+        conn.invoke("SendMessage", orderId, senderId, msg);
+
+        $.post("/Chat/SendMessage", {
+            orderId: orderId,
+            senderId: senderId,
+            receiverId: receiverId,
+            message: msg
+        });
+
+        $("#msgInput").val("");
+    });
+</script>
+
+<style>
+    .my-msg {
+        text-align: right;
+        background: #d1f5d3;
+        padding: 5px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+
+    .their-msg {
+        text-align: left;
+        background: #eee;
+        padding: 5px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+</style>
