@@ -70,6 +70,7 @@ namespace webCore
             services.AddScoped<ForgotPasswordService>();
             services.AddScoped<RoleService>();
             services.AddScoped<ShopService>();
+            services.AddScoped<SellerOrderService>();
 
             // Add session management
             services.AddDistributedMemoryCache();
