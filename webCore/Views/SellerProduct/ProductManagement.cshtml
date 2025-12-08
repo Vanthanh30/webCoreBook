@@ -2,7 +2,7 @@
     ViewData["Title"] = "Sản phẩm của tôi";
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
 }
-<link rel="stylesheet" href="/css/Account_admin.css" />
+<link rel="stylesheet" href="/css/ProductManagement.css" />
 
 <div class="container">
     <h1>Danh sách sản phẩm của tôi</h1>
@@ -12,158 +12,178 @@
         </a>
     </div>
 
-    <table class="account-table">
+    <div id="loadingSpinner" style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
+        <p>Đang tải dữ liệu...</p>
+    </div>
+
+    <div id="emptyState" style="display: none; text-align: center; padding: 40px;">
+        <p>Bạn chưa có sản phẩm nào. Hãy thêm sản phẩm mới!</p>
+    </div>
+
+    <table class="account-table" id="productTable" style="display: none;">
         <thead>
             <tr>
                 <th>Tên sản phẩm</th>
                 <th>Hình ảnh</th>
                 <th>Danh mục</th>
                 <th>Giá</th>
+                <th>Giảm giá</th>
                 <th>Số lượng</th>
                 <th>Trạng thái</th>
-                <th>Vị trí</th>
+                <th>Đặc trưng</th>
                 <th class="actions-header">Hành động</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Dữ liệu giả - Sản phẩm 1 -->
-            <tr>
-                <td>Đắc Nhân Tâm</td>
-                <td>
-                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/3e/ae/52/99a4867cd5d27c84af5e1018653eda9e.jpg" alt="Image" style="width: 50px; height: 50px" />
-                </td>
-                <td>Sách Kỹ Năng Sống</td>
-                <td>86,000đ</td>
-                <td>50</td>
-                <td class="status-hoạt động">
-                    <span class="status-active">Hoạt động</span>
-                </td>
-                <td>Nổi bật</td>
-                <td class="actions-cell">
-                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
-
-            <!-- Dữ liệu giả - Sản phẩm 2 -->
-            <tr>
-                <td>Nhà Giả Kim</td>
-                <td>
-                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/45/3b/fc/aa81d0a534b45706ae1f8ffbf83a0f29.jpg" alt="Image" style="width: 50px; height: 50px" />
-                </td>
-                <td>Văn học nước ngoài</td>
-                <td>69,000đ</td>
-                <td>30</td>
-                <td class="status-hoạt động">
-                    <span class="status-active">Hoạt động</span>
-                </td>
-                <td>Mới</td>
-                <td class="actions-cell">
-                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
-
-            <!-- Dữ liệu giả - Sản phẩm 3 -->
-            <tr>
-                <td>Sapiens - Lược Sử Loài Người</td>
-                <td>
-                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg" alt="Image" style="width: 50px; height: 50px" />
-                </td>
-                <td>Lịch sử</td>
-                <td>189,000đ</td>
-                <td>15</td>
-                <td class="status-hoạt động">
-                    <span class="status-active">Hoạt động</span>
-                </td>
-                <td>Gợi ý</td>
-                <td class="actions-cell">
-                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
-
-            <!-- Dữ liệu giả - Sản phẩm 4 -->
-            <tr>
-                <td>Atomic Habits</td>
-                <td>
-                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/7f/bb/6c/3b43b2c31b3ebb9fc3e445e1d1c6e37e.jpg" alt="Image" style="width: 50px; height: 50px" />
-                </td>
-                <td>Sách Kỹ Năng Sống</td>
-                <td>179,000đ</td>
-                <td>0</td>
-                <td class="status-không hoạt động">
-                    <span class="status-inactive">Dừng hoạt động</span>
-                </td>
-                <td>Không nổi bật</td>
-                <td class="actions-cell">
-                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
-
-            <!-- Dữ liệu giả - Sản phẩm 5 -->
-            <tr>
-                <td>Tuổi Trẻ Đáng Giá Bao Nhiêu</td>
-                <td>
-                    <img src="https://salt.tikicdn.com/cache/280x280/ts/product/25/69/f8/6db139a89d57c1d5f5d1538293bbddd2.jpg" alt="Image" style="width: 50px; height: 50px" />
-                </td>
-                <td>Sách Kỹ Năng Sống</td>
-                <td>80,000đ</td>
-                <td>25</td>
-                <td class="status-hoạt động">
-                    <span class="status-active">Hoạt động</span>
-                </td>
-                <td>Nổi bật</td>
-                <td class="actions-cell">
-                    <a class="icon-btn edit-btn" title="Edit" href="@Url.Action("EditProduct","Seller")">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button type="button" class="icon-btn delete-btn" title="Delete" onclick="if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) alert('Đã xóa')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
+        <tbody id="productTableBody">
         </tbody>
     </table>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation" id="pagination" style="display: none;">
         <ul class="pagination justify-content-center">
-            <!-- Previous Page -->
             <li class="page-item disabled">
                 <a class="page-link" href="#" tabindex="-1">Trước</a>
             </li>
-            <!-- Page Numbers -->
             <li class="page-item active">
                 <a class="page-link" href="#">1</a>
             </li>
-            <li class="page-item">
-                <a class="page-link" href="#">2</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">3</a>
-            </li>
-            <!-- Next Page -->
             <li class="page-item">
                 <a class="page-link" href="#">Tiếp theo</a>
             </li>
         </ul>
     </nav>
 </div>
+
+<script>
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    function getFeaturedText(featured) {
+        switch (featured) {
+            case 0: return 'Không nổi bật';
+            case 1: return 'Nổi bật';
+            case 2: return 'Mới';
+            case 3: return 'Gợi ý';
+            default: return 'Không xác định';
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            const response = await fetch('/api/product/list');
+            const result = await response.json();
+
+            document.getElementById('loadingSpinner').style.display = 'none';
+
+            if (!result.success) {
+                alert(result.message || 'Lỗi khi tải dữ liệu');
+                return;
+            }
+
+            const products = result.data;
+
+            if (products.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('productTable').style.display = 'table';
+            document.getElementById('pagination').style.display = 'block';
+
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = '';
+
+            products.forEach(product => {
+                const isActive = product.status === 'Hoạt động' || product.status === 'Đã duyệt';
+                const statusClass = isActive ? 'status-active' : 'status-inactive';
+                const statusText = isActive ? 'Hoạt động' : product.status;
+                const statusBadgeClass = isActive ? 'status-active' : 'status-inactive';
+
+                const finalPrice = product.price * (1 - product.discountPercentage / 100);
+
+                const row = `
+                            <tr data-product-id="${product.id}">
+                                <td>${product.title}</td>
+                                <td>
+                                    <img src="${product.image || '/images/no-image.png'}"
+                                        alt="${product.title}"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                        onerror="this.src='/images/no-image.png'" />
+                                </td>
+                                <td>${product.categoryTitle}</td>
+                                <td>
+                                    ${product.discountPercentage > 0
+                        ? `<span style="text-decoration: line-through; color: #999;">${formatPrice(product.price)}</span><br>${formatPrice(finalPrice)}`
+                        : formatPrice(product.price)}
+                                </td>
+                                <td>${product.discountPercentage > 0 ? product.discountPercentage + '%' : '-'}</td>
+                                <td>${product.stock}</td>
+                                <td class="${statusClass}">
+                                    <span class="${statusBadgeClass}">${statusText}</span>
+                                </td>
+                                <td>${getFeaturedText(product.featured)}</td>
+                                <td class="actions-cell">
+                                    <a class="icon-btn edit-btn"
+                                        title="Chỉnh sửa"
+                                        href="/SellerProduct/EditProduct?id=${product.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button"
+                                            class="icon-btn delete-btn"
+                                            title="Xóa"
+                                            onclick="deleteProduct('${product.id}', '${product.title}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                tbody.innerHTML += row;
+            });
+
+        } catch (error) {
+            console.error('Error loading products:', error);
+            document.getElementById('loadingSpinner').style.display = 'none';
+            alert('Lỗi kết nối server!');
+        }
+    }
+
+    async function deleteProduct(productId, productTitle) {
+        if (!confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${productTitle}"?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/product/delete/${productId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Đã xóa sản phẩm thành công!');
+                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                if (row) {
+                    row.remove();
+                }
+
+                const tbody = document.getElementById('productTableBody');
+                if (tbody.children.length === 0) {
+                    document.getElementById('productTable').style.display = 'none';
+                    document.getElementById('pagination').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            } else {
+                alert(result.message || 'Không thể xóa sản phẩm');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('Lỗi khi xóa sản phẩm!');
+        }
+    }
+
+    loadProducts();
+</script>

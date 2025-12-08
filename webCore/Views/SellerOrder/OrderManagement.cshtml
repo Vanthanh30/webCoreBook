@@ -1,6 +1,9 @@
-﻿@{
+﻿@model List<webCore.Models.Order>
+@{
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
     ViewData["Title"] = "Quản lý Đơn hàng";
+    var statusCount = ViewBag.StatusCount as Dictionary<string, int>;
+    var currentStatus = ViewBag.CurrentStatus as string;
 }
 
 <link rel="stylesheet" href="~/css/SellerOrder.css" />
@@ -9,435 +12,416 @@
 <div class="container-fluid py-4">
     <h3 class="mb-4">Quản lý đơn hàng</h3>
 
+    <!-- Navigation Tabs -->
     <ul class="nav nav-pills mb-4" id="orderTabs">
         <li class="nav-item">
-            <a class="nav-link active" data-toggle="pill" href="#tab-all">Tất cả</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#tab-pending">
-                Chờ xác nhận <span class="badge badge-warning ml-1">3</span>
+            <a class="nav-link @(string.IsNullOrEmpty(currentStatus) ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder")">
+                Tất cả
+                @if (statusCount != null && statusCount.ContainsKey("All"))
+                {
+                    <span class="badge badge-secondary ml-1">@statusCount["All"]</span>
+                }
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#tab-packing">Chờ lấy hàng <span class="badge badge-info ml-1">4</span></a>
+            <a class="nav-link @(currentStatus == "Chờ xác nhận" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Chờ xác nhận" })">
+                Chờ xác nhận
+                @if (statusCount != null && statusCount.ContainsKey("Pending"))
+                {
+                    <span class="badge badge-warning ml-1">@statusCount["Pending"]</span>
+                }
+            </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#tab-shipping">Đang giao <span class="badge badge-primary ml-1">6</span></a>
+            <a class="nav-link @(currentStatus == "Chờ lấy hàng" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Chờ lấy hàng" })">
+                Chờ lấy hàng
+                @if (statusCount != null && statusCount.ContainsKey("Packing"))
+                {
+                    <span class="badge badge-info ml-1">@statusCount["Packing"]</span>
+                }
+            </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#tab-completed">Đã giao <span class="badge badge-success ml-1">2</span></a>
+            <a class="nav-link @(currentStatus == "Đang giao" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Đang giao" })">
+                Đang giao
+                @if (statusCount != null && statusCount.ContainsKey("Shipping"))
+                {
+                    <span class="badge badge-primary ml-1">@statusCount["Shipping"]</span>
+                }
+            </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#tab-return">Trả hàng <span class="badge badge-danger ml-1">1</span></a>
+            <a class="nav-link @(currentStatus == "Đã giao" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Đã giao" })">
+                Đã giao
+                @if (statusCount != null && statusCount.ContainsKey("Completed"))
+                {
+                    <span class="badge badge-success ml-1">@statusCount["Completed"]</span>
+                }
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentStatus == "Đã hủy" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Đã hủy" })">
+                Đã hủy
+                @if (statusCount != null && statusCount.ContainsKey("Return"))
+                {
+                    <span class="badge badge-danger ml-1">@statusCount["Return"]</span>
+                }
+            </a>
         </li>
     </ul>
 
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="tab-all">
-
-        <div class="card order-card">
-            <div class="order-header">
-                <div>
-                    <span class="order-id">Mã đơn: #1001</span>
-                    <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                </div>
-                <span class="badge badge-warning">Chờ xác nhận</span>
+    <!-- Bulk Actions -->
+    @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ lấy hàng")
+    {
+        <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+                <label class="form-check-label font-weight-bold" for="selectAll">
+                    Chọn tất cả (<span id="selectedCount">0</span>)
+                </label>
             </div>
-
-            <div class="order-body">
-                <div class="product-item">
-                    <img src="/image/book_cover_placeholder.png" alt="Take note">
-                    <div class="product-info">
-                        <h6>Take Note - Ghi chép thông minh</h6>
-                        <small>Phân loại: Bìa cứng, Màu đen</small>
-                        <div class="product-price">200.000đ x 2</div>
-                    </div>
-                </div>
-
-                <div class="order-total">
-                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
-                </div>
-
-                <div class="order-actions">
-                    <button class="btn btn-outline-secondary btn-sm mr-2-2">
-                        <i class="fas fa-comment-dots"></i> Liên hệ người mua
-                    </button>
-                    <button class="btn btn-primary btn-sm">
-                        <i class="fas fa-check"></i> Xác nhận đơn hàng
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="card order-card">
-            <div class="order-header">
-                <div>
-                    <span class="order-id">Mã đơn: #1002</span>
-                    <span class="ml-3 text-muted">| Trần Thị Lan</span>
-                </div>
-                <span class="badge badge-info">Chờ lấy hàng</span>
-            </div>
-
-            <div class="order-body">
-                <div class="product-item">
-                    <img src="/image/book_cover_placeholder.png" alt="Atomic Habits">
-                    <div class="product-info">
-                        <h6>Atomic Habits - Thói quen nguyên tử (Tái bản 2024)</h6>
-                        <small>Phân loại: Tiếng Việt</small>
-                        <div class="product-price">135.000đ x 1</div>
-                    </div>
-                </div>
-                <div class="product-item">
-                    <img src="/image/book_cover_placeholder.png" alt="Bút">
-                    <div class="product-info">
-                        <h6>Bút gel cao cấp Uni-ball Signo 0.5mm</h6>
-                        <div class="product-price">25.000đ x 3</div>
-                    </div>
-                </div>
-
-                <div class="order-total">
-                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">210.000đ</strong>
-                </div>
-
-                <div class="order-actions">
-                    <button class="btn btn-success btn-sm">
-                        <i class="fas fa-truck"></i> Đã chuẩn bị hàng
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="card order-card">
-            <div class="order-header">
-                <div>
-                    <span class="order-id">Mã đơn: #1003</span>
-                    <span class="ml-3 text-muted">| Lê Văn Minh</span>
-                </div>
-                <span class="badge badge-primary">Đang giao</span>
-            </div>
-
-            <div class="order-body">
-                <div class="product-item">
-                    <img src="/image/book_cover_placeholder.png" alt="Dấu chân">
-                    <div class="product-info">
-                        <h6>Dấu chân trên cát</h6>
-                        <div class="product-price">89.000đ x 1</div>
-                    </div>
-                </div>
-
-                <div class="order-total">
-                    Thành tiền: <strong class="text-danger" style="font-size: 18px;">89.000đ</strong>
-                </div>
-
-                <div class="order-actions">
-                    <button class="btn btn-outline-info btn-sm" disabled>
-                        Đang giao bởi GHTK
-                    </button>
-                </div>
-            </div>
-        </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-pending">
-            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAll">
-                    <label class="form-check-label font-weight-bold" for="selectAll">
-                        Chọn tất cả (<span id="selectedCount">0</span>)
-                    </label>
-                </div>
-                <div>
+            <div>
+                @if (currentStatus == "Chờ xác nhận")
+                {
                     <button class="btn btn-success btn-sm mr-2" id="btnConfirmAll" disabled>
                         <i class="fas fa-check-double"></i> Xác nhận tất cả
                     </button>
-                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
-                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
-                    </button>
-                </div>
+                }
+                <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
+                    <i class="fas fa-times"></i> Hủy các đơn đã chọn
+                </button>
             </div>
+        </div>
+    }
 
-            <div class="order-list">
-
-                <div class="card order-card mb-3">
+    <!-- Order List -->
+    <div class="order-list">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                <h5>Chưa có đơn hàng nào</h5>
+                <p class="text-muted">@(string.IsNullOrEmpty(currentStatus) ? "Bạn chưa có đơn hàng nào." : $"Không có đơn hàng ở trạng thái '{currentStatus}'.")</p>
+            </div>
+        }
+        else
+        {
+            foreach (var order in Model)
+            {
+                var orderId = order.Id.ToString();
+                <div class="card order-card mb-3" data-order-id="@orderId">
                     <div class="order-header">
                         <div class="d-flex align-items-center">
-                            <div class="form-check mr-3">
-                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
-                            </div>
+                            @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ lấy hàng")
+                            {
+                                <div class="form-check mr-3">
+                                    <input class="form-check-input order-checkbox" type="checkbox" value="@orderId">
+                                </div>
+                            }
                             <div>
-                                <span class="order-id">Mã đơn: #1001</span>
-                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
+                                <span class="order-id">Mã đơn: #@orderId.Substring(Math.Max(0, orderId.Length - 8))</span>
+                                <span class="ml-3 text-muted">| @order.FullName</span>
+                                <span class="ml-3 text-muted">| @order.CreatedAt.AddHours(7).ToString("HH:mm, dd/MM/yyyy")</span>
                             </div>
                         </div>
-                        <span class="badge badge-warning">Chờ xác nhận</span>
+                        <span class="badge @GetStatusBadgeClass(order.Status)">@order.Status</span>
                     </div>
 
                     <div class="order-body">
-                        <div class="product-item">
-                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
-                            <div class="product-info">
-                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
-                                <small>Bìa cứng, Đen</small>
-                                <div class="product-price">200.000đ × 2</div>
+                        @foreach (var item in order.Items)
+                        {
+                            var finalPrice = item.Price * (1 - item.DiscountPercentage / 100);
+                            <div class="product-item">
+                                <img src="@item.Image" alt="@item.Title" onerror="this.src='/image/book_cover_placeholder.png'">
+                                <div class="product-info">
+                                    <h6>@item.Title</h6>
+                                    <div class="product-price">
+                                        @string.Format("{0:N0}đ", finalPrice) × @item.Quantity
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        }
+
                         <div class="order-total">
-                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
+                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">@string.Format("{0:N0}đ", order.FinalAmount)</strong>
                         </div>
+
                         <div class="order-actions">
-                            <button class="btn btn-outline-secondary btn-sm mr-2">
-                                <i class="fas fa-comment-dots"></i> Liên hệ
-                            </button>
-                            <button class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-check"></i> Xác nhận
-                            </button>
-                            <button class="btn btn-danger btn-sm">
-                                <i class="fas fa-times"></i> Hủy đơn
-                            </button>
+                            @if (order.Status == "Chờ xác nhận")
+                            {
+                                <button class="btn btn-outline-secondary btn-sm mr-2" onclick="contactBuyer('@order.UserId')">
+                                    <i class="fas fa-comment-dots"></i> Liên hệ
+                                </button>
+                                <button class="btn btn-primary btn-sm mr-2" onclick="confirmOrder('@orderId')">
+                                    <i class="fas fa-check"></i> Xác nhận
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="cancelOrder('@orderId')">
+                                    <i class="fas fa-times"></i> Hủy đơn
+                                </button>
+                            }
+                            else if (order.Status == "Chờ lấy hàng")
+                            {
+                                <button class="btn btn-outline-secondary btn-sm mr-2" onclick="contactBuyer('@order.UserId')">
+                                    <i class="fas fa-comment-dots"></i> Liên hệ
+                                </button>
+                                <button class="btn btn-success btn-sm mr-2" onclick="readyToShip('@orderId')">
+                                    <i class="fas fa-box"></i> Giao hàng
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="cancelOrder('@orderId')">
+                                    <i class="fas fa-times"></i> Hủy đơn
+                                </button>
+                            }
+                            else if (order.Status == "Đang giao")
+                            {
+                                <a href="@Url.Action("OrderDetail", "SellerOrder", new { id = orderId })" class="btn btn-outline-info btn-sm mr-2">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                                <button class="btn btn-success btn-sm" onclick="completeOrder('@orderId')">
+                                    <i class="fas fa-check"></i> Đã giao
+                                </button>
+                            }
+                            else if (order.Status == "Đã giao")
+                            {
+                                <a href="@Url.Action("OrderDetail", "SellerOrder", new { id = orderId })" class="btn btn-outline-info btn-sm mr-2">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="contactBuyer('@order.UserId')">
+                                    <i class="fas fa-comment-dots"></i> Liên hệ
+                                </button>
+                            }
+                            else if (order.Status == "Đã hủy")
+                            {
+                                <a href="@Url.Action("CancelDetail", "SellerOrder", new { id = orderId })" class="btn btn-outline-info btn-sm mr-2">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="contactBuyer('@order.UserId')">
+                                    <i class="fas fa-comment-dots"></i> Liên hệ
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
-
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-packing">
-            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAll">
-                    <label class="form-check-label font-weight-bold" for="selectAll">
-                        Chọn tất cả (<span id="selectedCount">0</span>)
-                    </label>
-                </div>
-                <div>
-                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
-                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
-                    </button>
-                </div>
-            </div>
-
-            <div class="order-list">
-
-                <div class="card order-card mb-3">
-                    <div class="order-header">
-                        <div class="d-flex align-items-center">
-                            <div class="form-check mr-3">
-                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
-                            </div>
-                            <div>
-                                <span class="order-id">Mã đơn: #1001</span>
-                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
-                            </div>
-                        </div>
-                        <span class="badge badge-info">Chờ lấy hàng</span>
-                    </div>
-
-                    <div class="order-body">
-                        <div class="product-item">
-                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
-                            <div class="product-info">
-                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
-                                <small>Bìa cứng, Đen</small>
-                                <div class="product-price">200.000đ × 2</div>
-                            </div>
-                        </div>
-                        <div class="order-total">
-                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
-                        </div>
-                        <div class="order-actions">
-                            <button class="btn btn-outline-secondary btn-sm mr-2">
-                                <i class="fas fa-comment-dots"></i> Liên hệ
-                            </button>
-                            <button class="btn btn-success btn-sm mr-2"><i class="fas fa-box"></i> Giao hàng</button>
-                            <button class="btn btn-danger btn-sm">
-                                <i class="fas fa-times"></i> Hủy đơn
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-shipping">
-            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAll">
-                    <label class="form-check-label font-weight-bold" for="selectAll">
-                        Chọn tất cả (<span id="selectedCount">0</span>)
-                    </label>
-                </div>
-                <div>
-                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
-                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
-                    </button>
-                </div>
-            </div>
-
-            <div class="order-list">
-
-                <div class="card order-card mb-3">
-                    <div class="order-header">
-                        <div class="d-flex align-items-center">
-                            <div class="form-check mr-3">
-                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
-                            </div>
-                            <div>
-                                <span class="order-id">Mã đơn: #1001</span>
-                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
-                            </div>
-                        </div>
-                        <span class="badge badge-primary">Đang giao</span>
-                    </div>
-
-                    <div class="order-body">
-                        <div class="product-item">
-                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
-                            <div class="product-info">
-                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
-                                <small>Bìa cứng, Đen</small>
-                                <div class="product-price">200.000đ × 2</div>
-                            </div>
-                        </div>
-                        <div class="order-total">
-                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
-                        </div>
-                        <div class="order-actions">
-                            <a href="@Url.Action("OrderDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
-                                Xem chi tiết
-                            </a>
-                            <button class="btn btn-success btn-sm">
-                                Đã giao
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-completed">
-            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAll">
-                    <label class="form-check-label font-weight-bold" for="selectAll">
-                        Chọn tất cả (<span id="selectedCount">0</span>)
-                    </label>
-                </div>
-                <div>
-                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
-                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
-                    </button>
-                </div>
-            </div>
-
-            <div class="order-list">
-
-                <div class="card order-card mb-3">
-                    <div class="order-header">
-                        <div class="d-flex align-items-center">
-                            <div class="form-check mr-3">
-                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
-                            </div>
-                            <div>
-                                <span class="order-id">Mã đơn: #1001</span>
-                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
-                            </div>
-                        </div>
-                        <span class="badge badge-success">Đã giao</span>
-                    </div>
-
-                    <div class="order-body">
-                        <div class="product-item">
-                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
-                            <div class="product-info">
-                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
-                                <small>Bìa cứng, Đen</small>
-                                <div class="product-price">200.000đ × 2</div>
-                            </div>
-                        </div>
-                        <div class="order-total">
-                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
-                        </div>
-                        <div class="order-actions">
-                            <a href="@Url.Action("OrderDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
-                                Xem chi tiết
-                            </a>
-                            <button class="btn btn-outline-secondary btn-sm mr-2">
-                                <i class="fas fa-comment-dots"></i> Liên hệ
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-return">
-            <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="selectAll">
-                    <label class="form-check-label font-weight-bold" for="selectAll">
-                        Chọn tất cả (<span id="selectedCount">0</span>)
-                    </label>
-                </div>
-                <div>
-                    <button class="btn btn-outline-danger btn-sm" id="btnCancelAll" disabled>
-                        <i class="fas fa-times"></i> Hủy các đơn đã chọn
-                    </button>
-                </div>
-            </div>
-
-            <div class="order-list">
-
-                <div class="card order-card mb-3">
-                    <div class="order-header">
-                        <div class="d-flex align-items-center">
-                            <div class="form-check mr-3">
-                                <input class="form-check-input order-checkbox" type="checkbox" value="1001">
-                            </div>
-                            <div>
-                                <span class="order-id">Mã đơn: #1001</span>
-                                <span class="ml-3 text-muted">| Nguyễn Văn An</span>
-                                <span class="ml-3 text-muted">| 10:30, 22/11/2025</span>
-                            </div>
-                        </div>
-                        <span class="badge badge-danger">Đã hủy</span>
-                    </div>
-
-                    <div class="order-body">
-                        <div class="product-item">
-                            <img src="/image/book_cover_placeholder.png" alt="Take Note">
-                            <div class="product-info">
-                                <h6>Take Note - Ghi chép thông minh (Bản đặc biệt)</h6>
-                                <small>Bìa cứng, Đen</small>
-                                <div class="product-price">200.000đ × 2</div>
-                            </div>
-                        </div>
-                        <div class="order-total">
-                            Thành tiền: <strong class="text-danger" style="font-size: 18px;">400.000đ</strong>
-                        </div>
-                        <div class="order-actions">
-                            <button class="btn btn-outline-secondary btn-sm mr-2">
-                                <i class="fas fa-comment-dots"></i> Liên hệ
-                            </button>
-                            <a href="@Url.Action("CancelDetail", "Seller")" class="btn btn-outline-info btn-sm mr-2">
-                                Xem chi tiết
-                            </a>
-                            <button class="btn btn-danger btn-sm">
-                                <i class="fas fa-times"></i> Từ chối
-                            </button>
-                            <button class="btn btn-primary btn-sm mr-2">
-                                <i class="fas fa-check"></i> Duyệt
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
+            }
+        }
     </div>
 </div>
+
+@functions {
+    string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Chờ xác nhận" => "badge-warning",
+            "Chờ lấy hàng" => "badge-info",
+            "Đang giao" => "badge-primary",
+            "Đã giao" => "badge-success",
+            "Đã hủy" => "badge-danger",
+            _ => "badge-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Xử lý checkbox chọn tất cả
+            $('#selectAll').change(function () {
+                $('.order-checkbox').prop('checked', this.checked);
+                updateSelectedCount();
+            });
+
+            // Xử lý checkbox đơn lẻ
+            $(document).on('change', '.order-checkbox', function () {
+                updateSelectedCount();
+                var total = $('.order-checkbox').length;
+                var checked = $('.order-checkbox:checked').length;
+                $('#selectAll').prop('checked', total === checked);
+            });
+
+            // Cập nhật số lượng đã chọn
+            function updateSelectedCount() {
+                const count = $('.order-checkbox:checked').length;
+                $('#selectedCount').text(count);
+                $('#btnConfirmAll, #btnCancelAll').prop('disabled', count === 0);
+            }
+
+            // Xác nhận tất cả
+            $('#btnConfirmAll').click(function () {
+                const orderIds = $('.order-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+
+                if (orderIds.length === 0) return;
+
+                if (confirm(`Xác nhận ${orderIds.length} đơn hàng?`)) {
+                    $.ajax({
+                        url: '@Url.Action("ConfirmMultipleOrders", "SellerOrder")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify(orderIds),
+                        success: function (response) {
+                            if (response.success) {
+                                showAlert('success', response.message);
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                showAlert('danger', response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                            showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                        }
+                    });
+                }
+            });
+
+            // Hủy tất cả
+            $('#btnCancelAll').click(function () {
+                const orderIds = $('.order-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+
+                if (orderIds.length === 0) return;
+
+                if (confirm(`Bạn có chắc muốn hủy ${orderIds.length} đơn hàng?`)) {
+                    $.ajax({
+                        url: '@Url.Action("CancelMultipleOrders", "SellerOrder")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify(orderIds),
+                        success: function (response) {
+                            if (response.success) {
+                                showAlert('success', response.message);
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                showAlert('danger', response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                            showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Xác nhận đơn hàng
+        function confirmOrder(orderId) {
+            if (confirm('Xác nhận đơn hàng này?')) {
+                $.post('@Url.Action("ConfirmOrder", "SellerOrder")',
+                    { orderId: orderId },
+                    function (response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    'json'
+                ).fail(function (xhr, status, error) {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        // Sẵn sàng giao hàng
+        function readyToShip(orderId) {
+            if (confirm('Đánh dấu đơn hàng đã chuẩn bị xong?')) {
+                $.post('@Url.Action("ReadyToShip", "SellerOrder")',
+                    { orderId: orderId },
+                    function (response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    'json'
+                ).fail(function (xhr, status, error) {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        // Hoàn thành đơn hàng
+        function completeOrder(orderId) {
+            if (confirm('Xác nhận đơn hàng đã giao thành công?')) {
+                $.post('@Url.Action("CompleteOrder", "SellerOrder")',
+                    { orderId: orderId },
+                    function (response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    'json'
+                ).fail(function (xhr, status, error) {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        // Hủy đơn hàng
+        function cancelOrder(orderId) {
+            if (confirm('Bạn có chắc muốn hủy đơn hàng này?')) {
+                $.post('@Url.Action("CancelOrder", "SellerOrder")',
+                    { orderId: orderId },
+                    function (response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    'json'
+                ).fail(function (xhr, status, error) {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        // Liên hệ người mua
+        function contactBuyer(userId) {
+            showAlert('info', 'Chức năng chat đang được phát triển');
+        }
+
+        // Hiển thị thông báo
+        function showAlert(type, message) {
+            const alertHtml = `
+                        <div class="alert alert-${type} alert-dismissible fade show position-fixed"
+                             style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                            ${message}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    `;
+            $('body').append(alertHtml);
+
+            setTimeout(function () {
+                $('.alert').fadeOut('slow', function () {
+                    $(this).remove();
+                });
+            }, 3000);
+        }
+    </script>
+}

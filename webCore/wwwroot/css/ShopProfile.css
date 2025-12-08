@@ -1,0 +1,141 @@
+﻿
+.shop-profile-container {
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.shop-profile-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px;
+}
+
+/* Tiêu đề và Nút hành động */
+.header-section {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004d9c;
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transition: background-color 0.3s;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+/* Phần hiển thị thông tin (View Mode) */
+.info-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px 20px;
+}
+
+.info-row {
+    display: flex; /* Sử dụng Flexbox để căn chỉnh tốt hơn */
+    align-items: flex-start; /* Căn chỉnh nội dung hàng đầu tiên */
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+.info-label {
+    flex: 0 0 30%; /* Chiếm 30% chiều rộng */
+    font-weight: 600; /* Tăng độ đậm */
+    color: #495057;
+    padding-right: 15px;
+}
+
+.info-value {
+    flex: 1; /* Chiếm phần còn lại */
+    color: #212529;
+    word-break: break-word; /* Ngắt từ dài nếu cần */
+    min-height: 24px; /* Đảm bảo chiều cao tối thiểu */
+}
+
+/* Logo */
+.logo-preview {
+    width: 80px; /* Giảm kích thước logo để không quá to */
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.shop-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Chế độ chỉnh sửa (Edit Mode) */
+#editShopForm .form-group {
+    margin-bottom: 20px;
+}
+
+#editShopForm label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+#editShopForm .form-control,
+#editShopForm .form-control-file {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    height: 45px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+#editShopForm select.form-control {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#editShopForm input[type="file"].form-control-file {
+    height: auto;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    display: block;
+
+/* Logo trong Edit Mode */
+.edit-logo-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+    .edit-logo-container img {
+        margin-right: 15px;
+    }
+
+/* Alert styles (Giả định đang dùng Bootstrap) */
+.alert {
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Utilities (Cần thiết cho việc hiển thị/ẩn) */
+.edit-mode, .view-mode {
+    transition: opacity 0.3s ease-in-out;
+}

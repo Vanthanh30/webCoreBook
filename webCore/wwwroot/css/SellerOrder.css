@@ -6,15 +6,15 @@
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     background: #fff;
+    position: relative;
 }
 
 .order-header {
+    padding: 10px 15px;
     background-color: #f8f9fa;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e9ecef;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     align-items: center;
 }
 
@@ -89,6 +89,7 @@
     text-align: right;
     padding-top: 16px;
     border-top: 1px dashed #eee;
+    z-index: 10;
 }
 
 /* Badge trạng thái */

@@ -1,108 +1,291 @@
-﻿
-@{
+﻿@{
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
     ViewData["Title"] = "Quản lý Shop";
 }
+<link rel="stylesheet" href="/css/ShopProfile.css" />
 
-<div class="shop-profile-content p-3">
-
-    <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-            <a class="nav-link active" id="basic-tab" data-toggle="tab" href="#basic-info" role="tab">Thông tin cơ bản</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="identity-tab" data-toggle="tab" href="#identity-info" role="tab">Thông tin định danh</a>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="shopTabsContent">
-
-        <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-tab">
-
-            <h5 class="mb-4">Thông tin cơ bản</h5>
-
-            <div class="card p-4">
-
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-3 text-muted">Tên shop</div>
-                    <div class="col-md-6">
-                    </div>
-                    <div class="col-md-3 text-right">
-                        <button class="btn btn-sm btn-outline-secondary mr-2">Xem shop của tôi</button>
-                        <button class="btn btn-sm btn-primary">Chỉnh sửa</button>
-                    </div>
-                </div>
-
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-3 text-muted">Logo shop</div>
-                    <div class="col-md-6 d-flex align-items-center">
-                        <div class="logo-placeholder" style="width: 80px; height: 80px; border-radius: 50%; background-color: #e0f7fa; border: 1px solid #00bcd4;">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row align-items-center mb-2">
-                    <div class="col-md-3 text-muted">Mô tả shop</div>
-                    <div class="col-md-6">
-                    </div>
-                </div>
-            </div>
-
+<div class="container shop-profile-container">
+    <div class="shop-profile-content">
+        <div id="loadingSpinner" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
+            <p>Đang tải thông tin shop...</p>
         </div>
 
-        <div class="tab-pane fade" id="identity-info" role="tabpanel" aria-labelledby="identity-tab">
+        <div class="alert alert-danger" style="display: none;" id="errorAlert"></div>
+        <div class="alert alert-success" style="display: none;" id="successAlert"></div>
 
-            <h5 class="mb-4">Thông tin định danh</h5>
+        <div id="viewMode" class="view-mode" style="display: none;">
+            <div class="header-section d-flex justify-content-between align-items-center">
+                <h4>Thông tin cơ bản của Shop</h4>
+                <button class="btn btn-primary" onclick="toggleEditMode()">
+                    <i class="fas fa-edit"></i> Chỉnh sửa
+                </button>
+            </div>
 
-            <div class="card p-4">
-
-                <div class="d-flex justify-content-end mb-4">
-                    <button class="btn btn-sm btn-primary">Chỉnh sửa</button>
+            <div class="info-card">
+                <div class="info-row">
+                    <div class="info-label">Tên shop</div>
+                    <div class="info-value" id="viewShopName">-</div>
                 </div>
 
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-4 text-muted">Hình thức định danh</div>
-                    <div class="col-md-8">
-                        <span class="identity-type-display">Chứng Minh Nhân Dân (CMND)</span>
+                <div class="info-row">
+                    <div class="info-label">Logo shop</div>
+                    <div class="info-value shop-logo-container">
+                        <img id="viewShopImage" src="" alt="Shop Logo" class="logo-preview" />
                     </div>
                 </div>
 
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-4 text-muted">Số Chứng Minh Nhân Dân (CMND)</div>
-                    <div class="col-md-8">
-                        <span class="id-number-display">*******</span>
-                    </div>
+                <div class="info-row">
+                    <div class="info-label">Loại hình kinh doanh</div>
+                    <div class="info-value" id="viewBusinessType">-</div>
                 </div>
 
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-4 text-muted">Họ & Tên</div>
-                    <div class="col-md-8">
-                        <span class="full-name-display">*******</span>
-                    </div>
+                <div class="info-row">
+                    <div class="info-label">Địa chỉ</div>
+                    <div class="info-value" id="viewAddress">-</div>
                 </div>
 
-                <div class="row align-items-center mb-4 border-bottom pb-3">
-                    <div class="col-md-4 text-muted">Hình chụp của thẻ CMND/CCCD (Hộ chiếu)</div>
-                    <div class="col-md-8">
-                        <div class="lock-icon text-secondary" style="font-size: 24px;">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                    </div>
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value" id="viewEmail">-</div>
                 </div>
 
-                <div class="row align-items-center mb-2">
-                    <div class="col-md-4 text-muted">Ảnh đang cầm CMND/CCCD (Hộ chiếu) của bạn</div>
-                    <div class="col-md-8">
-                        <div class="lock-icon text-secondary" style="font-size: 24px;">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                    </div>
+                <div class="info-row">
+                    <div class="info-label">Số điện thoại</div>
+                    <div class="info-value" id="viewPhone">-</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Mô tả shop</div>
+                    <div class="info-value" id="viewDescription">-</div>
                 </div>
             </div>
         </div>
 
+        <div id="editMode" class="edit-mode" style="display: none;">
+            <div class="header-section d-flex justify-content-between align-items-center">
+                <h4>Chỉnh sửa thông tin Shop</h4>
+                <button class="btn btn-secondary" onclick="cancelEdit()">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+            </div>
+
+            <form id="editShopForm" onsubmit="handleUpdateShop(event)">
+                <div class="info-card">
+                    <div class="form-group">
+                        <label for="ShopName">Tên shop *</label>
+                        <input type="text" class="form-control" id="ShopName" name="ShopName" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Logo shop hiện tại</label>
+                        <div class="edit-logo-container">
+                            <img id="editCurrentImage" src="" alt="Logo hiện tại" class="logo-preview" />
+                        </div>
+
+                        <label for="Avatar">Thay đổi logo (Chọn tệp)</label>
+                        <input type="file" class="form-control" id="Avatar" name="Avatar" accept="image/*" onchange="previewNewLogo(event)" />
+
+                        <div id="newLogoPreviewContainer" style="margin-top: 15px; display: none;">
+                            <label>Ảnh logo mới (Xem trước)</label>
+                            <img id="newLogoPreview" src="" alt="Logo mới" class="logo-preview" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="BusinessType">Loại hình kinh doanh *</label>
+                        <select class="form-control" id="BusinessType" name="BusinessType" required>
+                            <option value="">-- Chọn loại hình --</option>
+                            <option value="Cá nhân">Cá nhân</option>
+                            <option value="Hộ kinh doanh">Hộ kinh doanh</option>
+                            <option value="Công ty">Công ty</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Address">Địa chỉ *</label>
+                        <input type="text" class="form-control" id="Address" name="Address" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Email">Email *</label>
+                        <input type="email" class="form-control" id="Email" name="Email" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Phone">Số điện thoại *</label>
+                        <input type="tel" class="form-control" id="Phone" name="Phone" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Description">Mô tả shop *</label>
+                        <textarea class="form-control" id="Description" name="Description" rows="4" required></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end pt-3 border-top">
+                        <button type="button" class="btn btn-secondary mr-2" onclick="cancelEdit()">Hủy</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-@section Scripts {
-}
+<script>
+    let shopData = null;
+
+    // Load shop info
+    async function loadShopInfo() {
+        try {
+            const response = await fetch('/api/shop/my-shop');
+            const result = await response.json();
+
+            document.getElementById('loadingSpinner').style.display = 'none';
+
+            if (!result.success) {
+                document.getElementById('errorAlert').textContent = result.message || 'Không thể tải thông tin shop';
+                document.getElementById('errorAlert').style.display = 'block';
+                return;
+            }
+
+            shopData = result.data;
+            displayShopInfo(shopData);
+            document.getElementById('viewMode').style.display = 'block';
+
+        } catch (error) {
+            console.error('Error loading shop:', error);
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('errorAlert').textContent = 'Lỗi kết nối server!';
+            document.getElementById('errorAlert').style.display = 'block';
+        }
+    }
+
+    // Display shop info in view mode
+    function displayShopInfo(data) {
+        document.getElementById('viewShopName').textContent = data.shopName || '-';
+        document.getElementById('viewBusinessType').textContent = data.businessType || '-';
+        document.getElementById('viewAddress').textContent = data.address || '-';
+        document.getElementById('viewEmail').textContent = data.email || '-';
+        document.getElementById('viewPhone').textContent = data.phone || '-';
+        document.getElementById('viewDescription').textContent = data.description || '-';
+
+        const viewShopImage = document.getElementById('viewShopImage');
+        if (data.shopImage && data.shopImage !== 'default-image-url') {
+            viewShopImage.src = data.shopImage;
+        } else {
+            viewShopImage.src = '/images/default-shop-logo.png';
+        }
+    }
+
+    // Toggle edit mode
+    function toggleEditMode() {
+        if (!shopData) return;
+
+        // Fill edit form
+        document.getElementById('ShopName').value = shopData.shopName || '';
+        document.getElementById('BusinessType').value = shopData.businessType || '';
+        document.getElementById('Address').value = shopData.address || '';
+        document.getElementById('Email').value = shopData.email || '';
+        document.getElementById('Phone').value = shopData.phone || '';
+        document.getElementById('Description').value = shopData.description || '';
+
+        const editCurrentImage = document.getElementById('editCurrentImage');
+        if (shopData.shopImage && shopData.shopImage !== 'default-image-url') {
+            editCurrentImage.src = shopData.shopImage;
+        } else {
+            editCurrentImage.src = '/images/default-shop-logo.png';
+        }
+
+        // Reset image input and preview
+        document.getElementById('Avatar').value = '';
+        document.getElementById('newLogoPreviewContainer').style.display = 'none';
+        document.getElementById('newLogoPreview').src = '';
+
+
+        // Toggle display
+        document.getElementById('viewMode').style.display = 'none';
+        document.getElementById('editMode').style.display = 'block';
+    }
+
+    // Cancel edit
+    function cancelEdit() {
+        document.getElementById('editMode').style.display = 'none';
+        document.getElementById('viewMode').style.display = 'block';
+        document.getElementById('editShopForm').reset();
+        document.getElementById('newLogoPreviewContainer').style.display = 'none';
+        document.getElementById('newLogoPreview').src = '';
+    }
+
+    // Preview new logo
+    function previewNewLogo(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('newLogoPreview');
+
+        const previewContainer = document.getElementById('newLogoPreviewContainer');
+    
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        previewContainer.style.display = 'block'; // Hiển thị cả container
+    } else {
+        previewContainer.style.display = 'none'; // Ẩn cả container
+        preview.src = '';
+    }
+    }
+
+    // Update shop
+    async function handleUpdateShop(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('editShopForm');
+        const formData = new FormData(form);
+
+        // Reset alerts
+        document.getElementById('errorAlert').style.display = 'none';
+        document.getElementById('successAlert').style.display = 'none';
+
+        try {
+            const response = await fetch('/api/shop/update', {
+                method: 'PUT',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                document.getElementById('errorAlert').textContent = result.message || 'Cập nhật thất bại!';
+                document.getElementById('errorAlert').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            // Success
+            shopData = result.data;
+            displayShopInfo(shopData);
+
+            document.getElementById('successAlert').textContent = 'Cập nhật shop thành công!';
+            document.getElementById('successAlert').style.display = 'block';
+
+            // Back to view mode
+            cancelEdit();
+
+            // Hide success after 3s
+            setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 3000);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (error) {
+            console.error('Error updating shop:', error);
+            document.getElementById('errorAlert').textContent = 'Lỗi kết nối server!';
+            document.getElementById('errorAlert').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    // Load on page ready
+    loadShopInfo();
+</script>
