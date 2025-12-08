@@ -15,16 +15,16 @@ namespace webCore.Controllers.ApiControllers
     public class SellerDashboardApiController : ControllerBase
     {
         private readonly CategoryProduct_adminService _productService;
-        private readonly OrderService _orderService;
+        private readonly SellerOrderService _sellerOrderService;
         private readonly ILogger<SellerDashboardApiController> _logger;
 
         public SellerDashboardApiController(
             CategoryProduct_adminService productService,
-            OrderService orderService,
+            SellerOrderService sellerOrderService,
             ILogger<SellerDashboardApiController> logger)
         {
             _productService = productService;
-            _orderService = orderService;
+            _sellerOrderService = sellerOrderService;
             _logger = logger;
         }
 
@@ -64,7 +64,7 @@ namespace webCore.Controllers.ApiControllers
                 {
                     try
                     {
-                        var orderStats = await _orderService.GetOrderStatsBySellerAsync(productIds);
+                        var orderStats = await _sellerOrderService.GetOrderStatsBySellerAsync(productIds);
 
                         pendingOrders = orderStats.GetValueOrDefault("Chờ xác nhận", 0);
                         processingOrders = orderStats.GetValueOrDefault("Chờ lấy hàng", 0);
@@ -138,7 +138,7 @@ namespace webCore.Controllers.ApiControllers
                 {
                     try
                     {
-                        var sellerOrders = await _orderService.GetOrdersBySellerIdAsync(sellerId, productIds);
+                        var sellerOrders = await _sellerOrderService.GetOrdersBySellerIdAsync(sellerId, productIds);
                         totalOrders = sellerOrders.Count;
 
                         totalRevenue = sellerOrders
@@ -199,7 +199,7 @@ namespace webCore.Controllers.ApiControllers
 
                 if (productIds.Any())
                 {
-                    var sellerOrders = await _orderService.GetOrdersBySellerIdAsync(sellerId, productIds);
+                    var sellerOrders = await _sellerOrderService.GetOrdersBySellerIdAsync(sellerId, productIds);
 
                     orders = sellerOrders.Select(o => new
                     {
