@@ -30,23 +30,31 @@ namespace webCore.Controllers
                 return Unauthorized("Người dùng chưa login.");
 
             var userRoles = (HttpContext.Session.GetString("UserRoles") ?? "").Split(',');
+            var orderIdsWithMessages = await _chatService.GetOrderIdsWithMessagesAsync(currentUserId);
 
             List<Order> orders = new List<Order>();
 
             if (userRoles.Contains("Seller"))
             {
-                // Lấy tất cả đơn hàng có item thuộc seller
-                orders = await _orderService.GetOrdersBySellerIdAsync(currentUserId);
+                var allSellerOrders = await _orderService.GetOrdersBySellerIdAsync(currentUserId);
+
+                // Chỉ giữ lại các đơn đã có nhắn tin
+                orders = allSellerOrders
+                    .Where(o => orderIdsWithMessages.Contains(o.Id.ToString()))
+                    .ToList();
             }
             else
             {
-                // Buyer: lấy đơn của mình
-                orders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+                var allBuyerOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+
+                // Buyer chỉ thấy đơn có nhắn tin
+                orders = allBuyerOrders
+                    .Where(o => orderIdsWithMessages.Contains(o.Id.ToString()))
+                    .ToList();
             }
 
             // Danh sách orderId có tin nhắn
-            var orderIdsWithMessages = await _chatService.GetOrderIdsWithMessagesAsync(currentUserId);
-
+          
             // Nếu chưa chọn orderId, mặc định chọn order đầu tiên có tin nhắn hoặc đơn đầu tiên
             if (string.IsNullOrEmpty(orderId))
             {
