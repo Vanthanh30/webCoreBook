@@ -1,121 +1,114 @@
-/* Custom Styles */
+﻿
 body {
     background-color: #f4f6f9;
 }
 
-/* Inner Header */
 .inner-header {
-    background-color: #66C5FF; /* Changed to a vibrant blue */
+    background-color: #66C5FF;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     margin: 0;
 }
 
-/* Account Info Styles */
 .account-info {
     display: flex;
-    flex-direction: column; /* Stack items vertically */
-    align-items: center;    /* Center items horizontally */
+    flex-direction: column;
+    align-items: center;
 }
 
 .account-icon {
-    margin-bottom: 5px; /* Space between icon and text */
+    margin-bottom: 5px;
 }
 
-/* Adjust icon size */
-.account-icon i {
-    color: #fff; /* Change icon color to white for contrast */
-    font-size: 3rem; /* Ensure a good size for the icon */
-}
+    .account-icon i {
+        color: #fff;
+        font-size: 3rem;
+    }
 
 .account-name {
-    font-size: 16px; /* Increase font size for visibility */
-    color: #f8f9fa; /* Lighter color for better contrast */
-    text-align: center; /* Center align text */
+    font-size: 16px;
+    color: #f8f9fa;
+    text-align: center;
 }
-
-/* Sidebar */
 .sidebar {
     height: 100vh;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
+    .sidebar .list-group-item {
+        transition: background-color 0.3s, color 0.3s;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-/* Sidebar Item */
-.sidebar .list-group-item {
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 8px; /* Rounded corners for sidebar items */
-}
 
-/* Sidebar Hover Effect */
-.sidebar .list-group-item:hover {
-    background-color: #e3f2fd; /* Light hover effect */
-    color: #333;
-}
+        .sidebar .list-group-item i {
+            width: 20px;
+            text-align: center;
+        }
 
-/* Active state for sidebar items */
-.sidebar .list-group-item.active {
-    background-color: #1976d2; /* Active item background */
-    color: #fff; /* Active item text color */
-}
 
-/* Card Styles */
+        .sidebar .list-group-item:hover {
+            background-color: #e3f2fd;
+            color: #333;
+        }
+
+        .sidebar .list-group-item.active {
+            background-color: #1976d2;
+            color: #fff;
+        }
+
 .card {
-    border-radius: 15px; /* More rounded corners */
+    border-radius: 15px;
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
-}
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
+    }
 
-/* Card Icon */
 .card-icon {
     opacity: 0.9;
 }
 
-/* Table Styles */
 .table {
     background-color: #ffffff;
-    border-radius: 10px; /* Rounded corners for the table */
-    overflow: hidden; /* To ensure the border radius is applied */
+    border-radius: 10px;
+    overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.table th {
-    background-color: #f8f9fa; /* Light background for header */
-    color: #777;
-}
+    .table th {
+        background-color: #f8f9fa;
+        color: #777;
+    }
 
-.table td {
-    color: #555;
-    padding: 12px; /* Add padding for table cells */
-}
+    .table td {
+        color: #555;
+        padding: 12px;
+    }
 
-/* Status Badge */
 .badge {
     font-size: 14px;
     padding: 5px 10px;
 }
 
-/* Actions Buttons */
 .actions .btn {
     border-radius: 5px;
     padding: 8px 12px;
     font-size: 14px;
 }
 
-/* View All Link */
 .btn-link {
     color: #007bff;
 }
 
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-/* Responsive Styling */
+    .btn-link:hover {
+        text-decoration: underline;
+    }
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;

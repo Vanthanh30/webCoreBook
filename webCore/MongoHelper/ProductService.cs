@@ -122,7 +122,13 @@ namespace webCore.MongoHelper
 
             return await _productCollection.Find(filter).ToListAsync();
         }
+        public async Task<List<Product_admin>> SearchProductsAsync(string query)
+        {
+            var filter = Builders<Product_admin>.Filter
+                .Regex("Title", new MongoDB.Bson.BsonRegularExpression(query, "i"));
 
+            return await _productCollection.Find(filter).ToListAsync();
+        }
         public async Task<Product_admin> GetProductByIdAsync(string productId)
         {
             if (string.IsNullOrEmpty(productId))

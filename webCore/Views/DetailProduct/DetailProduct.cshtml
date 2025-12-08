@@ -1,242 +1,196 @@
 ﻿@model webCore.Models.Product_admin
-@{ 
+@{
     Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Model.Title</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
-          crossorigin="anonymous" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+@section Styles {
     <link rel="stylesheet" href="~/css/detail_product.css" asp-append-version="true" />
-@*    <script src="/js/Quantity.js"></script>
-*@   
-</head>
-<body>
-    <div class="container">
-        <div class="breadcrumbs">
-            @if (ViewBag.Breadcrumbs != null)
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+}
+
+<!-- BẢO VỆ NULL TOÀN BỘ TRANG -->
+@if (Model == null)
+{
+    <div class="container py-5 text-center">
+        <h2 class="text-danger">Không tìm thấy sản phẩm</h2>
+        <p>Sản phẩm không tồn tại hoặc đã bị xóa.</p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Quay lại trang chủ</a>
+    </div>
+    return;
+}
+
+<div class="product-wrapper">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        @if (ViewBag.Breadcrumbs is List<Category> breadcrumbs && breadcrumbs.Any())
+        {
+            for (int i = 0; i < breadcrumbs.Count; i++)
             {
-                var breadcrumbs = ViewBag.Breadcrumbs as List<Category>;
-                foreach (var category in breadcrumbs)
+                <span>@breadcrumbs[i].Title</span>
+                @if (i < breadcrumbs.Count - 1)
                 {
-                    <span>@category.Title</span>
-                    @if (category != breadcrumbs.Last())
-                    {
-                        <span> > </span> <!-- Thêm dấu phân cách '>' giữa các danh mục -->}}
+                    <span> > </span>
+                }
             }
+        }
+    </div>
+
+    <div class="main-row">
+        <!-- Ảnh sản phẩm -->
+        <div class="left-col">
+            <img src="@(string.IsNullOrWhiteSpace(Model.Image) ? "/image/no-image.jpg" : Model.Image)"
+                 alt="@Model.Title"
+                 onerror="this.src='/image/no-image.jpg'" />
         </div>
 
-        <div class="row">
-            <!-- Section One -->
-            <div id="section-one" class="py-4 row-6">
-                <div class="row align-items-center justify-content-start">
-                    <div class="col-12 rounded-box">
-                        <div class="d-flex flex-column justify-content-center">
-                            <div class="image-container">
-                                <img src="@Model.Image" alt="@Model.Title" class="book" style="max-width: 100%;" />
+        <!-- Thông tin sản phẩm -->
+        <div class="right-col">
+            <h1 class="product-title">@Model.Title</h1>
+
+            <!-- GIÁ – SỬA LỖI decimal / double -->
+            <div style="margin:25px 0;">
+                <span class="price-current">
+                    @String.Format("{0:N0}", Model.Price * (1m - Model.DiscountPercentage / 100m)) đ
+                </span>
+                @if (Model.DiscountPercentage > 0)
+                {
+                    <span class="price-old">@String.Format("{0:N0}", Model.Price) đ</span>
+                    <span class="discount">-@Model.DiscountPercentage%</span>
+                }
+            </div>
+
+            <!-- Số lượng -->
+            <div class="quantity-row">
+                <label>Số lượng</label>
+                <div class="quantity-input">
+                    <button type="button" class="btn-minus">-</button>
+                    <input type="text" id="quantitypr" value="1" readonly>
+                    <button type="button" class="btn-plus">+</button>
+                </div>
+                <span style="margin-left:20px;color:#666;">
+                    @(Model.Stock > 0 ? $"{Model.Stock} sản phẩm có sẵn" : "Hết hàng")
+                </span>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="buttons-row">
+                <button class="add_button"
+                        data-productid="@Model.Id"
+                        data-title="@Model.Title"
+                        data-price="@Model.Price"
+                        data-discountpercentage="@Model.DiscountPercentage"
+                        data-image="@Model.Image">
+                    Thêm vào giỏ hàng
+                </button>
+                <button class="buy_button" id="btnBuyNow" data-productid="@Model.Id">
+                    Mua ngay
+                </button>
+                <input type="hidden" id="quantityInput" value="1" />
+            </div>
+
+            <!-- Mô tả sản phẩm – BẢO VỆ NULL -->
+            <div class="description">
+                <h6>Mô tả sản phẩm</h6>
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="text-muted fst-italic">Chưa có mô tả cho sản phẩm này.</p>
+                }
+                else
+                {
+                    @Html.Raw(Model.Description.Replace(Environment.NewLine, "<br>"))
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sản phẩm tương tự -->
+<div class="container my-5">
+    <h4 class="fw-bold mb-4">Sản phẩm tương tự</h4>
+    <div class="row g-4">
+        @{
+            var similarList = ViewBag.SimilarProducts as IEnumerable<dynamic>;
+        }
+        @if (similarList != null && similarList.Any())
+        {
+            @foreach (var p in similarList)
+            {
+                <div class="col-lg-3 col-md-4 col-6">
+                    <div class="text-center border rounded p-3 shadow-sm h-100 d-flex flex-column">
+                        <img src="@(string.IsNullOrWhiteSpace(p.Image) ? "/image/no-image.jpg" : p.Image)"
+                             class="img-fluid rounded"
+                             style="height:180px; object-fit:contain;"
+                             alt="@p.Title">
+                        <h6 class="my-3 flex-grow-1" style="font-size:15px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                            @p.Title
+                        </h6>
+                        <div class="mb-2">
+                            <div style="color:#e74c3c; font-weight:700; font-size:18px;">
+                                @String.Format("{0:N0} đ", p.Price * (1m - p.DiscountPercentage / 100m))
                             </div>
-                            <div class="mt-3 d-flex justify-content-between">
-                                <button class="btn mb-4 add_button mr-2"
-                                        data-productId="@Model.Id"
-                                        data-title="@Model.Title"
-                                        data-price="@Model.Price"
-                                        data-discountPercentage="@Model.DiscountPercentage"
-                                        data-image="@Model.Image">
-                                    Thêm vào giỏ hàng
-                                </button>
-                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                                <script>
-                                    function addToCart(button) {
-                                        // Lấy giá trị từ các data attributes trong button
-                                        var productId = $(button).data('productid');
-                                        var title = $(button).data('title');
-                                        var price = $(button).data('price');
-                                        var discountPercentage = $(button).data('discountpercentage');
-                                        var image = $(button).data('image');
-
-                                        // Lấy giá trị số lượng từ input .quantity
-                                        var quantity = $(button).closest('.row').find('.quantity input').val();  // Lấy giá trị số lượng từ input trong phần quantity
-
-                                        $.ajax({
-                                            url: '@Url.Action("AddToCart", "Cart")',  // Gọi tới Action AddToCart trong CartController
-                                            type: 'POST',
-                                            data: {
-                                                productId: productId,
-                                                title: title,
-                                                price: price,
-                                                discountPercentage: discountPercentage,
-                                                quantity: quantity,  // Truyền số lượng vào AJAX request
-                                                image: image
-                                            },
-                                            success: function(response) {
-                                                if (response.success) {
-                                                    // Gửi sự kiện để Layout cập nhật số lượng
-                                                    $(document).trigger('cartUpdated', [response.itemCount]);
-                                                    alert(response.message); // Thông báo thêm thành công
-                                                } else {
-                                                    alert(response.message); // Thông báo lỗi
-                                                }
-                                            },
-                                            error: function() {
-                                                alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
-                                            }
-                                        });
-                                    }
-
-                                    // Thêm sự kiện click vào nút "Thêm vào giỏ hàng"
-                                    $(document).ready(function() {
-                                        $('.add_button').on('click', function() {
-                                            addToCart(this);  // Gọi hàm addToCart và truyền button hiện tại làm tham số
-                                        });
-                                    });
-                                </script>
-                                <button class="btn buy_button ml-2" id="btnBuyNow"
-                                        data-productid="@Model.Id">
-                                    Mua ngay
-                                </button>
-
-                                <input type="hidden" id="quantityInput" value="1" />
-
-                                <script>
-                                    $(document).ready(function () {
-
-                                        $("#btnBuyNow").click(function (e) {
-                                            e.preventDefault();
-
-                                            var productId = $(this).data("productid");
-                                            var quantity = $("#quantityInput").val();
-
-                                            $.ajax({
-                                                url: "/Cart/BuyNow",
-                                                type: "GET",
-                                                data: {
-                                                    productId: productId,
-                                                    quantity: quantity
-                                                },
-                                                success: function (response) {
-
-                                                    // 🟢  Nếu thành công và server trả về success = false → show lỗi
-                                                    if (response.success === false) {
-                                                        alert(response.message);
-                                                        return;
-                                                    }
-
-                                                    // 🟢 Khi BuyNow thành công → server trả view HTML
-                                                    // => Chuyển hướng sang trang Checkout
-                                                    window.location.href = "/Cart/BuyNow?productId=" + productId + "&quantity=" + quantity;
-                                                },
-                                                error: function () {
-                                                    alert("Có lỗi xảy ra khi thực hiện mua ngay!");
-                                                }
-                                            });
-                                        });
-
-                                    });
-                                </script>
-                            </div>
-                            <div class="d-flex quantity">
-                                <label for="quantity" class="mr-4">Số lượng</label>
-                                <div class="input-group mb-3" style="max-width: 150px;">
-                                    <button class="btn btn-outline-secondary btn-minus" type="button">
-                                        <i class="bi bi-dash"></i>
-                                    </button>
-                                    <input id="quantitypr" type="text" class="form-control text-center" value="1" min="1" max="10">
-                                    <button class="btn btn-outline-secondary btn-plus" type="button">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <script>
-                                // Cập nhật giá trị quantity khi người dùng thay đổi số lượng
-                                document.querySelector('.btn-plus').addEventListener('click', function () {
-                                    var quantityInput = document.getElementById('quantitypr');
-                                    var quantity = parseInt(quantityInput.value) + 1;
-                                    if (quantity > 10) quantity = 10;  // Đảm bảo số lượng không vượt quá 10
-                                    quantityInput.value = quantity;
-                                    document.getElementById('quantityInput').value = quantity;  // Cập nhật giá trị cho trường ẩn
-                                });
-
-                                document.querySelector('.btn-minus').addEventListener('click', function () {
-                                    var quantityInput = document.getElementById('quantitypr');
-                                    var quantity = parseInt(quantityInput.value) - 1;
-                                    if (quantity < 1) quantity = 1;  // Đảm bảo số lượng không nhỏ hơn 1
-                                    quantityInput.value = quantity;
-                                    document.getElementById('quantityInput').value = quantity;  // Cập nhật giá trị cho trường ẩn
-                                });
-                            </script>
+                            @if (p.DiscountPercentage > 0)
+                            {
+                                <del style="color:#aaa; font-size:14px;">@String.Format("{0:N0} đ", p.Price)</del>
+                                <span style="color:#e74c3c;"> -@p.DiscountPercentage%</span>
+                            }
                         </div>
+                        <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = p.Id })"
+                           class="btn btn-primary btn-sm mt-auto">Xem chi tiết</a>
                     </div>
                 </div>
-              
-            </div>
-            <!-- end Section One -->
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Chưa có sản phẩm tương tự.</p>
+        }
+    </div>
+</div>
 
-            <div class="col ml-5">
-                <!-- Section two -->
-                <div class="p-5 rounded-box mt-4 mb-3">
-                    <h5 class="font-weight-bold mb-3">@Model.Title</h5>
-                    <div class="font-weight-bold text-danger" style="font-size: 28px;">
-                        @((@Model.Price * (1 - @Model.DiscountPercentage / 100)).ToString("C"))
-                    </div>
-                    <div class="text-muted">
-                        <span class="price">@((@Model.Price).ToString("C"))</span>
-                        <span class="discount">-@Model.DiscountPercentage%</span>
-                    </div>
-                    <p style="margin-top: 20px;">Số lượng: @Model.Stock</p>
-                </div>
-                <!-- End Section two -->
-                <!-- Section three -->
-                <div class="p-4 rounded-box mb-4">
-                    <h6 class="font-weight-bold mb-3">Mô tả sản phẩm</h6>
-                    <p>@Html.Raw(Model.Description.Replace(Environment.NewLine, "<br />"))</p>
-                </div>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('.btn-plus').click(function () {
+            let val = parseInt($('#quantitypr').val()) + 1;
+            if (val > 100) val = 100;
+            if (val > @Model.Stock) val = @Model.Stock;
+            $('#quantitypr').val(val);
+            $('#quantityInput').val(val);
+        });
 
-                <!-- End section three -->
-            </div>
-        </div>
+        $('.btn-minus').click(function () {
+            let val = parseInt($('#quantitypr').val()) - 1;
+            if (val < 1) val = 1;
+            $('#quantitypr').val(val);
+            $('#quantityInput').val(val);
+        });
 
-        <!-- Phần sản phẩm tương tự -->
-            <div class="similar-products mt-5">
-                <h4 class="font-weight-bold mb-4">Sản phẩm tương tự</h4>
-                <div class="row">
-                    @foreach (var similarProduct in ViewBag.SimilarProducts)
-                    {
-                        <div class="col-md-3 mb-3">
-                            <div class="product-card border">
-                                <img src="@similarProduct.Image" alt="@similarProduct.Title" class="card-img-top" />
-                                <div class="card-body">
-                                    <h5 class="card-title">@similarProduct.Title</h5>
+        function addToCart(btn) {
+            const data = {
+                productId: $(btn).data('productid'),
+                title: $(btn).data('title'),
+                price: $(btn).data('price'),
+                discountPercentage: $(btn).data('discountpercentage'),
+                image: $(btn).data('image'),
+                quantity: $('#quantitypr').val()
+            };
+            $.post('@Url.Action("AddToCart", "Cart")', data, function(res) {
+                if (res.success) {
+                    $(document).trigger('cartUpdated', [res.itemCount]);
+                    alert(res.message);
+                } else {
+                    alert(res.message);
+                }
+            }).fail(() => alert('Lỗi khi thêm vào giỏ'));
+        }
 
-                                    <div class="text-muted">
-                                        <span class="card-text">@((similarProduct.Price * (1 - similarProduct.DiscountPercentage / 100)).ToString("C"))</span>
-
-                                        <span class="discount">-@Model.DiscountPercentage%</span>
-                                        <p class="price">@((@Model.Price).ToString("C"))</p>
-                                    </div>
-                 
-                                    <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = similarProduct.Id })" class="btn btn-primary" style="width: 100%">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        }
-                </div>
-            </div>
-            <!-- End phần sản phẩm tương tự -->
-        </div>
-</body>
-</html>
+        $(function () {
+            $('.add_button').click(function () { addToCart(this); });
+            $('#btnBuyNow').click(function () {
+                const pid = $(this).data('productid');
+                const qty = $('#quantitypr').val();
+                location.href = `/Cart/BuyNow?productId=${pid}&quantity=${qty}`;
+            });
+        });
+    </script>
+}

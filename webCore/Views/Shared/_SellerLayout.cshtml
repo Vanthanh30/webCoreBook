@@ -1,123 +1,130 @@
-﻿
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @using Microsoft.AspNetCore.Http
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Dashboard Người Bán</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-..." crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/home.css" asp-append-version="true" />
-
     <style>
+        /* Seller Dashboard Specific Styles */
         .seller-wrapper {
-            min-height: calc(100vh - 100px); /* Đảm bảo nội dung kéo dài đủ */
+            min-height: calc(100vh - 200px);
+            background-color: #f5f5f5;
         }
 
         .seller-sidebar-col {
-            background-color: #f8f9fa; /* Màu nền cho Sidebar */
-            padding-right: 0;
+            background-color: #fff;
+            padding: 0;
+            border-right: 1px solid #e0e0e0;
         }
 
         .seller-content-col {
             padding: 30px;
+            background-color: #f5f5f5;
         }
 
         .seller-menubar .nav-link {
-            padding: 10px 15px;
+            padding: 15px 20px;
             color: #333;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s;
         }
 
-            .seller-menubar .nav-link:hover, .seller-menubar .nav-link.active {
-                background-color: #e9ecef;
-                color: #007bff;
+            .seller-menubar .nav-link:hover,
+            .seller-menubar .nav-link.active {
+                background-color: #f0f7ff;
+                color: #0066cc;
+                border-left: 3px solid #0066cc;
             }
+
+        /* User Dropdown - Same as main layout */
+        .user-dropdown {
+            position: absolute !important;
+            top: calc(100% + 10px) !important;
+            right: 0 !important;
+            background: white !important;
+            border: 1px solid #ddd !important;
+            border-radius: 5px !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+            min-width: 200px !important;
+            z-index: 1000 !important;
+            display: block !important;
+        }
+
+            .user-dropdown.hidden {
+                display: none !important;
+            }
+
+        .items-icon {
+            position: relative !important;
+        }
+
+        header .col-auto {
+            position: relative !important;
+        }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-
+<body data-logged-in="@ViewBag.IsLoggedIn">
+    <!-- Header - Same as _Layout.cshtml -->
     <header>
         <div class="container">
             <div class="row">
-                <div class="col-3">
+                <div class="col-auto">
                     <div class="inner-logo">
                         <a href="@Url.Action("Index", "Home")">
-                            <div class="inner-img">
-                                <img src="/image/logo2.png" alt="Logo" />
-                            </div>
+                            <img src="/image/logo2.png" alt="TYB BOOK" class="logo-img" />
                         </a>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col">
                     <div class="inner-search">
-                        <!-- Form tìm kiếm -->
                         <form class="d-flex" role="search" action="/api/products/search" method="get">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="name" />
-                            <button class="btn btn-outline-success" type="submit">
-                                Search
+                            <input class="form-control" type="search" placeholder="Tìm kiếm..." aria-label="Search" name="name" />
+                            <button class="btn" type="submit">
+                                <i class="fa-solid fa-magnifying-glass"></i>
                             </button>
                         </form>
                     </div>
                 </div>
-                <div class="col-2">
-
+                <div class="col-auto">
                     <div class="items-icon">
-                        <!-- Icon Cart -->
-                        <div>
-                            <div class="inner-cart">
-                                <a href="@Url.Action("Cart", "Cart")">
-                                    <i class="fa-solid fa-cart-shopping"></i>
-                                </a>
-                            </div>
-                            <div id="cart-item-1" class="cart-item-1">
-                                <p>0</p>
-                            </div>
+                        <!-- Chat Icon -->
+                        <div class="inner-chat">
+                            <a href="#">
+                                <i class="fa-solid fa-comment-dots"></i>
+                                <span class="chat-count" id="chat-count">0</span>
+                            </a>
                         </div>
-                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                        <script>
-                            $(document).ready(function () {
-                                // Hàm để cập nhật số lượng trên giỏ hàng
-                                function updateCartCount(itemCount) {
 
-                                    $('#cart-item-1').text(itemCount).show(); // Hiển thị số lượng
+                        <!-- Cart Icon -->
+                        <div class="inner-cart">
+                            <a href="@Url.Action("Cart", "Cart")">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span class="cart-item-1" id="cart-item-1">0</span>
+                            </a>
+                        </div>
 
-                                }
-                                // Lấy số lượng giỏ hàng khi tải trang
-                                $.ajax({
-                                    url: '@Url.Action("GetCartItemCount", "Cart")',
-                                    type: 'GET',
-                                    success: function (response) {
-                                        updateCartCount(response.itemCount); // Cập nhật số lượng giỏ hàng
-                                    },
-                                    error: function () {
-                                        console.error('Không thể lấy số lượng giỏ hàng.');
-                                    }
-                                });
-
-                                // Lắng nghe sự kiện cập nhật từ trang chi tiết sản phẩm
-                                $(document).on('cartUpdated', function (event, itemCount) {
-                                    updateCartCount(itemCount); // Cập nhật số lượng trên icon giỏ hàng
-                                });
-                            });
-                        </script>
-                        <!-- Icon User -->
-                        <div>
-                            <div class="inner-user" id="userIcon">
-                                <a href="#" class="user-dropdown-toggle">
-                                    <i class="fa-regular fa-user"></i>
-                                </a>
+                        <!-- User Icon -->
+                        <div class="inner-user" id="userIcon" style="cursor: pointer;">
+                            <div>
+                                <i class="fa-regular fa-user"></i>
                             </div>
                             <div class="user-name">
                                 @{
                                     var userName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
                                     if (!string.IsNullOrEmpty(userName))
                                     {
-                                        <span class="username">@userName</span> <!-- Hiển thị tên người dùng -->
+                                        <span class="username">@userName</span>
                                     }
                                     else
                                     {
@@ -128,153 +135,137 @@
                         </div>
                     </div>
 
-                    <!-- Dropdown menu -->
+                    <!-- Dropdown Menu -->
                     <div id="userDropdownMenu" class="user-dropdown hidden">
-                        <!-- Mục thông tin cá nhân và đăng xuất (hiển thị nếu người dùng đã đăng nhập) -->
-                        <a id="profileLink" href="@Url.Action("Index", "DetailUser")" class="hidden">Thông tin cá nhân</a>
-                        <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" class="hidden">Đơn mua</a>
-                        <form id="logoutForm" method="post" action="@Url.Action("Sign_out", "User")">
+                        <a id="profileLink" href="@Url.Action("Index", "DetailUser")" style="display: none;">Thông tin cá nhân</a>
+                        <div id="sellerChannelContainer" class="dropdown-item-container" style="display: none;">
+                            <a href="#" id="sellerChannelLink" class="dropdown-item-with-arrow">
+                                Kênh người bán
+                            </a>
+                        </div>
+                        <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" style="display: none;">Đơn mua</a>
+                        <form id="logoutForm" onsubmit="return handleLogout(event)" style="display: none;">
                             <button type="submit" id="logoutButton">Đăng xuất</button>
                         </form>
-
-                        <!-- Mục đăng nhập và đăng ký (hiển thị nếu người dùng chưa đăng nhập) -->
-                        <a id="loginLink" href="@Url.Action("Sign_in", "User")" class="hidden">Đăng nhập</a>
-                        <a id="registerLink" href="@Url.Action("Sign_up", "User")" class="hidden">Đăng ký</a>
+                        <a id="loginLink" href="@Url.Action("Sign_in", "User")" style="display: none;">Đăng nhập</a>
+                        <a id="registerLink" href="@Url.Action("Sign_up", "User")" style="display: none;">Đăng ký</a>
                     </div>
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            var userIcon = document.getElementById("userIcon");
-                            var userDropdownMenu = document.getElementById("userDropdownMenu");
-                            var profileLink = document.getElementById("profileLink");
-                            var orderLink = document.getElementById("orderLink");
-                            var logoutForm = document.getElementById("logoutForm");
-                            var loginLink = document.getElementById("loginLink");
-                            var registerLink = document.getElementById("registerLink");
-
-                            // Lấy trạng thái đăng nhập từ ViewBag
-                            var isLoggedIn = '@ViewBag.IsLoggedIn' === 'True';
-
-                            // Khi nhấn vào userIcon, toggle dropdown menu
-                            userIcon.addEventListener('click', function (e) {
-                                e.preventDefault(); // Ngừng sự kiện mặc định (nếu có)
-                                userDropdownMenu.classList.toggle("hidden");
-                            });
-
-                            // Kiểm tra trạng thái đăng nhập và hiển thị các mục phù hợp
-                            if (isLoggedIn) {
-                                profileLink.classList.remove("hidden");
-                                orderLink.classList.remove("hidden");
-                                logoutForm.classList.remove("hidden");
-                                loginLink.classList.add("hidden");
-                                registerLink.classList.add("hidden");
-                            } else {
-                                profileLink.classList.add("hidden");
-                                orderLink.classList.add("hidden");
-                                logoutForm.classList.add("hidden");
-                                loginLink.classList.remove("hidden");
-                                registerLink.classList.remove("hidden");
-                            }
-                        });
-                    </script>
-                    <!-- Username -->
-
-
-
-                    <style>
-                        /* Áp dụng margin-right cho tên người dùng */
-                        .username {
-                            margin-right: 15px;
-                            display: inline-block;
-                            text-align: center;
-                            white-space: nowrap;
-                            word-wrap: break-word;
-                        }
-
-                        /* Đảm bảo không có margin-right khi là "Đăng nhập" */
-                        .login-text {
-                            margin-right: 0;
-                        }
-                    </style>
                 </div>
             </div>
         </div>
-        </div>
     </header>
 
+    <!-- Seller Dashboard Content -->
     <div id="seller-dashboard-wrapper" class="container-fluid seller-wrapper">
         <div class="row">
-
+            <!-- Sidebar -->
             <div class="col-md-2 p-0 seller-sidebar-col">
                 @await Html.PartialAsync("~/Views/Seller/_SellerMenubar.cshtml")
             </div>
 
+            <!-- Main Content -->
             <div class="col-md-10 seller-content-col">
                 @RenderBody()
             </div>
         </div>
     </div>
 
-    <footer class="text-white py-4">
+    <!-- Footer - Same as _Layout.cshtml -->
+    <footer>
         <div class="container">
             <div class="row">
-                <!-- Logo -->
-                <div class="col-md-3 mb-3">
+                <!-- Logo & Slogan -->
+                <div class="col-md-3 footer-section">
                     <div class="footer-logo">
-                        <a href="#" class="text-white text-decoration-none">TYB</a>
-                        <span class="title-second"> BOOK</span>
+                        <span class="title-first">TYB</span>
+                        <span class="title-second">BOOK</span>
                     </div>
+                    <p class="footer-slogan">
+                        Nơi hội tụ tất cả những cuốn sách bạn yêu thích. Khám phá những "THẾ GIỚI MỚI, TUNG TRÀNG MỘT"
+                    </p>
                 </div>
-                <!-- Contact Information -->
-                <div class="col-md-2 mb-3 text-md-end text-center">
-                    <div class="contact-info">
-                        <p class="mb-0">Dịch vụ</p>
-                        <p class="mb-0">Điều khoản sử dụng</p>
-                        <p class="mb-0">Chính sách bảo mật</p>
+
+                <!-- Cửa hàng -->
+                <div class="col-md-2 footer-section">
+                    <h3>Cửa hàng</h3>
+                    <ul>
+                        <li><a href="#">Bán chạy nhất</a></li>
+                        <li><a href="#">Bán phát hành mới</a></li>
+                        <li><a href="#">Thể loại</a></li>
+                    </ul>
+                </div>
+
+                <!-- Hỗ trợ -->
+                <div class="col-md-2 footer-section">
+                    <h3>Hỗ Trợ</h3>
+                    <ul>
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Hỏi đáp</a></li>
+                        <li><a href="#">Khảo sát sự hài lòng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Liên hệ -->
+                <div class="col-md-3 footer-section">
+                    <h3>Liên Hệ</h3>
+                    <div class="footer-contact">
+                        <p>Hotline</p>
+                        <p>Email</p>
                     </div>
-                </div>
-                <div class="col-md-2 mb-3 text-md-end text-center">
-                    <div class="contact-info">
-                        <p class="mb-0">Hỗ trợ</p>
-                        <p class="mb-0">Chính sách hoàn trả tiền</p>
-                        <p class="mb-0">Chính sách vận chuyển</p>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3 text-md-end text-center">
-                    <div class="contact-info">
-                        <p class="mb-0">Liên hệ</p>
-                        <p class="mb-0">
-                            <i class="fa-solid fa-phone"></i>
-                            Hotline: 0905-773-799
-                        </p>
-                        <p class="mb-0">
-                            <i class="fa-solid fa-envelope"></i>
-                            Email: tybbook@gmail.com
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-3 text-center">
                     <div class="social-icons">
-                        <a href="#" class="text-white me-3">
+                        <a  class="facebook" target="_blank">
                             <i class="fa-brands fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="text-white me-3">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                        <a href="#" class="text-white me-3">
+                        <a  class="instagram" target="_blank">
                             <i class="fa-brands fa-instagram"></i>
                         </a>
-                        <a href="#" class="text-white">
-                            <i class="fa-brands fa-linkedin-in"></i>
+                        <a  class="youtube" target="_blank">
+                            <i class="fa-brands fa-youtube"></i>
                         </a>
                     </div>
                 </div>
             </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div>@@TybBook. Bản quyền thuộc về TybBook</div>
+                <div>Chính sách bảo mật và điều khoản dịch vụ</div>
+            </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/layout.js?v=@DateTime.Now.Ticks" asp-append-version="true"></script>
+
+    <!-- Force re-initialize dropdown on every page load -->
+    <script>
+        console.log("=== Seller Layout Script Executing ===");
+
+        // Wait for layout.js to load
+        function waitForLayoutJs() {
+            if (typeof initializeUserDropdown === 'function') {
+                console.log("✅ layout.js loaded, initializing dropdown");
+                initializeUserDropdown();
+            } else {
+                console.log("⏳ Waiting for layout.js...");
+                setTimeout(waitForLayoutJs, 50);
+            }
+        }
+
+        // Start waiting
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("DOM ready in seller layout");
+                waitForLayoutJs();
+            });
+        } else {
+            console.log("DOM already ready in seller layout");
+            waitForLayoutJs();
+        }
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

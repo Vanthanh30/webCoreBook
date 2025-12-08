@@ -12,7 +12,6 @@
 <div class="container-fluid py-4">
     <h3 class="mb-4">Quản lý đơn hàng</h3>
 
-    <!-- Navigation Tabs -->
     <ul class="nav nav-pills mb-4" id="orderTabs">
         <li class="nav-item">
             <a class="nav-link @(string.IsNullOrEmpty(currentStatus) ? "active" : "")"
@@ -35,9 +34,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(currentStatus == "Chờ lấy hàng" ? "active" : "")"
-               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Chờ lấy hàng" })">
-                Chờ lấy hàng
+            <a class="nav-link @(currentStatus == "Chờ vận chuyển" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Chờ vận chuyển" })">
+                Chờ vận chuyển
                 @if (statusCount != null && statusCount.ContainsKey("Packing"))
                 {
                     <span class="badge badge-info ml-1">@statusCount["Packing"]</span>
@@ -45,9 +44,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link @(currentStatus == "Đang giao" ? "active" : "")"
-               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Đang giao" })">
-                Đang giao
+            <a class="nav-link @(currentStatus == "Chờ giao hàng" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Chờ giao hàng" })">
+                Chờ giao hàng
                 @if (statusCount != null && statusCount.ContainsKey("Shipping"))
                 {
                     <span class="badge badge-primary ml-1">@statusCount["Shipping"]</span>
@@ -77,7 +76,7 @@
     </ul>
 
     <!-- Bulk Actions -->
-    @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ lấy hàng")
+    @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ vận chuyển")
     {
         <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
             <div class="form-check">
@@ -118,7 +117,7 @@
                 <div class="card order-card mb-3" data-order-id="@orderId">
                     <div class="order-header">
                         <div class="d-flex align-items-center">
-                            @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ lấy hàng")
+                            @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ vận chuyển")
                             {
                                 <div class="form-check mr-3">
                                     <input class="form-check-input order-checkbox" type="checkbox" value="@orderId">
@@ -165,7 +164,7 @@
                                     <i class="fas fa-times"></i> Hủy đơn
                                 </button>
                             }
-                            else if (order.Status == "Chờ lấy hàng")
+                            else if (order.Status == "Chờ vận chuyển")
                             {
                                 <button class="btn btn-outline-secondary btn-sm mr-2" onclick="contactBuyer('@order.UserId')">
                                     <i class="fas fa-comment-dots"></i> Liên hệ
@@ -177,7 +176,7 @@
                                     <i class="fas fa-times"></i> Hủy đơn
                                 </button>
                             }
-                            else if (order.Status == "Đang giao")
+                            else if (order.Status == "Chờ giao hàng")
                             {
                                 <a href="@Url.Action("OrderDetail", "SellerOrder", new { id = orderId })" class="btn btn-outline-info btn-sm mr-2">
                                     <i class="fas fa-eye"></i> Xem chi tiết
@@ -218,8 +217,8 @@
         return status switch
         {
             "Chờ xác nhận" => "badge-warning",
-            "Chờ lấy hàng" => "badge-info",
-            "Đang giao" => "badge-primary",
+            "Chờ vận chuyển" => "badge-info",
+            "Chờ giao hàng" => "badge-primary",
             "Đã giao" => "badge-success",
             "Đã hủy" => "badge-danger",
             _ => "badge-secondary"

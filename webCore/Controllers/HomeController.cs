@@ -52,7 +52,7 @@ namespace webCore.Controllers
             return View(); // Trả về View Index.cshtml
         }
 
-        // Lấy danh sách sản phẩm theo danh mục (AJAX)
+        // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
         public async Task<IActionResult> GetProductsByCategoryId(string categoryId)
         {
             if (string.IsNullOrEmpty(categoryId))
@@ -60,28 +60,107 @@ namespace webCore.Controllers
                 return BadRequest("Category ID is required.");
             }
 
-            var products = await _productService.GetProductsByCategoryIdAsync(categoryId);
-            return PartialView("_BookListPartial", products);
-        }
+            // --- BẮT ĐẦU SỬA ĐỔI ---
 
-        // Phương thức tìm kiếm sản phẩm
-        public async Task<IActionResult> Search(string searchQuery)
-        {
-            if (string.IsNullOrEmpty(searchQuery))
-            {
-                return PartialView("_ProductList", new List<Product_admin>());
-            }
+            // 1. Lấy tất cả danh mục để kiểm tra quan hệ cha-con
+            var allCategories = await _categoryService.GetCategoriesAsync();
 
-            // Tìm kiếm sản phẩm từ MongoDB
-            var allProducts = await _productService.GetProductsAsync();
-            var searchResults = allProducts
-                .Where(p => p.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+            // 2. Tìm danh sách các ID danh mục con của categoryId hiện tại
+            var childCategoryIds = allCategories
+                .Where(c => c.ParentId == categoryId)
+                .Select(c => c._id)
                 .ToList();
 
-            return PartialView("_ProductList", searchResults);
+            List<Product_admin> products = new List<Product_admin>();
+
+            // 3. Logic: Nếu có con (là Cha) thì lấy cả cha lẫn con. Nếu không (là Con) thì chỉ lấy nó.
+            if (childCategoryIds.Any())
+            {
+                // A. Trường hợp chọn Danh mục Cha:
+
+                var parentProducts = await _productService.GetProductsByCategoryIdAsync(categoryId);
+                products.AddRange(parentProducts);
+
+                foreach (var childId in childCategoryIds)
+                {
+                    var childProducts = await _productService.GetProductsByCategoryIdAsync(childId);
+                    products.AddRange(childProducts);
+                }
+            }
+            else
+            {
+
+                products = await _productService.GetProductsByCategoryIdAsync(categoryId);
+            }
+
+            products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
+
+            var groupedProducts = new Dictionary<string, List<Product_admin>>();
+
+            var featuredProducts = products.Where(p => p.DiscountPercentage > 0).ToList();
+            var newProducts = products.Where(p => p.DiscountPercentage == 0 && p.Price > 0).Take(10).ToList();
+            var suggestedProducts = products.Except(featuredProducts).Except(newProducts).ToList();
+
+            if (featuredProducts.Any()) groupedProducts.Add("Nổi bật", featuredProducts);
+            if (newProducts.Any()) groupedProducts.Add("Mới", newProducts);
+            if (suggestedProducts.Any()) groupedProducts.Add("Gợi ý", suggestedProducts);
+
+            var orderedGroupedProducts = groupedProducts
+                .OrderBy(group =>
+                    group.Key == "Nổi bật" ? 0 :
+                    group.Key == "Mới" ? 1 :
+                    group.Key == "Gợi ý" ? 2 : int.MaxValue)
+                .ToList();
+
+            return PartialView("_BookListPartial", orderedGroupedProducts);
         }
 
-        // Xử lý đăng nhập và lưu thông tin vào session
+        [HttpGet]
+        public async Task<IActionResult> Search(string q)
+        {
+            // Lấy tất cả dữ liệu như trang chủ
+            var categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.Categories = categories;
+
+            var groupedProducts = await _productService.GetProductsGroupedByFeaturedAsync();
+            ViewBag.GroupedProducts = groupedProducts;
+
+            var featuredProducts = await _productService.GetFeaturedProductsAsync();
+            ViewBag.FeaturedProducts = featuredProducts;
+
+            var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
+            ViewBag.BestsellerProducts = bestsellerProducts;
+
+            // === PHẦN TÌM KIẾM ===
+            ViewBag.SearchQuery = q?.Trim() ?? "";
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var searchResults = await _productService.SearchProductsAsync(q);
+
+                // Tạo nhóm giống hệt trang chủ
+                var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
+
+                var flash = searchResults.Where(p => p.DiscountPercentage > 0).Take(20).ToList();
+                var newest = searchResults.Where(p => p.DiscountPercentage == 0).Take(20).ToList();
+                var suggest = searchResults.Except(flash).Except(newest).Take(20).ToList();
+
+                if (flash.Any()) grouped.Add(new("Nổi bật", flash));
+                if (newest.Any()) grouped.Add(new("Mới", newest));
+                if (suggest.Any()) grouped.Add(new("Gợi ý", suggest));
+
+                ViewBag.SearchResults = grouped; // Dùng để hiển thị thay thế
+                ViewBag.IsSearching = true;
+                ViewBag.ResultCount = searchResults.Count;
+            }
+            else
+            {
+                ViewBag.IsSearching = false;
+            }
+
+            // TRẢ VỀ LUÔN TRANG CHỦ (Index.cshtml)
+            return View("Index");
+        }
         [HttpPost]
         public async Task<IActionResult> Sign_in(User loginUser)
         {
@@ -90,7 +169,6 @@ namespace webCore.Controllers
                 return View(loginUser);
             }
 
-            // Kiểm tra tài khoản trong MongoDB
             var user = await _userService.GetAccountByEmailAsync(loginUser.Email);
             if (user == null)
             {
@@ -98,21 +176,17 @@ namespace webCore.Controllers
                 return View(loginUser);
             }
 
-            // Kiểm tra mật khẩu
             if (loginUser.Password != user.Password)
             {
                 ModelState.AddModelError("", "Mật khẩu không đúng.");
                 return View(loginUser);
             }
 
-            // Lưu thông tin đăng nhập vào session
             HttpContext.Session.SetString("UserToken", user.Token);
             HttpContext.Session.SetString("UserName", user.Name);
 
             return RedirectToAction("Index", "Home");
         }
-
-        // Xử lý đăng xuất và xóa thông tin session
         [HttpPost]
         public IActionResult Sign_out()
         {
@@ -121,8 +195,6 @@ namespace webCore.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
-        // API lấy breadcrumb theo CategoryId
         [HttpGet("api/breadcrumbs/{categoryId}")]
         public async Task<IActionResult> GetBreadcrumbs(string categoryId)
         {

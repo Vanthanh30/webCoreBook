@@ -10,6 +10,8 @@ using webCore.MongoHelper;
 using webCore.Services;
 using Microsoft.AspNetCore.Http;
 using webCore.Hubs;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace webCore
 {
@@ -48,12 +50,33 @@ namespace webCore
                 logger.LogInformation("MongoDB connection string is configured.");
                 return new MongoClient(mongoConnection);
             });
+            // Add MongoDB Database
+            services.AddScoped<IMongoDatabase>(sp =>
+            {
+                var mongoConfig = Configuration.GetSection("MongoDB");
+                var databaseName = mongoConfig["DatabaseName"];
 
+                var client = sp.GetRequiredService<IMongoClient>();
+
+                return client.GetDatabase(databaseName);
+            });
             // Register MongoDBService with DI container
             services.AddSingleton<MongoDBService>();
 
             // Register Cloudinary service for image upload
             services.AddSingleton<CloudinaryService>();
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 104857600; // 100MB
+                options.ValueLengthLimit = 104857600;
+                options.MultipartHeadersLengthLimit = 16384;
+            });
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 104857600; // 100MB
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
+            });
 
             // Register services that will be used for the application
             services.AddScoped<ProductService>();
@@ -71,6 +94,7 @@ namespace webCore
             services.AddScoped<ForgotPasswordService>();
             services.AddScoped<RoleService>();
             services.AddScoped<ShopService>();
+            services.AddScoped<ReviewService>();
             services.AddScoped<SellerOrderService>();
 
             services.AddScoped<ChatService>();

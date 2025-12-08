@@ -5,240 +5,327 @@
     var groupedProducts = ViewBag.GroupedProducts as Dictionary<string, List<webCore.Models.Product_admin>>;
     var featuredProducts = ViewBag.FeaturedProducts as List<webCore.Models.Product_admin>;
     var bestsellerProducts = ViewBag.BestsellerProducts as List<webCore.Models.Product_admin>;
-    var sortedProducts = ViewBag.SortedProducts as List<webCore.Models.Product_admin>;
 
-    // Sắp xếp các nhóm sản phẩm theo thứ tự: Nổi bật, Mới, Gợi ý, Không nổi bật
-    var orderedGroupedProducts = groupedProducts
-        .Where(group => group.Key == "Nổi bật" || group.Key == "Mới" || group.Key == "Gợi ý" || group.Key == "Không nổi bật")
-        .OrderBy(group =>
-            group.Key == "Nổi bật" ? 0 :
-            group.Key == "Mới" ? 1 :
-            group.Key == "Gợi ý" ? 2 :
-            group.Key == "Không nổi bật" ? 3 : int.MaxValue)
-        .ToList();
+    // === SỬA CHÍNH TẠI ĐÂY ===
+    var isSearching = ViewBag.IsSearching == true;
+    var searchResults = ViewBag.SearchResults as List<KeyValuePair<string, List<Product_admin>>>;
+
+    var displayGroups = isSearching && searchResults != null && searchResults.Any()
+        ? searchResults
+        : groupedProducts?
+            .Where(g => g.Key == "Nổi bật" || g.Key == "Mới" || g.Key == "Gợi ý" || g.Key == "Bán chạy")
+            .OrderBy(g => g.Key == "Nổi bật" ? 0 : g.Key == "Mới" ? 1 : 2)
+            .Select(g => new KeyValuePair<string, List<Product_admin>>(g.Key, g.Value))
+            .ToList() ?? new List<KeyValuePair<string, List<Product_admin>>>();
 }
 
-<div class="container">
-    <div class="row">
-        <!-- Sidebar - Danh mục sản phẩm -->
-        <aside class="list col-md-4">
-            <ul class="list-group">
-                <li class="inner-title list-group-item">
-                    <h3>Danh mục sản phẩm</h3>
-                </li>
-                @if (parentCategories != null)
-                {
-                    foreach (var parent in parentCategories)
-                    {
-                        <li class="list-group-item" onclick="toggleArrow(this)">
-                            <a>@parent.Title<span class="arrow"></span></a>
-                            <ul class="list-group subcategories">
-                                @foreach (var sub in categories.Where(c => c.ParentId == parent._id))
-                                {
-                                    <li class="list-group-item" onclick="event.stopPropagation(); loadProductsByCategoryId('@sub._id')">
-                                        <a>@sub.Title</a>
-                                    </li>
-                                }
-                            </ul>
-                        </li>
-                    }
-                }
-            </ul>
+<style>
+    .sub-categories {
+        display: none;
+        margin-left: 15px;
+        margin-top: 5px;
+    }
 
-            <!-- Phần hiển thị Sách Bán Chạy - chỉ Featured 1,2,3 -->
-            @if (bestsellerProducts != null && bestsellerProducts.Any())
-            {
-                <div class="featured-section mt-4">
-                    <h4 class="featured-title">Sách Bán Chạy</h4>
-                    <ul class="list-group">
-                        @foreach (var product in bestsellerProducts.Take(5))
-                        {
-                            <li class="list-group-item">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <img src="@product.Image" class="img-fluid" alt="@product.Title" />
+        .sub-categories.show {
+            display: block;
+        }
+
+    /* Badge mới cho 3 phần chính */
+    .section-badge {
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 15px;
+        display: inline-block;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+        .section-badge.featured {
+            background: #ff4757;
+        }
+        /* Đỏ nổi bật */
+        .section-badge.new {
+            background: #2ed573;
+        }
+        /* Xanh lá */
+        .section-badge.bestseller {
+            background: #1e90ff;
+        }
+    /* Xanh dương */
+</style>
+
+<div class="home-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- SIDEBAR BÊN TRÁI -->
+            <aside class="col-xl-2 col-lg-3 col-md-3 col-sm-12 pe-lg-3 mb-4 mb-lg-0">
+                <div class="filter-sidebar">
+                    <div class="filter-header">BỘ LỌC</div>
+
+                    <!-- Lọc theo danh mục -->
+                    <div class="filter-section">
+                        <div class="filter-title">Lọc theo danh mục</div>
+                        <div class="filter-options">
+                            @if (parentCategories != null)
+                            {
+                                foreach (var parent in parentCategories)
+                                {
+                                    var subCategories = categories.Where(c => c.ParentId == parent._id).ToList();
+                                    <div class="filter-item">
+                                        <input type="checkbox" id="cat_@parent._id" class="filter-checkbox parent-checkbox"
+                                               onchange="toggleSubCategories('@parent._id')" onclick="loadProductsByCategoryId('@parent._id')">
+                                        <label for="cat_@parent._id">@parent.Title</label>
                                     </div>
-                                    <div class="col-8">
-                                        <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })" class="product-title">
-                                            @product.Title
-                                        </a>
+
+                                    @if (subCategories.Any())
+                                    {
+                                        <div class="sub-categories" id="sub_@parent._id">
+                                            @foreach (var sub in subCategories)
+                                            {
+                                                <div class="filter-item sub-item">
+                                                    <input type="checkbox" id="subcat_@sub._id" class="filter-checkbox"
+                                                           onclick="loadProductsByCategoryId('@sub._id')">
+                                                    <label for="subcat_@sub._id">@sub.Title</label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Lọc theo giá -->
+                    <div class="filter-section filter-price-section">
+                        <div class="filter-title">Lọc theo giá</div>
+                        <div class="price-inputs">
+                            <input type="text" placeholder="--giá từ--" class="price-input" id="priceFrom">
+                            <input type="text" placeholder="--giá đến--" class="price-input" id="priceTo">
+                        </div>
+                        <button class="apply-filter-btn" onclick="applyPriceFilter()">ÁP DỤNG</button>
+                    </div>
+                </div>
+
+                <!-- FLASH SALE CHỈ HIỆN Ở SIDEBAR -->
+                @if (bestsellerProducts != null && bestsellerProducts.Any())
+                {
+                    <div class="flash-sale-sidebar mt-4">
+                        <div class="flash-sale-badge">FLASH SALE</div>
+                        <div class="flash-sale-items">
+                            @foreach (var product in bestsellerProducts.Take(3))
+                            {
+                                <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })" class="flash-item">
+                                    @if (product.DiscountPercentage > 0)
+                                    {
+                                        <span class="flash-discount-tag">-@product.DiscountPercentage%</span>
+                                    }
+                                    <img src="@product.Image" alt="@product.Title" loading="lazy">
+                                    <div class="flash-item-info">
+                                        <div class="flash-item-title text-truncate">@product.Title</div>
                                         @if (product.DiscountPercentage > 0)
                                         {
-                                            <div>
-                                                <span class="text-muted old-price">@string.Format("{0:N0}đ", product.Price)</span>
-                                                <span class="new-price">@string.Format("{0:N0}đ", product.Price * (1 - product.DiscountPercentage / 100))</span>
+                                            <div class="flash-item-old-price">@string.Format("{0:N0} đ", product.Price)</div>
+                                            <div class="flash-item-price text-danger fw-bold">
+                                                @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
                                             </div>
                                         }
                                         else
                                         {
-                                            <div class="price">@string.Format("{0:N0}đ", product.Price)</div>
+                                            <div class="flash-item-price text-danger fw-bold">@string.Format("{0:N0} đ", product.Price)</div>
                                         }
+                                        <small class="text-muted">Đã bán 10+</small>
                                     </div>
-                                </div>
-                            </li>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </aside>
+
+            <!-- NỘI DUNG CHÍNH -->
+            <main class="col-xl-10 col-lg-9 col-md-9 col-sm-12">
+                <!-- Banner carousel -->
+                <div class="main-banner mb-4">
+                    <div id="bookCarousel" class="carousel slide rounded shadow" data-bs-ride="carousel" data-bs-interval="4000">
+
+                        @* Danh sách ảnh hard-code *@
+                        @{
+                            var slideImages = new List<string>
+                        {
+                        "/image/image_theme1.jpg",
+                        "/image/image_theme2.jpg",
+                        "/image/image_theme3.jpg"
+                        };
                         }
-                    </ul>
-                </div>
-            }
-        </aside>
 
-        <!-- Main Content - Sản phẩm -->
-        <main class="main col-md-8 p-3">
-            <!-- Slideshow -->
-            <div id="bookCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                </div>
+                        <!-- Indicators -->
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < slideImages.Count; i++)
+                            {
+                                <button type="button"
+                                        data-bs-target="#bookCarousel"
+                                        data-bs-slide-to="@i"
+                                        class="@(i == 0 ? "active" : "")"
+                                        aria-current="@(i == 0 ? "true" : "false")">
+                                </button>
+                            }
+                        </div>
 
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="/image/image_theme1.jpg" class="d-block w-100" alt="Theme 1" />
+                        <!-- Slideshow images -->
+                        <div class="carousel-inner rounded">
+                            @for (int i = 0; i < slideImages.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@slideImages[i]" class="d-block w-100 rounded" alt="Slide @(i + 1)">
+                                </div>
+                            }
+                        </div>
+
                     </div>
-                    <div class="carousel-item">
-                        <img src="/image/image_theme2.jpg" class="d-block w-100" alt="Theme 2" />
-                    </div>
-                    <div class="carousel-item">
-                        <img src="/image/image_theme3.jpg" class="d-block w-100" alt="Theme 3" />
-                    </div>
                 </div>
 
-                <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#bookCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
 
-            <!-- Danh sách sản phẩm theo Featured 0,1,2,3 -->
-            <div class="product-list mt-5">
-                @if (orderedGroupedProducts != null && orderedGroupedProducts.Any())
-                {
-                    foreach (var group in orderedGroupedProducts)
+                <!-- Tab danh mục (cuộn ngang) -->
+                <div class="category-tabs-container mb-4">
+                    <button class="scroll-arrow left" onclick="scrollTabs(-1)">‹</button>
+                    <div class="category-tabs" id="categoryTabs">
+                        @if (parentCategories != null)
+                        {
+                            foreach (var cat in parentCategories)
+                            {
+                                <a href="javascript:void(0)"
+                                   class="category-tab"
+                                   data-category-id="@cat._id"
+                                   onclick="loadProductsByCategoryId('@cat._id')">
+                                    @cat.Title
+                                </a>
+                            }
+                        }
+                    </div>
+                    <button class="scroll-arrow right" onclick="scrollTabs(1)">›</button>
+                </div>
+                <!-- 3 NHÓM SẢN PHẨM CHÍNH: NỔI BẬT - MỚI NHẤT - BÁN CHẠY -->
+                <div class="product-list">
+                    @if (displayGroups.Any())
                     {
-                        <h3 class="product-group-name">@group.Key</h3>
-                        <div class="position-relative">
-                            <button class="scroll-btn scroll-left" onclick="scrollProducts(this, -300)">
-                                &lt;
-                            </button>
+                        foreach (var group in displayGroups)
+                        {
+                            var sectionTitle = group.Key switch
+                            {
+                                "Nổi bật" => "NỔI BẬT",
+                                "Mới" => "MỚI NHẤT",
+                                _ => "BÁN CHẠY"
+                            };
 
-                            <div class="product-row">
-                                @foreach (var product in group.Value)
-                                {
-                                    <div class="product-item">
-                                        <div class="card">
-                                            <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })">
-                                                <img src="@product.Image" class="card-img-top" alt="@product.Title" />
-                                                <div class="card-body">
-                                                    <h5 class="card-title">@product.Title</h5>
-                                                    <p class="card-text">
+                            var sectionClass = group.Key switch
+                            {
+                                "Nổi bật" => "featured",
+                                "Mới" => "new",
+                                _ => "bestseller"
+                            };
+
+                            <div class="product-section mb-5" data-section-type="@group.Key">
+                                <h2 class="section-badge @sectionClass">@sectionTitle</h2>
+
+                                <div class="products-slider-wrapper position-relative">
+                                    <button class="slider-arrow left" onclick="slideProducts(this, -1)">‹</button>
+                                    <div class="products-slider d-flex overflow-hidden">
+                                        @foreach (var product in group.Value)
+                                        {
+                                            <div class="product-box me-3 flex-shrink-0" style="width: 220px;">
+                                                <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })" class="text-decoration-none">
+                                                    @if (product.DiscountPercentage > 0)
+                                                    {
+                                                        <span class="product-discount-badge">-@product.DiscountPercentage%</span>
+                                                    }
+                                                    <div class="product-img-wrapper bg-light rounded">
+                                                        <img src="@product.Image" alt="@product.Title" class="w-100 rounded" loading="lazy" style="height: 280px; object-fit: cover;">
+                                                    </div>
+                                                    <div class="product-details mt-2">
+                                                        <h3 class="product-name text-dark mb-1" style="font-size: 14px; height: 40px; overflow: hidden;">@product.Title</h3>
                                                         @if (product.DiscountPercentage > 0)
                                                         {
-                                                            <span class="badge discount-badge">
-                                                                Giảm @product.DiscountPercentage%
-                                                            </span>
-                                                            <br />
-                                                            <span class="text-muted old-price">
-                                                                @string.Format("{0:N0}đ", product.Price)
-                                                            </span>
-                                                            <br />
-                                                            <span class="price new-price">
-                                                                @string.Format("{0:N0}đ", product.Price * (1 - product.DiscountPercentage / 100))
-                                                            </span>
+                                                            <div class="product-price-old text-muted"><del>@string.Format("{0:N0} đ", product.Price)</del></div>
+                                                            <div class="product-price-new text-danger fw-bold">
+                                                                @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
+                                                            </div>
                                                         }
                                                         else
                                                         {
-                                                            <span class="price normal-price">
-                                                                @string.Format("{0:N0}đ", product.Price)
-                                                            </span>
+                                                            <div class="product-price-single text-danger fw-bold">@string.Format("{0:N0} đ", product.Price)</div>
                                                         }
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        }
                                     </div>
-                                }
+                                    <button class="slider-arrow right" onclick="slideProducts(this, 1)">›</button>
+                                </div>
                             </div>
-
-                            <button class="scroll-btn scroll-right" onclick="scrollProducts(this, 300)">
-                                &gt;
-                            </button>
-                        </div>
+                        }
                     }
-                }
-                else
-                {
-                    <p>Không có sản phẩm nào để hiển thị.</p>
-                }
-            </div>
-        </main>
+                    else
+                    {
+                        <p class="text-center py-5 fs-4 text-muted">Không có sản phẩm nào để hiển thị.</p>
+                    }
+                </div>
+            </main>
+        </div>
     </div>
 </div>
 
+<!-- SCRIPT -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
-    function toggleArrow(item) {
-        const allItems = document.querySelectorAll("aside .list-group > .list-group-item");
-        allItems.forEach(otherItem => {
-            if (otherItem !== item) {
-                otherItem.classList.remove("menu-active");
-            }
-        });
-        item.classList.toggle("menu-active");
+    var currentCategoryId = "";
+
+    function toggleSubCategories(parentId) {
+        const sub = document.getElementById('sub_' + parentId);
+        const checkbox = document.getElementById('cat_' + parentId);
+        if (sub) sub.classList.toggle('show', checkbox.checked);
     }
 
     function loadProductsByCategoryId(categoryId) {
+        currentCategoryId = categoryId;
         fetch(`/Home/GetProductsByCategoryId?categoryId=${categoryId}`)
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('.product-list').innerHTML = html;
-            })
-            .catch(error => console.error('Error loading products:', error));
+            .then(r => r.text())
+            .then(html => document.querySelector('.product-list').innerHTML = html)
+            .catch(err => console.error(err));
     }
 
-    function scrollProducts(button, distance) {
-        const row = button.parentElement.querySelector('.product-row');
-        row.scrollBy({
-            left: distance,
-            behavior: 'smooth'
-        });
-    }
+    // SignalR real-time update
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/productHub")
+        .build();
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const subItems = document.querySelectorAll(".subcategories .list-group-item");
-
-        subItems.forEach(item => {
-            item.addEventListener("click", function () {
-                subItems.forEach(i => i.classList.remove("active"));
-                this.classList.add("active");
-            });
-        });
-
-        document.addEventListener('click', function (e) {
-            const sidebar = document.querySelector('aside.list');
-            if (!sidebar.contains(e.target)) {
-                const allItems = document.querySelectorAll("aside .list-group > .list-group-item");
-                allItems.forEach(item => {
-                    item.classList.remove("menu-active");
-                });
-            }
-        });
-    });
-</script>
-
-@functions {
-    public string GetFeaturedLabel(string featured)
-    {
-        switch (featured)
-        {
-            case "Nổi bật": return "Nổi bật";
-            case "Mới": return "Mới";
-            case "Gợi ý": return "Gợi ý";
-            case "Không nổi bật": return "Không nổi bật";
-            default: return "";
+    connection.on("ReceiveProductUpdate", function () {
+        console.log("Sản phẩm vừa được cập nhật!");
+        if (currentCategoryId) {
+            loadProductsByCategoryId(currentCategoryId);
+        } else {
+            location.reload();
         }
+    });
+
+    connection.start().catch(err => console.error(err));
+
+    // Các hàm cuộn
+    function scrollTabs(dir) {
+        const el = document.querySelector('.category-tabs');
+        el.scrollBy({ left: dir * 200, behavior: 'smooth' });
     }
-}
+
+    function slideProducts(btn, dir) {
+        const slider = btn.parentElement.querySelector('.products-slider');
+        slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
+    }
+
+    function applyPriceFilter() {
+        const from = document.getElementById('priceFrom').value;
+        const to = document.getElementById('priceTo').value;
+        alert(`Lọc giá từ ${from} đến ${to}`);
+        // TODO: gọi AJAX lọc giá ở đây
+    }
+</script>
