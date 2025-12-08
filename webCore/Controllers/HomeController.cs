@@ -52,19 +52,69 @@ namespace webCore.Controllers
             return View(); // Trả về View Index.cshtml
         }
 
-        // Lấy danh sách sản phẩm theo danh mục (AJAX)
+        // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
         public async Task<IActionResult> GetProductsByCategoryId(string categoryId)
         {
-            if (string.IsNullOrEmpty(categoryId))
+            if (string.IsNullOrEmpty(categoryId))   
             {
                 return BadRequest("Category ID is required.");
             }
 
-            var products = await _productService.GetProductsByCategoryIdAsync(categoryId);
-            return PartialView("_BookListPartial", products);
+            // --- BẮT ĐẦU SỬA ĐỔI ---
+
+            // 1. Lấy tất cả danh mục để kiểm tra quan hệ cha-con
+            var allCategories = await _categoryService.GetCategoriesAsync();
+
+            // 2. Tìm danh sách các ID danh mục con của categoryId hiện tại
+            var childCategoryIds = allCategories
+                .Where(c => c.ParentId == categoryId)
+                .Select(c => c._id)
+                .ToList();
+
+            List<Product_admin> products = new List<Product_admin>();
+
+            // 3. Logic: Nếu có con (là Cha) thì lấy cả cha lẫn con. Nếu không (là Con) thì chỉ lấy nó.
+            if (childCategoryIds.Any())
+            {
+                // A. Trường hợp chọn Danh mục Cha:
+
+                var parentProducts = await _productService.GetProductsByCategoryIdAsync(categoryId);
+                products.AddRange(parentProducts);
+
+                foreach (var childId in childCategoryIds)
+                {
+                    var childProducts = await _productService.GetProductsByCategoryIdAsync(childId);
+                    products.AddRange(childProducts);
+                }
+            }
+            else
+            {
+
+                products = await _productService.GetProductsByCategoryIdAsync(categoryId);
+            }
+
+            products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
+
+            var groupedProducts = new Dictionary<string, List<Product_admin>>();
+
+            var featuredProducts = products.Where(p => p.DiscountPercentage > 0).ToList();
+            var newProducts = products.Where(p => p.DiscountPercentage == 0 && p.Price > 0).Take(10).ToList();
+            var suggestedProducts = products.Except(featuredProducts).Except(newProducts).ToList();
+
+            if (featuredProducts.Any()) groupedProducts.Add("Nổi bật", featuredProducts);
+            if (newProducts.Any()) groupedProducts.Add("Mới", newProducts);
+            if (suggestedProducts.Any()) groupedProducts.Add("Gợi ý", suggestedProducts);
+
+            var orderedGroupedProducts = groupedProducts
+                .OrderBy(group =>
+                    group.Key == "Nổi bật" ? 0 :
+                    group.Key == "Mới" ? 1 :
+                    group.Key == "Gợi ý" ? 2 : int.MaxValue)
+                .ToList();
+
+            return PartialView("_BookListPartial", orderedGroupedProducts);
         }
 
-        // Phương thức tìm kiếm sản phẩm
         public async Task<IActionResult> Search(string searchQuery)
         {
             if (string.IsNullOrEmpty(searchQuery))
@@ -72,7 +122,6 @@ namespace webCore.Controllers
                 return PartialView("_ProductList", new List<Product_admin>());
             }
 
-            // Tìm kiếm sản phẩm từ MongoDB
             var allProducts = await _productService.GetProductsAsync();
             var searchResults = allProducts
                 .Where(p => p.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
@@ -80,8 +129,6 @@ namespace webCore.Controllers
 
             return PartialView("_ProductList", searchResults);
         }
-
-        // Xử lý đăng nhập và lưu thông tin vào session
         [HttpPost]
         public async Task<IActionResult> Sign_in(User loginUser)
         {
@@ -90,7 +137,6 @@ namespace webCore.Controllers
                 return View(loginUser);
             }
 
-            // Kiểm tra tài khoản trong MongoDB
             var user = await _userService.GetAccountByEmailAsync(loginUser.Email);
             if (user == null)
             {
@@ -98,21 +144,17 @@ namespace webCore.Controllers
                 return View(loginUser);
             }
 
-            // Kiểm tra mật khẩu
             if (loginUser.Password != user.Password)
             {
                 ModelState.AddModelError("", "Mật khẩu không đúng.");
                 return View(loginUser);
             }
 
-            // Lưu thông tin đăng nhập vào session
             HttpContext.Session.SetString("UserToken", user.Token);
             HttpContext.Session.SetString("UserName", user.Name);
 
             return RedirectToAction("Index", "Home");
         }
-
-        // Xử lý đăng xuất và xóa thông tin session
         [HttpPost]
         public IActionResult Sign_out()
         {
@@ -121,8 +163,6 @@ namespace webCore.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
-        // API lấy breadcrumb theo CategoryId
         [HttpGet("api/breadcrumbs/{categoryId}")]
         public async Task<IActionResult> GetBreadcrumbs(string categoryId)
         {

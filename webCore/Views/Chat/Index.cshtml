@@ -15,16 +15,16 @@
         <div class="sidebar-header">
             <h5>💬 Tin nhắn theo đơn hàng</h5>
 
+            <!-- Search Input -->
             <div class="search-wrapper">
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Tìm đơn hàng...">
-            </div>
 
+
+            <!-- Filter Select -->
             <select class="filter-select">
                 <option value="all">Tất cả</option>
                 <option value="unread">Có tin nhắn</option>
-            </select>
-        </div>
 
         <div class="chat-list">
             @foreach (var order in Model.Item1)
@@ -43,6 +43,8 @@
                         <h6>@order.FullName</h6>
                         <small>ID: @order.Id</small>
                     </div>
+        </div>
+    </div>
 
                     @if (hasMsg)
                     {
@@ -165,6 +167,6 @@
 
             $("#messageInput").val("");
         });
-    }
-
 </script>
+
+<script src="~/js/chat.js"></script>

@@ -50,7 +50,16 @@ namespace webCore
                 logger.LogInformation("MongoDB connection string is configured.");
                 return new MongoClient(mongoConnection);
             });
+            // Add MongoDB Database
+            services.AddScoped<IMongoDatabase>(sp =>
+            {
+                var mongoConfig = Configuration.GetSection("MongoDB");
+                var databaseName = mongoConfig["DatabaseName"];
 
+                var client = sp.GetRequiredService<IMongoClient>();
+
+                return client.GetDatabase(databaseName);
+            });
             // Register MongoDBService with DI container
             services.AddSingleton<MongoDBService>();
 
