@@ -216,10 +216,17 @@ namespace webCore.Controllers
         [ServiceFilter(typeof(SetLoginStatusFilter))]
         public async Task<IActionResult> PaymentHistory(string? status = null)
         {
-            var userId = HttpContext.Session.GetString("UserId"); // Đúng UserId
+            var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
 
-            if (string.IsNullOrEmpty(userId))
+            // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
+            ViewBag.IsLoggedIn = isLoggedIn;
+
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
+            {
                 return RedirectToAction("Sign_in", "User");
+            }
+            var userId = HttpContext.Session.GetString("UserId");
 
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
 
