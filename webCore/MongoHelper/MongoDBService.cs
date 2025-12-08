@@ -28,7 +28,7 @@ namespace webCore.Services
         internal readonly IMongoCollection<User> _accountCollection;
         internal readonly IMongoCollection<Role> _roleCollection;
         internal readonly IMongoCollection<Shop> _shopCollection;
-
+        internal readonly IMongoCollection<ChatMessage> _chatCollection;
         public IMongoCollection<ForgotPassword> ForgotPasswords { get; internal set; }
 
         public MongoDBService(IConfiguration configuration)
@@ -46,6 +46,7 @@ namespace webCore.Services
             _voucherCollection = mongoDatabase.GetCollection<Voucher>("Vouchers");
             _roleCollection = mongoDatabase.GetCollection<Role>("Roles");
             _shopCollection = mongoDatabase.GetCollection<Shop>("Shops");
+            _chatCollection = mongoDatabase.GetCollection<ChatMessage>("Chat");
         }
 
     }

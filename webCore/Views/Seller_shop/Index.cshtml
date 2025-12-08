@@ -1,0 +1,287 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cửa hàng MEN_SHOP66</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/SellerShop.css" />
+</head>
+<body>
+    <!-- Shop Header -->
+    <div class="shop-header">
+        <div class="container">
+            <div class="shop-header-flex">
+                <div class="shop-info">
+                    <div class="shop-avatar">
+                        <img src="/images/shop-avatar.jpg" alt="Shop Avatar">
+                        <span class="favorite-badge">Yêu thích</span>
+                    </div>
+                    <div class="shop-details">
+                        <h1>MEN_SHOP66 <i class="fas fa-chevron-right"></i></h1>
+                        <div class="shop-stats">
+                            <span><i class="fas fa-star"></i> 4.7</span>
+                            <span>|</span>
+                            <span><i class="fas fa-users"></i> 303 Người theo dõi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="shop-actions">
+                    <button class="btn btn-follow">
+                        <i class="fas fa-plus"></i> Theo dõi
+                    </button>
+                    <button class="btn btn-chat">
+                        <i class="fas fa-comment"></i> Chat
+                    </button>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <a href="#">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Video sản phẩm</span>
+                </a>
+                <span>21k Lượt xem <i class="fas fa-chevron-right"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs-wrapper">
+        <div class="container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="shop">Shop</button>
+                <button class="nav-tab" data-tab="products">Sản phẩm</button>
+                <button class="nav-tab" data-tab="categories">Danh mục hàng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <div class="container">
+            <!-- Shop Tab -->
+            <div id="shop-tab" class="tab-content active">
+                <div class="recommendation-section">
+                    <h3>
+                        Gợi ý cho bạn
+                        <a href="#">Tìm hiểu ngay <i class="fas fa-chevron-right"></i></a>
+                    </h3>
+                    <div class="recommendation-products">
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1603252109360-909baaf261c7?w=400&h=400&fit=crop" alt="Product" class="product-image">
+                                <span class="product-badge">Yêu thích</span>
+                                <span class="sale-badge">BLACK FRIDAY</span>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">Áo Đũi Cộc Tay Nam, Chất Đũi, Mặc Mát, Cơ Giãn...</div>
+                                <div class="product-price-row">
+                                    <span class="product-price">85.140đ</span>
+                                    <span class="product-discount">-34%</span>
+                                </div>
+                                <span class="product-payment">SPayLater 0%</span>
+                                <div class="product-footer">
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i> 4.9
+                                    </div>
+                                    <span>Đã bán 1k+</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop" alt="Product" class="product-image">
+                                <span class="product-badge">Yêu thích</span>
+                                <span class="sale-badge">BLACK FRIDAY</span>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">Quần âu nam cạp chun suơn ăn 2 bên đẳng Hàn Quốc...</div>
+                                <div class="product-price-row">
+                                    <span class="product-price">216.720đ</span>
+                                    <span class="product-discount">-34%</span>
+                                </div>
+                                <span class="product-payment">SPayLater 0%</span>
+                                <div class="product-footer">
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i> 5.0
+                                    </div>
+                                    <span>Đã bán 231</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop" alt="Product" class="product-image">
+                                <span class="product-badge">Yêu thích</span>
+                                <span class="sale-badge">BLACK FRIDAY</span>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">Sơ Mi Đũi Dài Tay Nam Cổ tàu, Mát mẻ, lịch sự...</div>
+                                <div class="product-price-row">
+                                    <span class="product-price">107.500đ</span>
+                                    <span class="product-discount">-38%</span>
+                                </div>
+                                <span class="product-payment">SPayLater 0%</span>
+                                <div class="product-footer">
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i> 5.0
+                                    </div>
+                                    <span>Đã bán 89</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="banner-section">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=300&fit=crop" alt="Banner">
+                </div>
+
+                <div class="section-title">Sản Phẩm Bán Chạy</div>
+                <div class="product-grid">
+                    <!-- Thêm các sản phẩm ở đây -->
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="products-tab" class="tab-content">
+                <div class="filter-bar">
+                    <button class="filter-btn active">Phổ biến</button>
+                    <button class="filter-btn">Mới nhất</button>
+                    <button class="filter-btn">Bán chạy</button>
+                    <button class="filter-btn">Giá <i class="fas fa-sort"></i></button>
+                </div>
+
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop" alt="Product" class="product-image">
+                            <span class="product-badge">Yêu thích</span>
+                            <span class="sale-badge">BLACK FRIDAY</span>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">Áo sơ mi dài tay nam CỔ BẺ DÀI TAY form rộng...</div>
+                            <div class="product-price-row">
+                                <span class="product-price">107.500đ</span>
+                                <span class="product-discount">-38%</span>
+                            </div>
+                            <span class="product-payment">SPayLater 0%</span>
+                            <div class="product-footer">
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i> 4.8
+                                </div>
+                                <span>Đã bán 175</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Thêm các sản phẩm khác -->
+                </div>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categories-tab" class="tab-content">
+                <div class="category-list">
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Quần Short</div>
+                            <div class="category-count">(12)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1622445275576-721325763afe?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Áo Ba Lỗ</div>
+                            <div class="category-count">(5)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Áo</div>
+                            <div class="category-count">(5)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Đồ tập</div>
+                            <div class="category-count">(4)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Quần Dài/Quần Âu</div>
+                            <div class="category-count">(4)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Áo Hoodie, Áo Len & Áo Nỉ</div>
+                            <div class="category-count">(4)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Thời Trang Thể Thao & Dã Ngoại</div>
+                            <div class="category-count">(4)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Bộ</div>
+                            <div class="category-count">(2)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1618453292459-6f33f909339c?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Đồ Bộ</div>
+                            <div class="category-count">(2)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <div class="category-item">
+                        <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=100&h=100&fit=crop" alt="Category" class="category-image">
+                        <div class="category-info">
+                            <div class="category-name">Đồ Lót</div>
+                            <div class="category-count">(1)</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/SellerShop.js"></script>
+</body>
+</html>

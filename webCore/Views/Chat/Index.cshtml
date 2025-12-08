@@ -1,89 +1,170 @@
-﻿@{
-    Layout = "~/Views/Shared/_SellerLayout.cshtml";
-}
+﻿@model Tuple<List<webCore.Models.Order>, List<webCore.Models.ChatMessage>>
 
-<link rel="stylesheet" href="~/css/chat.css" />
+<link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<input type="hidden" id="currentUserId" value="@ViewBag.CurrentUserId" />
+<input type="hidden" id="otherUserId" value="@ViewBag.OtherUserId" />
 
 <div class="chat-container">
-    <!-- Sidebar - Danh sách khách hàng -->
+
+    <!-- ======================== SIDEBAR =========================== -->
     <div class="chat-sidebar">
         <div class="sidebar-header">
-            <h5>💬 Tin nhắn khách hàng</h5>
+            <h5>💬 Tin nhắn theo đơn hàng</h5>
 
-            <!-- Search Input -->
             <div class="search-wrapper">
                 <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Tìm theo tên, SĐT...">
+                <input type="text" class="search-input" placeholder="Tìm đơn hàng...">
             </div>
 
-            <!-- Filter Select -->
             <select class="filter-select">
-                <option value="all">Tất cả tin nhắn</option>
-                <option value="unread">Chưa đọc</option>
-                <option value="important">Quan trọng</option>
-                <option value="pending">Chờ xử lý</option>
+                <option value="all">Tất cả</option>
+                <option value="unread">Có tin nhắn</option>
             </select>
         </div>
 
-        <div class="chat-list" id="chatList">
-            <!-- Chat items will be loaded here -->
+        <div class="chat-list">
+            @foreach (var order in Model.Item1)
+            {
+                var hasMsg = ViewBag.OrdersWithMessages != null &&
+                             ((List<string>)ViewBag.OrdersWithMessages).Contains(order.Id.ToString());
+
+                <a href="@Url.Action("Index", "Chat", new { orderId = order.Id })"
+                   class="chat-list-item @(order.Id.ToString() == (ViewBag.OrderId ?? "") ? "active" : "")">
+
+                    <div class="chat-avatar">
+                        <img src="/images/avatar-default.png" />
+                    </div>
+
+                    <div class="chat-info">
+                        <h6>@order.FullName</h6>
+                        <small>ID: @order.Id</small>
+                    </div>
+
+                    @if (hasMsg)
+                    {
+                        <span class="badge bg-success">●</span>
+                    }
+                </a>
+            }
         </div>
     </div>
 
-    <!-- Main chat area -->
+    <!-- ====================== MAIN CHAT AREA ===================== -->
     <div class="chat-main">
+
+        <!-- HEADER -->
         <div class="chat-header">
             <div class="d-flex align-items-center">
-                <img src="/images/avatar-default.png" alt="Avatar" class="header-avatar" id="headerAvatar">
+
+                <img src="/images/avatar-default.png"
+                     alt="Avatar"
+                     class="header-avatar">
+
                 <div class="ms-3">
-                    <h6 class="mb-0" id="headerName">Chọn khách hàng để chat</h6>
-                    <small class="text-muted" id="headerStatus">Online</small>
+                    <h6 class="mb-0">
+                        @(ViewBag.OrderId == null ? "Chọn đơn hàng để chat" : ViewBag.OtherUserId)
+                    </h6>
+
+                    <small class="text-muted">
+                        @(ViewBag.OrderId == null ? "Chưa chọn" : "Online")
+                    </small>
                 </div>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-secondary" title="Tìm kiếm tin nhắn">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" title="Xóa cuộc hội thoại">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
         </div>
 
+        <!-- MESSAGES -->
         <div class="chat-messages" id="chatMessages">
-            <div class="text-center text-muted py-5">
-                <i class="bi bi-chat-dots fs-1"></i>
-                <p class="mt-2">Chọn khách hàng để bắt đầu trò chuyện</p>
-            </div>
+
+            @if (ViewBag.OrderId == null)
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-chat-dots fs-1"></i>
+                    <p class="mt-2">Chọn đơn hàng để bắt đầu trò chuyện</p>
+                </div>
+            }
+            else
+            {
+                foreach (var msg in Model.Item2)
+                {
+                    <div class="@(msg.SenderId == ViewBag.CurrentUserId ? "msg-me" : "msg-other")">
+                        @msg.Message
+                    </div>
+                }
+            }
         </div>
 
-        <div class="chat-input-area">
-            <!-- File Preview Area -->
-            <div class="file-preview-area" id="filePreviewArea">
-                <!-- File previews will be shown here -->
-            </div>
+        <!-- INPUT -->
+        @if (ViewBag.OrderId != null)
+        {
+            <div class="chat-input-area">
 
-            <!-- Input Wrapper -->
-            <div class="chat-input-wrapper">
-                <button class="btn btn-light btn-sm" type="button" id="btnEmoji" title="Emoji">
-                    <i class="bi bi-emoji-smile"></i>
-                </button>
-                <button class="btn btn-light btn-sm" type="button" id="btnImage" title="Đính kèm ảnh">
-                    <i class="bi bi-image"></i>
-                </button>
-                <button class="btn btn-light btn-sm" type="button" id="btnFile" title="Gửi file">
-                    <i class="bi bi-paperclip"></i>
-                </button>
-                <input type="text" class="form-control message-input" id="messageInput" placeholder="Nhập tin nhắn...">
-                <button class="btn btn-primary send-btn" id="sendBtn">
-                    <i class="bi bi-send-fill"></i>
-                </button>
+                <div class="chat-input-wrapper">
+                    <button class="btn btn-light btn-sm"><i class="bi bi-emoji-smile"></i></button>
+                    <button class="btn btn-light btn-sm"><i class="bi bi-image"></i></button>
+
+                    <input type="text"
+                           class="form-control message-input"
+                           id="messageInput"
+                           placeholder="Nhập tin nhắn...">
+
+                    <button class="btn btn-primary send-btn" id="sendBtn">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
             </div>
-        </div>
+        }
     </div>
 </div>
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-<script src="~/js/chat.js"></script>
+<!-- ================== SIGNALR ================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+<script>
+
+    const orderId = "@ViewBag.OrderId";
+    const currentUserId = "@ViewBag.CurrentUserId";
+    const otherUserId = "@ViewBag.OtherUserId";
+
+    if (orderId) {
+
+        const conn = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub?orderId=" + orderId)
+            .build();
+
+        conn.on("ReceiveMessage", function (sender, message) {
+
+            $("#chatMessages").append(`
+                <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
+                    ${message}
+                </div>
+            `);
+
+            $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
+        });
+
+        conn.start();
+
+        $("#sendBtn").click(() => {
+
+            const msg = $("#messageInput").val();
+            if (!msg) return;
+
+            conn.invoke("SendMessage", orderId, currentUserId, msg);
+
+            $.post("/Chat/SendMessage", {
+                OrderId: orderId,
+                SenderId: currentUserId,
+                ReceiverId: otherUserId,
+                Message: msg
+            });
+
+            $("#messageInput").val("");
+        });
+    }
+
+</script>

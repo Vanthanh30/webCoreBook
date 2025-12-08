@@ -9,6 +9,7 @@ using System;
 using webCore.MongoHelper;
 using webCore.Services;
 using Microsoft.AspNetCore.Http;
+using webCore.Hubs;
 
 namespace webCore
 {
@@ -26,7 +27,7 @@ namespace webCore
         {
             // Add controllers and views
             services.AddControllersWithViews();
-
+            services.AddSignalR();
             // Add MongoDB Client (singleton because it is thread-safe)
             services.AddSingleton<IMongoClient>(sp =>
             {
@@ -70,7 +71,7 @@ namespace webCore
             services.AddScoped<ForgotPasswordService>();
             services.AddScoped<RoleService>();
             services.AddScoped<ShopService>();
-
+            services.AddScoped<ChatService>();
             // Add session management
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -134,7 +135,7 @@ namespace webCore
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+                endpoints.MapHub<ChatHub>("/chatHub");
                 // Custom route for DetailUserController
                 endpoints.MapControllerRoute(
                     name: "detailUser",
