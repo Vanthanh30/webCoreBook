@@ -17,13 +17,20 @@ namespace webCore.Controllers
         private readonly OrderService _orderService;
         private readonly VoucherClientService _voucherClientService;
         private readonly CategoryProduct_adminService _categoryProductAdminService;
+        private readonly ReviewService _reviewService;
+        private readonly UserService _userService;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public CheckoutController(CartService cartService, OrderService orderService, VoucherClientService voucherClientService, CategoryProduct_adminService categoryProduct_AdminService)
+        public CheckoutController(CartService cartService, OrderService orderService, VoucherClientService voucherClientService, CategoryProduct_adminService categoryProduct_AdminService, ReviewService reviewService,
+            UserService userService, CloudinaryService cloudinaryService)
         {
             _cartService = cartService;
             _orderService = orderService;
             _voucherClientService = voucherClientService;
             _categoryProductAdminService = categoryProduct_AdminService;
+            _reviewService = reviewService;
+            _userService = userService;
+            _cloudinaryService = cloudinaryService;
         }
 
 
@@ -269,6 +276,103 @@ namespace webCore.Controllers
         public IActionResult ReturnReason()
         {
             return View(); 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReviewProduct(string orderId, string productId)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Sign_in", "User");
+
+            // Lấy đơn hàng
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            if (order == null) return NotFound("Không tìm thấy đơn hàng");
+
+            // Tìm sản phẩm cụ thể trong đơn hàng đó để đánh giá
+            var item = order.Items.FirstOrDefault(p => p.ProductId == productId);
+            if (item == null) return NotFound("Sản phẩm không tồn tại trong đơn hàng này");
+
+            var hasReviewed = await _reviewService.HasReviewedAsync(orderId, productId);
+            if (hasReviewed)
+            {
+                TempData["ErrorMessage"] = "Bạn đã đánh giá sản phẩm này rồi.";
+                return RedirectToAction("PaymentHistory");
+            }
+
+            decimal orderTotalCalculated = order.Items.Sum(i => i.Price * i.Quantity * (1 - i.DiscountPercentage / 100m));
+
+            decimal itemTotalCalculated = item.Price * item.Quantity * (1 - item.DiscountPercentage / 100m);
+
+            decimal ratio = (orderTotalCalculated == 0) ? 0 : (itemTotalCalculated / orderTotalCalculated);
+
+            decimal actualPaidTotal = order.FinalAmount * ratio;
+
+            ViewBag.OrderId = orderId;
+            ViewBag.ActualPaidTotal = actualPaidTotal;
+
+            return View(item);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SubmitReview(string orderId, string productId, int qualityRating, int serviceRating, string comment, List<IFormFile> mediaFiles)
+        {
+            // 1. Kiểm tra đăng nhập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Sign_in", "User");
+
+            // --- 2. UPLOAD LÊN CLOUDINARY ---
+            List<string> uploadedUrls = new List<string>();
+            if (mediaFiles != null && mediaFiles.Count > 0)
+            {
+                foreach (var file in mediaFiles)
+                {
+                    if (file.Length > 0)
+                    {
+                        // Upload cả ảnh và video
+                        var url = await _cloudinaryService.UploadMediaAsync(file);
+                        if (!string.IsNullOrEmpty(url)) uploadedUrls.Add(url);
+                    }
+                }
+            }
+
+            // 3. Lấy dữ liệu Order và Item
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            var item = order.Items.FirstOrDefault(p => p.ProductId == productId);
+
+            // --- 4. LẤY THÔNG TIN USER (SỬ DỤNG USER SERVICE CỦA BẠN) ---
+            // Gọi hàm GetUserByIdAsync từ UserService bạn vừa cung cấp
+            var currentUser = await _userService.GetUserByIdAsync(userId);
+
+            // 5. Tạo Object Review
+            var review = new Review
+            {
+                OrderId = orderId,
+                ProductId = productId,
+                UserId = userId,
+
+                // Map thông tin User (Xử lý null nếu user chưa có ảnh)
+                UserName = currentUser?.Name ?? "Khách hàng",
+                UserAvatar = !string.IsNullOrEmpty(currentUser?.ProfileImage)
+                             ? currentUser.ProfileImage
+                             : "https://res.cloudinary.com/demo/image/upload/d_avatar.png/non_existing_id.png",
+
+                // Map thông tin Product
+                ProductTitle = item.Title,
+                ProductImage = item.Image,
+
+                // Nội dung đánh giá
+                QualityRating = qualityRating,
+                ServiceRating = serviceRating,
+                Comment = comment,
+                MediaUrls = uploadedUrls,
+
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // 6. Lưu vào MongoDB
+            await _reviewService.CreateAsync(review);
+
+            TempData["SuccessMessage"] = "Cảm ơn bạn đã đánh giá sản phẩm!";
+            return RedirectToAction("PaymentHistory");
         }
     }
 }

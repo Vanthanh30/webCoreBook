@@ -30,7 +30,7 @@ namespace webCore.Services
         internal readonly IMongoCollection<Shop> _shopCollection;
 
         public IMongoCollection<ForgotPassword> ForgotPasswords { get; internal set; }
-
+        public IMongoCollection<Review> Reviews { get; internal set; }
         public MongoDBService(IConfiguration configuration)
         {
             var mongoClient = new MongoClient(configuration["MongoDB:ConnectionString"]);
@@ -46,6 +46,7 @@ namespace webCore.Services
             _voucherCollection = mongoDatabase.GetCollection<Voucher>("Vouchers");
             _roleCollection = mongoDatabase.GetCollection<Role>("Roles");
             _shopCollection = mongoDatabase.GetCollection<Shop>("Shops");
+            Reviews = mongoDatabase.GetCollection<Review>("Reviews");
         }
 
     }

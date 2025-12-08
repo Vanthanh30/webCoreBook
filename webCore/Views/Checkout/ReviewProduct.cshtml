@@ -1,0 +1,230 @@
+﻿@model webCore.Models.CartItem
+@{
+    ViewData["Title"] = "Đánh giá sản phẩm";
+    Layout = "_Layout";
+
+    decimal actualPaidTotal = ViewBag.ActualPaidTotal != null ? (decimal)ViewBag.ActualPaidTotal : 0;
+}
+
+<style>
+    .review-wrapper {
+        max-width: 700px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .product-summary {
+        display: flex;
+        gap: 15px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 25px;
+    }
+
+        .product-summary img {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #f0f0f0;
+        }
+
+    .product-meta {
+        flex-grow: 1;
+    }
+
+        .product-meta h5 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+    .price-display {
+        font-size: 15px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 13px;
+        margin-right: 5px;
+    }
+
+    .total-price {
+        color: #d9534f;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    /* ... (Giữ nguyên các CSS rating và upload) ... */
+    .rating-group {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .rating-label {
+        width: 180px;
+        font-weight: 500;
+        color: #555;
+    }
+
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 28px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0 2px;
+        }
+
+            .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label {
+                color: #ffc107;
+            }
+
+    .upload-area {
+        border: 2px dashed #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+
+        .upload-area:hover {
+            border-color: #007bff;
+            background: #f8fbff;
+        }
+
+    .preview-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .preview-item {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+</style>
+
+<div class="container">
+    <div class="review-wrapper">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Đánh giá sản phẩm</h4>
+            <a href="@Url.Action("PaymentHistory", "Checkout")" class="text-muted"><i class="fa fa-times"></i> Trở lại</a>
+        </div>
+
+        <div class="product-summary">
+            <img src="@Model.Image" alt="@Model.Title">
+            <div class="product-meta">
+                <h5>@Model.Title</h5>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Phân loại: X@(Model.Quantity)</span>
+
+                    <div class="text-right">
+                        <span class="price-display">@Model.Price.ToString("N0")đ</span>
+                    </div>
+                </div>
+
+                <div class="text-right mt-2">
+                    <span style="font-size: 14px; color: #888;">Tổng tiền: </span>
+                    <span class="total-price">@actualPaidTotal.ToString("N0")đ</span>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="SubmitReview" asp-controller="Checkout" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+            <input type="hidden" name="productId" value="@Model.ProductId" />
+
+            <div class="rating-group">
+                <div class="rating-label">Chất lượng sản phẩm</div>
+                <div class="star-rating">
+                    <input type="radio" id="q5" name="qualityRating" value="5" checked /><label for="q5" title="Tuyệt vời">★</label>
+                    <input type="radio" id="q4" name="qualityRating" value="4" /><label for="q4" title="Tốt">★</label>
+                    <input type="radio" id="q3" name="qualityRating" value="3" /><label for="q3" title="Bình thường">★</label>
+                    <input type="radio" id="q2" name="qualityRating" value="2" /><label for="q2" title="Tệ">★</label>
+                    <input type="radio" id="q1" name="qualityRating" value="1" /><label for="q1" title="Rất tệ">★</label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">Dịch vụ người bán</div>
+                <div class="star-rating">
+                    <input type="radio" id="s5" name="serviceRating" value="5" checked /><label for="s5" title="Tuyệt vời">★</label>
+                    <input type="radio" id="s4" name="serviceRating" value="4" /><label for="s4" title="Tốt">★</label>
+                    <input type="radio" id="s3" name="serviceRating" value="3" /><label for="s3" title="Bình thường">★</label>
+                    <input type="radio" id="s2" name="serviceRating" value="2" /><label for="s2" title="Tệ">★</label>
+                    <input type="radio" id="s1" name="serviceRating" value="1" /><label for="s1" title="Rất tệ">★</label>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <label class="font-weight-bold">Nhận xét chi tiết</label>
+                <textarea name="comment" class="form-control" rows="4" placeholder="Hãy chia sẻ những điều bạn thích về sản phẩm này nhé..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Thêm hình ảnh/video</label>
+                <div class="upload-area" onclick="document.getElementById('mediaInput').click()">
+                    <i class="fa fa-camera"></i>
+                    <p class="mb-0 text-muted">Nhấn để tải lên hình ảnh hoặc video thực tế</p>
+                </div>
+                <input type="file" id="mediaInput" name="mediaFiles" multiple accept="image/*,video/*" style="display:none;" onchange="previewMedia(this)">
+                <div id="previewContainer" class="preview-container"></div>
+            </div>
+
+            <div class="text-right mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5">Gửi Đánh Giá</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewMedia(input) {
+        var container = document.getElementById('previewContainer');
+        container.innerHTML = '';
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var media;
+                    if (file.type.startsWith('video')) {
+                        media = document.createElement('video');
+                        media.src = e.target.result;
+                        media.className = 'preview-item';
+                        media.controls = true;
+                    } else {
+                        media = document.createElement('img');
+                        media.src = e.target.result;
+                        media.className = 'preview-item';
+                    }
+                    container.appendChild(media);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+</script>

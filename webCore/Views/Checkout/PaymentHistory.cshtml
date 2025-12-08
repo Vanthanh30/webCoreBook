@@ -159,13 +159,8 @@
                             {
                                 @foreach (var item in order.Items)
                                 {
-                                    <a class="btn btn-sm btn-outline-primary action-btn btnReview"
-                                       data-order-id="@order.Id"
-                                       data-product-title="@item.Title"
-                                       data-product-price="@item.Price"
-                                       data-product-image="@item.Image"
-                                       data-quantity="@item.Quantity"
-                                       data-total="@order.FinalAmount">
+                                    <a href="@Url.Action("ReviewProduct", "Checkout", new { orderId = order.Id, productId = item.ProductId })"
+                                       class="btn btn-sm btn-outline-primary action-btn">
                                         Đánh giá
                                     </a>
                                 }
