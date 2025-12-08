@@ -10,7 +10,7 @@ namespace webCore.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public string OrderId { get; set; }
+        public string OrderId { get; set; }      // luôn string
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
         public string Message { get; set; }

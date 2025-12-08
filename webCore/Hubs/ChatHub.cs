@@ -13,7 +13,9 @@ namespace webCore.Hubs
         public override async Task OnConnectedAsync()
         {
             var orderId = Context.GetHttpContext().Request.Query["orderId"];
-            await Groups.AddToGroupAsync(Context.ConnectionId, orderId);
+            if (!string.IsNullOrEmpty(orderId))
+                await Groups.AddToGroupAsync(Context.ConnectionId, orderId);
+
             await base.OnConnectedAsync();
         }
     }
