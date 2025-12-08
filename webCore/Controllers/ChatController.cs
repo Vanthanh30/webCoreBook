@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using webCore.Models;
+using webCore.MongoHelper;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using webCore.MongoHelper;
 
 namespace webCore.Controllers
 {
@@ -20,6 +20,7 @@ namespace webCore.Controllers
             _orderService = orderService;
         }
 
+        // Trang chat
         public async Task<IActionResult> Index(string orderId)
         {
             string currentUserId = HttpContext.Session.GetString("SellerId") ??
@@ -33,14 +34,24 @@ namespace webCore.Controllers
             List<Order> orders = new List<Order>();
 
             if (userRoles.Contains("Seller"))
+            {
+                // Lấy tất cả đơn hàng có item thuộc seller
                 orders = await _orderService.GetOrdersBySellerIdAsync(currentUserId);
+            }
             else
+            {
+                // Buyer: lấy đơn của mình
                 orders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+            }
 
+            // Danh sách orderId có tin nhắn
             var orderIdsWithMessages = await _chatService.GetOrderIdsWithMessagesAsync(currentUserId);
 
+            // Nếu chưa chọn orderId, mặc định chọn order đầu tiên có tin nhắn hoặc đơn đầu tiên
             if (string.IsNullOrEmpty(orderId))
+            {
                 orderId = orderIdsWithMessages.FirstOrDefault() ?? orders.FirstOrDefault()?.Id.ToString();
+            }
 
             List<ChatMessage> messages = new List<ChatMessage>();
             string otherUserId = null;
@@ -52,20 +63,29 @@ namespace webCore.Controllers
                 if (order != null)
                 {
                     var item = order.Items?.FirstOrDefault();
-                    otherUserId = userRoles.Contains("Seller") ? order.UserId : item?.SellerId;
 
-                    ViewBag.OtherUserAvatar = item?.Image;
+                    // Xác định người kia
+                    otherUserId = userRoles.Contains("Seller")
+                                  ? order.UserId
+                                  : item?.SellerId;
+
+                    // Avatar sản phẩm
+                    ViewBag.OtherUserAvatar = item?.Image ;
                     ViewBag.OtherTitle = item?.Title;
-
+                    // Load tin nhắn
                     messages = await _chatService.GetMessagesByOrderAsync(orderId);
+                   
                 }
             }
 
+
+            // ViewBag
             ViewBag.CurrentUserId = currentUserId;
             ViewBag.OtherUserId = otherUserId;
             ViewBag.OrderId = orderId;
             ViewBag.OrdersWithMessages = orderIdsWithMessages;
 
+            // Gộp orders + messages vào Tuple
             return View(new Tuple<List<Order>, List<ChatMessage>>(orders, messages));
         }
 

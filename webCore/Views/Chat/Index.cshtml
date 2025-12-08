@@ -13,7 +13,17 @@
     <!-- ======================== SIDEBAR =========================== -->
     <div class="chat-sidebar">
         <div class="sidebar-header">
-            <h5> Tin nhắn đơn hàng</h5>
+            <h5>💬 Tin nhắn theo đơn hàng</h5>
+
+            <div class="search-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Tìm đơn hàng...">
+            </div>
+
+            <select class="filter-select">
+                <option value="all">Tất cả</option>
+                <option value="unread">Có tin nhắn</option>
+            </select>
         </div>
 
         <div class="chat-list">
@@ -109,7 +119,6 @@
 
 <!-- ================== SIGNALR ================== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-
 <script>
 
     const orderId = "@ViewBag.OrderId";
@@ -125,19 +134,18 @@
         conn.on("ReceiveMessage", function (sender, message) {
 
             $("#chatMessages").append(`
-            <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
-                ${message}
-            </div>
-        `);
+                <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
+                    ${message}
+                </div>
+            `);
 
             $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
         });
 
         conn.start();
 
-        // CLICK SEND
-        $("#sendBtn").click(() => {
-
+        // ======= Hàm chung gửi tin nhắn =======
+        function sendMessage() {
             const msg = $("#messageInput").val();
             if (!msg) return;
 
@@ -151,16 +159,20 @@
             });
 
             $("#messageInput").val("");
+        }
+
+        // === Click nút gửi ===
+        $("#sendBtn").click(() => {
+            sendMessage();
         });
 
-        // ENTER SEND
-        $("#messageInput").on("keypress", function (e) {
-            if (e.which === 13 && !e.shiftKey) {
+        // === ENTER để gửi ===
+        $("#messageInput").on("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                $("#sendBtn").click();
+                sendMessage();
             }
         });
     }
-
 
 </script>
