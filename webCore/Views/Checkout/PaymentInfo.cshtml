@@ -42,26 +42,30 @@
                         <tbody>
                             @foreach (var item in Model.Items)
                             {
-                            <tr>
-                                <td>@item.Title</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.Image))
-                                    {
-                                        <img src="@item.Image" alt="@item.Title" style="width: 50px; height: 50px; object-fit: cover;" />
-                                    }
-                                    else
-                                    {
-                                        <span>Không có hình ảnh</span>
-                                    }
-                                </td>
-                                <td class="price-column2">@((item.Price * (1 - item.DiscountPercentage / 100)).ToString("C"))</td>
-                                <td>@item.Quantity</td>
-                                <td class="price-column2">@(((item.Price * (1 - item.DiscountPercentage / 100)) * item.Quantity).ToString("C"))</td>
-                            </tr>
+                                <tr>
+                                    <td>@item.Title</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Image))
+                                        {
+                                            <img src="@item.Image" alt="@item.Title" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <span>Không có hình ảnh</span>
+                                        }
+                                    </td>
+                                    <td class="price-column2">@((item.Price * (1 - item.DiscountPercentage / 100)).ToString("C"))</td>
+                                    <td>@item.Quantity</td>
+                                    <td class="price-column2">@(((item.Price * (1 - item.DiscountPercentage / 100)) * item.Quantity).ToString("C"))</td>
+                                </tr>
                             }
                             <tr>
                                 <td colspan="4" class="text-right"><strong class="total-pay">Tổng Tiền</strong></td>
                                 <td><strong class="total-pay">@Model.TotalAmount</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-right"><strong class="total-pay">Giảm giá</strong></td>
+                                <td><strong class="total-pay">@Model.DiscountAmount</strong></td>
                             </tr>
                             <tr>
                                 <td colspan="4" class="text-right"><strong class="total-pay">Số Tiền Cần Thanh Toán</strong></td>

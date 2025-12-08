@@ -13,7 +13,6 @@ using webCore.Services;
 
 namespace webCore.Controllers.ApiControllers
 {
-    [ApiAuthorizeRoleAttribute("Buyer")]
     [Route("api/shop")]
     [ApiController]
     public class ShopApiController : ControllerBase
@@ -121,7 +120,14 @@ namespace webCore.Controllers.ApiControllers
 
             if (user == null)
                 return NotFound(new { success = false });
-
+            if (user.Phone == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Vui lòng cập nhật đủ thông tin cá nhân để tạo shop!"
+                });
+            }
             return Ok(new
             {
                 success = true,

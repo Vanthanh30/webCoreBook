@@ -145,7 +145,7 @@
                         {
                             <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Không có khuyến mãi.</p>
                         }
-                        <a href="@Url.Action("VoucherClient", "VoucherClient")" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
+                        <a href="@Url.Action("VoucherClient", "VoucherClient")" onclick="sessionStorage.setItem('ReturnUrl', 'cart')" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
                     </div>
 
                     <hr />

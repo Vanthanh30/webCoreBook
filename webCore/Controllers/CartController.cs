@@ -153,7 +153,6 @@ namespace webCore.Controllers
             }
             // 2️⃣ LẤY USERID ĐỂ LOAD CART
             var userId = HttpContext.Session.GetString("UserId");
-
             // Lấy giỏ hàng của người dùng từ dịch vụ
             var cart = await _cartService.GetCartByUserIdAsync(userId);
 
@@ -205,6 +204,7 @@ namespace webCore.Controllers
             if (selectedProductIds == null || !selectedProductIds.Any())
             {
                 // Nếu không có sản phẩm nào được chọn, có thể ghi log hoặc trả về lỗi
+                HttpContext.Session.Remove("SelectedProductIds");
                 return Json(new { success = false, message = "No products selected" });
             }
 
@@ -379,6 +379,12 @@ namespace webCore.Controllers
             }
 
             decimal finalAmount = totalAmount - discountAmount;
+            HttpContext.Session.SetString("FinalAmount", finalAmount.ToString());
+            HttpContext.Session.SetString("TotalAmount", totalAmount.ToString());
+            HttpContext.Session.SetString("DiscountAmount", discountAmount.ToString());
+
+            HttpContext.Session.SetString("CheckoutItems",JsonConvert.SerializeObject(selectedItems));
+
             return View(new CheckoutViewModel
             {
                 Items = selectedItems,
@@ -395,6 +401,7 @@ namespace webCore.Controllers
         public async Task<IActionResult> BuyNow(string productId, int quantity)
         {
             HttpContext.Session.Remove("CartItem");
+
 
             // Kiểm tra trạng thái đăng nhập từ session
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;

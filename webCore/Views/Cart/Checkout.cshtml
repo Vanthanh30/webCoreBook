@@ -82,15 +82,15 @@
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
                         <h4>Khuyến mãi</h4>
-                        @if (ViewData["VoucherDiscount"] != null)
+                        @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
                         {
-                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Giảm @ViewData["VoucherDiscount"]%</p>
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Giảm @Model.VoucherDiscount %</p>
                         }
                         else
                         {
                             <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Không có khuyến mãi.</p>
                         }
-                        <a href="@Url.Action("VoucherClient", "VoucherClient")" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
+                        <a href="@Url.Action("VoucherClient", "VoucherClient")" onclick="sessionStorage.setItem('ReturnUrl', 'checkout')" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
                     </div>
 
                     <!-- Price Summary -->
