@@ -9,6 +9,9 @@ using System;
 using webCore.MongoHelper;
 using webCore.Services;
 using Microsoft.AspNetCore.Http;
+using webCore.Hubs;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace webCore
 {
@@ -26,7 +29,7 @@ namespace webCore
         {
             // Add controllers and views
             services.AddControllersWithViews();
-
+            services.AddSignalR();
             // Add MongoDB Client (singleton because it is thread-safe)
             services.AddSingleton<IMongoClient>(sp =>
             {
@@ -53,6 +56,18 @@ namespace webCore
 
             // Register Cloudinary service for image upload
             services.AddSingleton<CloudinaryService>();
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 104857600; // 100MB
+                options.ValueLengthLimit = 104857600;
+                options.MultipartHeadersLengthLimit = 16384;
+            });
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 104857600; // 100MB
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
+            });
 
             // Register services that will be used for the application
             services.AddScoped<ProductService>();
@@ -71,7 +86,9 @@ namespace webCore
             services.AddScoped<RoleService>();
             services.AddScoped<ShopService>();
             services.AddScoped<ReviewService>();
+            services.AddScoped<SellerOrderService>();
 
+            services.AddScoped<ChatService>();
             // Add session management
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -135,7 +152,7 @@ namespace webCore
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+                endpoints.MapHub<ChatHub>("/chatHub");
                 // Custom route for DetailUserController
                 endpoints.MapControllerRoute(
                     name: "detailUser",

@@ -1,97 +1,239 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Cập nhật sản phẩm";
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
 }
-<link rel="stylesheet" href="/css/create_account.css" />
+<link rel="stylesheet" href="/css/ProductManagement.css" />
 
 <div class="form-container">
     <h2>Cập nhật sản phẩm</h2>
 
-    <!-- Alert giả -->
+    <div id="loadingSpinner" style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
+        <p>Đang tải dữ liệu...</p>
+    </div>
+
     <div class="alert alert-danger" style="display: none;" id="errorAlert">
-        <ul id="errorList">
-            <!-- Errors will be inserted here -->
-        </ul>
+        <ul id="errorList"></ul>
     </div>
 
     <div class="alert alert-success" style="display: none;" id="successAlert">
         Sản phẩm đã được cập nhật thành công!
     </div>
 
-    <form id="updateProductForm" onsubmit="handleSubmit(event)">
-        <!-- Hidden ID field -->
-        <input type="hidden" id="Id" name="Id" value="1" />
+    <form id="updateProductForm" onsubmit="handleSubmit(event)" style="display: none;">
+        <input type="hidden" id="Id" name="Id" />
 
         <label for="Title">Tên sản phẩm *</label>
-        <input type="text" id="Title" name="Title" required value="Đắc Nhân Tâm" />
+        <input type="text" id="Title" name="Title" required placeholder="Nhập tên sản phẩm" />
 
         <label for="Image">Hình ảnh</label>
         <input type="file" id="Image" name="Image" accept="image/*" onchange="previewImage(event)" />
 
-        <!-- Hiển thị ảnh hiện tại -->
-        <div style="margin: 10px 0;">
+        <div style="margin: 10px 0;" id="currentImageContainer">
             <p style="font-size: 14px; color: #666;">Ảnh hiện tại:</p>
-            <img id="currentImage" src="https://salt.tikicdn.com/cache/280x280/ts/product/3e/ae/52/99a4867cd5d27c84af5e1018653eda9e.jpg"
-                 alt="Current Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;" />
+            <img id="currentImage" src="" alt="Current Image"
+                 style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" />
         </div>
 
-        <!-- Preview ảnh mới -->
         <div style="margin: 10px 0;">
             <p style="font-size: 14px; color: #666; display: none;" id="previewLabel">Ảnh mới (xem trước):</p>
             <img id="imagePreview" alt="Image Preview"
-                 style="max-width: 200px; max-height: 200px; display: none; border: 1px solid #ddd; padding: 5px;" />
+                 style="max-width: 200px; max-height: 200px; display: none; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" />
         </div>
 
-        <label for="Description">Mô tả</label>
-        <textarea id="Description" name="Description" style="width: 100%; height: 200px;">Đắc Nhân Tâm của Dale Carnegie là quyển sách nổi tiếng nhất, bán chạy nhất và có tầm ảnh hưởng nhất của mọi thời đại. Tác phẩm đã được chuyển ngữ sang hầu hết các thứ tiếng trên thế giới và có mặt ở hàng trăm quốc gia.</textarea>
+        <label for="Description">Mô tả sản phẩm</label>
+        <textarea id="Description" name="Description" style="width: 100%; height: 200px;" placeholder="Nhập mô tả chi tiết về sản phẩm"></textarea>
 
+        <label>Đặc trưng</label>
         <div class="status">
-            <label>Đặc trưng</label>
-            <input type="radio" id="editFeatured" name="featured" value="0" checked />
-            <label for="editFeatured" class="active">Nổi bật</label>
-            <input type="radio" id="editNew" name="featured" value="1" />
-            <label for="editNew" class="new">Mới</label>
-            <input type="radio" id="editSuggest" name="featured" value="2" />
-            <label for="editSuggest" class="suggest">Gợi ý</label>
-            <input type="radio" id="editNo" name="featured" value="3" />
-            <label for="editNo" class="no">Không nổi bật</label>
+            <input type="radio" id="highlighted" name="Featured" value="1" />
+            <label for="highlighted" class="featured">Nổi bật</label>
+
+            <input type="radio" id="new" name="Featured" value="2" />
+            <label for="new" class="new">Mới</label>
+
+            <input type="radio" id="suggest" name="Featured" value="3" />
+            <label for="suggest" class="suggest">Gợi ý</label>
+
+            <input type="radio" id="none" name="Featured" value="0" />
+            <label for="none" class="no">Không nổi bật</label>
         </div>
 
         <label for="CategoryId">Danh mục *</label>
-        <select id="CategoryId" name="CategoryId" class="form-control" required>
+        <select id="CategoryId" name="categoryId" class="form-control" required>
             <option value="">-- Chọn danh mục --</option>
-            <option value="1">Văn học Việt Nam</option>
-            <option value="2">Văn học nước ngoài</option>
-            <option value="3" selected>Sách Kỹ Năng Sống</option>
-            <option value="4">Kinh tế</option>
-            <option value="5">Lịch sử</option>
-            <option value="6">Khoa học - Công nghệ</option>
-            <option value="7">Tiểu thuyết</option>
-            <option value="8">Sách thiếu nhi</option>
         </select>
 
-        <label for="Price">Giá bán (VNĐ) *</label>
-        <input type="number" id="Price" name="Price" required value="86000" min="0" />
+        <div class="product-pricing-group">
+            <div class="form-group-item">
+                <label for="Price">Giá bán (VNĐ) *</label>
+                <input type="number" id="Price" name="Price" required placeholder="0" min="0" />
+            </div>
 
-        <label for="DiscountPercentage">Giảm giá (%)</label>
-        <input type="number" id="DiscountPercentage" name="DiscountPercentage" value="10" min="0" max="100" />
+            <div class="form-group-item">
+                <label for="DiscountPercentage">Giảm giá (%)</label>
+                <input type="number" id="DiscountPercentage" name="DiscountPercentage" placeholder="0" min="0" max="100" />
+            </div>
 
-        <label for="Stock">Số lượng trong kho *</label>
-        <input type="number" id="Stock" name="Stock" required value="50" min="0" />
-
+            <div class="form-group-item">
+                <label for="Stock">Số lượng trong kho *</label>
+                <input type="number" id="Stock" name="Stock" required placeholder="0" min="0" />
+            </div>
+        </div>
+        <label>Trạng thái</label>
         <div class="status">
-            <label>Trạng thái</label>
-            <input type="radio" id="editActive" name="Status" value="Hoạt động" checked />
-            <label for="editActive" class="active">Hoạt động</label>
-            <input type="radio" id="editInactive" name="Status" value="Không hoạt động" />
-            <label for="editInactive" class="inactive">Dừng hoạt động</label>
+            <input type="radio" id="statusActive" name="Status" value="Hoạt động" />
+            <label for="statusActive" class="active">Hoạt động</label>
+
+            <input type="radio" id="statusInactive" name="Status" value="Dừng hoạt động" />
+            <label for="statusInactive" class="inactive">Dừng hoạt động</label>
         </div>
 
-        <button type="submit">Cập nhật</button>
+        <button type="submit" style="margin-top: 20px;">Cập nhật</button>
         <button type="button" onclick="window.history.back()" style="background-color: #6c757d; margin-top: 20px;">Hủy</button>
     </form>
 </div>
 
 <script>
+    let productId = null;
+
+    function getProductIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id');
+    }
+
+    async function loadProductData() {
+        productId = getProductIdFromUrl();
+
+        if (!productId) {
+            alert('Không tìm thấy ID sản phẩm!');
+            window.history.back();
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/product/edit/${productId}`);
+            const result = await response.json();
+
+            document.getElementById('loadingSpinner').style.display = 'none';
+
+            if (!result.success) {
+                alert(result.message || 'Lỗi khi tải dữ liệu');
+                window.history.back();
+                return;
+            }
+
+            const product = result.product;
+            const categories = result.categories;
+
+            document.getElementById('Id').value = product.id;
+            document.getElementById('Title').value = product.title;
+            document.getElementById('Description').value = product.description || '';
+            document.getElementById('Price').value = product.price;
+            document.getElementById('DiscountPercentage').value = product.discountPercentage || 0;
+            document.getElementById('Stock').value = product.stock;
+
+            if (product.image) {
+                document.getElementById('currentImage').src = product.image;
+                document.getElementById('currentImageContainer').style.display = 'block';
+            } else {
+                document.getElementById('currentImageContainer').style.display = 'none';
+            }
+
+            const featuredRadios = document.getElementsByName('Featured');
+            featuredRadios.forEach(radio => {
+                if (parseInt(radio.value) === product.featured) {
+                    radio.checked = true;
+                }
+            });
+
+            const statusRadios = document.getElementsByName('Status');
+            statusRadios.forEach(radio => {
+                if (radio.value === product.status) {
+                    radio.checked = true;
+                }
+            });
+
+            const categorySelect = document.getElementById('CategoryId');
+            categorySelect.innerHTML = '<option value="">-- Chọn danh mục --</option>';
+            categories.forEach(cat => {
+                const selected = cat.id === product.categoryId ? 'selected' : '';
+                categorySelect.innerHTML += `<option value="${cat.id}" ${selected}>${cat.title}</option>`;
+            });
+
+            document.getElementById('updateProductForm').style.display = 'block';
+
+        } catch (error) {
+            console.error('Error loading product:', error);
+            document.getElementById('loadingSpinner').style.display = 'none';
+            alert('Lỗi kết nối server!');
+            window.history.back();
+        }
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('updateProductForm');
+        const formData = new FormData(form);
+
+        const imageFile = document.getElementById('Image').files[0];
+        if (imageFile) {
+            formData.append('Image', imageFile);
+        }
+
+        document.getElementById('errorAlert').style.display = 'none';
+        document.getElementById('successAlert').style.display = 'none';
+        document.getElementById('errorList').innerHTML = '';
+
+        try {
+            const response = await fetch(`/api/product/update/${productId}`, {
+                method: 'PUT',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                showError(result.message || 'Đã xảy ra lỗi. Vui lòng thử lại.');
+                return;
+            }
+
+            document.getElementById('successAlert').style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = '/SellerProduct/ProductManagement';
+            }, 1500);
+
+        } catch (err) {
+            showError('Lỗi kết nối server!');
+        }
+    }
+
+    function showError(message) {
+        const errorAlert = document.getElementById('errorAlert');
+        const errorList = document.getElementById('errorList');
+
+        errorList.innerHTML = `<li>${message}</li>`;
+        errorAlert.style.display = 'block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('imagePreview');
+        const previewLabel = document.getElementById('previewLabel');
+
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+            previewLabel.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+            previewLabel.style.display = 'none';
+        }
+    }
+
+    loadProductData();
 </script>

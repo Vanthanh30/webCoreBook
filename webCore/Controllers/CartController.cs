@@ -433,11 +433,19 @@ namespace webCore.Controllers
             ViewData["VoucherDiscount"] = voucherDiscount;  // Voucher giảm giá
             ViewData["TotalAmount"] = totalAmount;           // Tổng tiền trước giảm giá
             ViewData["FinalAmount"] = finalAmount;           // Tổng tiền sau giảm giá
+            string sellerId = product.SellerId;
+            if (product.SellerId == userId)
+                return Json(new
+                {
+                    success = false,
+                    message = "Bạn không thể thêm giỏ hàng sản phẩm của shop mình."
+                });
 
             // Chuyển sản phẩm từ Product_admin sang CartItem
             var cartItem = new CartItem
             {
                 ProductId = product.Id,
+                SellerId = sellerId,
                 Title = product.Title,
                 Price = product.Price,
                 DiscountPercentage = product.DiscountPercentage,

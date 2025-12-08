@@ -1,0 +1,116 @@
+﻿.seller-dashboard-content {
+    padding: 1rem;
+}
+
+#loadingSpinner {
+    text-align: center;
+    padding: 40px;
+}
+
+.task-list {
+    margin-bottom: 3rem;
+}
+
+.task-card {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #fff;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid #dee2e6 !important;
+}
+
+    .task-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .task-card h2 {
+        font-size: 2.5rem;
+        margin: 10px 0;
+        font-weight: 700;
+    }
+
+    .task-card p.text-muted {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+.stat-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+    .stat-card p.text-muted {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+.chart-area {
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    padding: 1.5rem;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+    .chart-area h5 {
+        margin-bottom: 0;
+    }
+
+    .chart-area .btn-group .btn {
+        font-size: 0.875rem;
+    }
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+#outOfStockBadge {
+    display: none;
+    font-size: 0.875rem;
+}
+
+    #outOfStockBadge i {
+        margin-right: 4px;
+    }
+
+/* Responsive điều chỉnh nhỏ */
+@media (max-width: 768px) {
+    .task-card h2 {
+        font-size: 2rem;
+    }
+
+    .chart-area {
+        height: 350px;
+    }
+
+        .chart-area .btn-group {
+            flex-wrap: wrap;
+        }
+
+            .chart-area .btn-group .btn {
+                margin-bottom: 0.5rem;
+            }
+}

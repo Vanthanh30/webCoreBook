@@ -130,5 +130,121 @@ namespace webCore.Controllers.ApiControllers
             });
         }
 
+        [HttpGet("my-shop")]
+        public async Task<IActionResult> GetMyShop()
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Bạn chưa đăng nhập!"
+                });
+            }
+
+            try
+            {
+                var shop = await _shopService.GetShopByUserIdAsync(userId);
+
+                if (shop == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Bạn chưa có shop. Vui lòng đăng ký shop!"
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        id = shop.Id,
+                        shopName = shop.ShopName,
+                        description = shop.Description,
+                        businessType = shop.BusinessType,
+                        address = shop.Address,
+                        email = shop.Email,
+                        phone = shop.Phone,
+                        shopImage = shop.ShopImage,
+                        createdAt = shop.CreatedAt,
+                        updatedAt = shop.UpdatedAt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi khi lấy thông tin shop: " + ex.Message
+                });
+            }
+        }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateShop([FromForm] Shop model, IFormFile Avatar)
+        {
+            string userId = HttpContext.Session.GetString("UserId");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Bạn chưa đăng nhập!"
+                });
+            }
+
+            try
+            {
+                var existingShop = await _shopService.GetShopByUserIdAsync(userId);
+
+                if (existingShop == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Không tìm thấy shop!"
+                    });
+                }
+
+                // Cập nhật thông tin
+                existingShop.ShopName = model.ShopName;
+                existingShop.Description = model.Description;
+                existingShop.BusinessType = model.BusinessType;
+                existingShop.Address = model.Address;
+                existingShop.Email = model.Email;
+                existingShop.Phone = model.Phone;
+                existingShop.UpdatedAt = DateTime.UtcNow;
+
+                // Upload ảnh mới nếu có
+                if (Avatar != null && Avatar.Length > 0)
+                {
+                    existingShop.ShopImage = await _cloudinaryService.UploadImageAsync(Avatar);
+                }
+
+                await _shopService.UpdateShopAsync(existingShop);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật shop thành công!",
+                    data = existingShop
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Lỗi khi cập nhật shop: " + ex.Message
+                });
+            }
+        }
+
     }
 }

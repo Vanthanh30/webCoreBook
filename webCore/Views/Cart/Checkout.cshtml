@@ -67,7 +67,7 @@
             <div class="col-md-4 section_2">
                 <div class="cart-summary">
                     <!-- Voucher Section -->
-                    @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
+@*                    @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
                     {
                         <div class="alert alert-info">
                             <strong>Khuyến mãi:</strong> Giảm @Model.VoucherDiscount %
@@ -78,7 +78,20 @@
                         <div class="alert alert-warning">
                             <strong>Khuyến mãi:</strong> Không có khuyến mãi.
                         </div>
-                    }
+                    }*@
+                    <div class="discount-box">
+                        <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
+                        <h4>Khuyến mãi</h4>
+                        @if (ViewData["VoucherDiscount"] != null)
+                        {
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Giảm @ViewData["VoucherDiscount"]%</p>
+                        }
+                        else
+                        {
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Không có khuyến mãi.</p>
+                        }
+                        <a href="@Url.Action("VoucherClient", "VoucherClient")" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
+                    </div>
 
                     <!-- Price Summary -->
                     <div class="price-summary mt-3">
