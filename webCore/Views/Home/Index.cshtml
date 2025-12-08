@@ -148,11 +148,11 @@
                         @* Danh sách ảnh hard-code *@
                         @{
                             var slideImages = new List<string>
-                                                {
-                                                "/image/image_theme1.jpg",
-                                                "/image/image_theme2.jpg",
-                                                "/image/image_theme3.jpg"
-                                                };
+                        {
+                        "/image/image_theme1.jpg",
+                        "/image/image_theme2.jpg",
+                        "/image/image_theme3.jpg"
+                        };
                         }
 
                         <!-- Indicators -->
@@ -277,11 +277,11 @@
         const sub = document.getElementById('sub_' + parentId);
         const checkbox = document.getElementById('cat_' + parentId);
         if (sub) sub.classList.toggle('show', checkbox.checked);
-            subCategoryList.style.display = "none";
-            arrow.classList.remove("open");
-        }
-        currentCategoryId = categoryId;
+    }
 
+    function loadProductsByCategoryId(categoryId) {
+        currentCategoryId = categoryId;
+        fetch(`/Home/GetProductsByCategoryId?categoryId=${categoryId}`)
             .then(r => r.text())
             .then(html => document.querySelector('.product-list').innerHTML = html)
             .catch(err => console.error(err));
@@ -300,7 +300,7 @@
             location.reload();
         }
     });
-            behavior: 'smooth'
+
     connection.start().catch(err => console.error(err));
 
     // Các hàm cuộn
@@ -308,19 +308,16 @@
         const el = document.querySelector('.category-tabs');
         el.scrollBy({ left: dir * 200, behavior: 'smooth' });
     }
-        subItems.forEach(item => {
+
     function slideProducts(btn, dir) {
         const slider = btn.parentElement.querySelector('.products-slider');
         slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
     }
-            });
+
     function applyPriceFilter() {
         const from = document.getElementById('priceFrom').value;
         const to = document.getElementById('priceTo').value;
         alert(`Lọc giá từ ${from} đến ${to}`);
         // TODO: gọi AJAX lọc giá ở đây
     }
-</script>            case "Gợi ý": return "Gợi ý";
-            default: return ""; // Trả về chuỗi rỗng thay vì "Không nổi bật"
-        }
-    } }
+</script>
