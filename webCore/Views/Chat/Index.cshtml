@@ -13,17 +13,7 @@
     <!-- ======================== SIDEBAR =========================== -->
     <div class="chat-sidebar">
         <div class="sidebar-header">
-            <h5>💬 Tin nhắn theo đơn hàng</h5>
-
-            <div class="search-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Tìm đơn hàng...">
-            </div>
-
-            <select class="filter-select">
-                <option value="all">Tất cả</option>
-                <option value="unread">Có tin nhắn</option>
-            </select>
+            <h5> Tin nhắn đơn hàng</h5>
         </div>
 
         <div class="chat-list">
@@ -35,19 +25,15 @@
                 <a href="@Url.Action("Index", "Chat", new { orderId = order.Id })"
                    class="chat-list-item @(order.Id.ToString() == (ViewBag.OrderId ?? "") ? "active" : "")">
 
-                    <div class="chat-avatar">
-                        <img src="/images/avatar-default.png" />
-                    </div>
+                    <img src="@(order.Items.FirstOrDefault()?.Image ?? "/images/avatar-default.png")"
+                         alt="Avatar"
+                         class="header-avatar">
 
                     <div class="chat-info">
-                        <h6>@order.FullName</h6>
-                        <small>ID: @order.Id</small>
+                        <h6>sản phẩm: @order.Items.FirstOrDefault()?.Title</h6>
+                        <small>@order.FullName</small>
                     </div>
 
-                    @if (hasMsg)
-                    {
-                        <span class="badge bg-success">●</span>
-                    }
                 </a>
             }
         </div>
@@ -60,13 +46,13 @@
         <div class="chat-header">
             <div class="d-flex align-items-center">
 
-                <img src="/images/avatar-default.png"
+                <img src="@(ViewBag.OtherUserAvatar ?? "/image/macdinh.jpg")"
                      alt="Avatar"
                      class="header-avatar">
 
                 <div class="ms-3">
                     <h6 class="mb-0">
-                        @(ViewBag.OrderId == null ? "Chọn đơn hàng để chat" : ViewBag.OtherUserId)
+                        @(ViewBag.OtherTitle == null ? "Chọn đơn hàng để chat" : ViewBag.OtherTitle)
                     </h6>
 
                     <small class="text-muted">
@@ -139,16 +125,17 @@
         conn.on("ReceiveMessage", function (sender, message) {
 
             $("#chatMessages").append(`
-                <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
-                    ${message}
-                </div>
-            `);
+            <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
+                ${message}
+            </div>
+        `);
 
             $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
         });
 
         conn.start();
 
+        // CLICK SEND
         $("#sendBtn").click(() => {
 
             const msg = $("#messageInput").val();
@@ -165,6 +152,15 @@
 
             $("#messageInput").val("");
         });
+
+        // ENTER SEND
+        $("#messageInput").on("keypress", function (e) {
+            if (e.which === 13 && !e.shiftKey) {
+                e.preventDefault();
+                $("#sendBtn").click();
+            }
+        });
     }
+
 
 </script>

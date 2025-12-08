@@ -64,7 +64,7 @@
         <div class="d-flex flex-wrap status-filter justify-content-center">
             @{
                 var statuses = new List<string> {
-                    "Tất cả", "Chờ xác nhận", "Chờ vận chuyển", "Chờ giao hàng",
+                    "Tất cả", "Chờ xác nhận", "Chờ lấy hàng", "Đang giao",
                     "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền"
                 };
             }
@@ -99,8 +99,8 @@
                         <div>
                             <span class="badge btn-status
                             @(order.Status == "Chờ xác nhận" ? "badge-warning" :
-                              order.Status == "Chờ vận chuyển" ? "badge-info" :
-                              order.Status == "Chờ giao hàng" ? "badge-primary" :
+                              order.Status == "Chờ lấy hàng" ? "badge-info" :
+                              order.Status == "Đang giao " ? "badge-primary" :
                               order.Status == "Đã giao" ? "badge-success" :
                               order.Status == "Đã hủy" ? "badge-danger" :
                               order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
@@ -143,15 +143,15 @@
                                 <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
                                    class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
                             }
-                            else if (order.Status == "Chờ vận chuyển")
+                            else if (order.Status == "Chờ lấy hàng")
                             {
                                 <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
                                    class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                             }
-                            else if (order.Status == "Chờ giao hàng")
+                            else if (order.Status == "Đang giao")
                             {
                                 <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
+                                   class="btn btn-sm btn-outline-success action-btn">Xác nhận nhận hàng</a>
                                 <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
                                    class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                             }

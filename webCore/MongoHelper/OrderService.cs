@@ -60,5 +60,6 @@ namespace webCore.MongoHelper
             var orders = await _orders.Find(Builders<Order>.Filter.Empty).ToListAsync();
             return orders.Sum(o => o.FinalAmount);
         }
+
     }
 }
