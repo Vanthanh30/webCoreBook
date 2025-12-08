@@ -1,250 +1,154 @@
 ﻿@model List<webCore.Models.Order>
-
 @{
     Layout = "_Layout";
+    ViewData["Title"] = "Lịch sử Thanh Toán";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lịch sử Thanh Toán</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+@section Styles {
     <link rel="stylesheet" href="~/css/PaymentHistory.css" asp-append-version="true" />
-
     <style>
-        .order-card {
-            border-radius: 12px;
-            transition: 0.3s ease;
-        }
-
-            .order-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-            }
-
-        .btn-status {
-            border-radius: 10px;
-            padding: 6px 18px;
-            font-size: 13px;
-            font-weight: 500;
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #007bff;
+            text-align: center;
+            margin: 30px 0 40px;
         }
 
         .status-filter a {
-            border-radius: 10px;
-            margin: 3px;
+            border-radius: 30px !important;
+            padding: 8px 20px !important;
+            margin: 4px;
+            min-width: 120px;
         }
 
-        .active {
-            background: #007bff !important;
-            color: white !important;
-            border-color: #007bff !important;
+            .status-filter a.active {
+                background: #007bff !important;
+                color: white !important;
+            }
+
+        .order-card {
+            border-radius: 15px;
+            transition: all 0.3s ease;
         }
 
-        .action-btn {
-            margin-left: 5px;
+            .order-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #888;
         }
+
+            .empty-state img {
+                width: 160px;
+                opacity: 0.7;
+                margin-bottom: 20px;
+            }
     </style>
-</head>
-<body>
+}
 
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="cart-title">
-                    <h2 class="title">LỊCH SỬ THANH TOÁN</h2>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- ===================== TIÊU ĐỀ + BỘ LỌC ===================== -->
+<div class="container">
+    <h2 class="page-title">LỊCH SỬ THANH TOÁN</h2>
 
-    <!-- Filter by Status -->
-    <div class="container mt-3">
-        <div class="d-flex flex-wrap status-filter justify-content-center">
-            @{
-                var statuses = new List<string> {
-                    "Tất cả", "Chờ xác nhận", "Chờ vận chuyển", "Chờ giao hàng",
-                    "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền"
-                };
-            }
-
-            @foreach (var s in statuses)
-            {
-                <a href="#" data-status="@s"
-                   class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentStatus == s ? "active" : "")">
-                    @s
-                </a>
-            }
-        </div>
-    </div>
-
-    <div class="container mt-4">
-        @if (!Model.Any())
-        {
-            <p class="text-center text-muted mt-5">Không có đơn hàng nào.</p>
+    <!-- Bộ lọc trạng thái -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-5 status-filter">
+        @{
+            var statuses = new List<string> { "Tất cả", "Chờ xác nhận", "Chờ vận chuyển", "Chờ giao hàng", "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền" };
         }
-        else
+        @foreach (var s in statuses)
         {
-            foreach (var order in Model)
-            {
-                <div class="order-card border p-4 mb-4 shadow-sm" data-status="@order.Status">
-                    <div class="d-flex justify-content-between align-items-center">
+            <a href="?status=@Uri.EscapeDataString(s)"
+               class="btn btn-outline-secondary @(ViewBag.CurrentStatus == s ? "active" : "")">
+                @s
+            </a>
+        }
+    </div>
 
-                        <div>
-                            <strong>Mã đơn:</strong> @order.Id <br />
-                            <small>Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-                        </div>
+    <!-- ===================== NỘI DUNG CHÍNH ===================== -->
+    @if (!Model?.Any() ?? true)
+    {
+        <!-- Chỉ hiện đúng 1 lần khi không có đơn -->
+        <div class="empty-state">
+            <img src="/image/empty-order.png" alt="Chưa có đơn hàng" />
+            <h4 class="mt-3 text-muted">Không có đơn hàng nào.</h4>
+            <p>Bạn chưa mua sách nào hoặc đơn hàng đang được xử lý</p>
+        </div>
+    }
+    else
+    {
+        <!-- Danh sách đơn hàng -->
+        foreach (var order in Model)
+        {
+            <div class="order-card border bg-white p-4 mb-4 shadow">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <strong>Mã đơn:</strong> #@order.Id<br>
+                        <small class="text-muted">Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                    <span class="badge px-4 py-2
+                                @(order.Status.Contains("Chờ xác nhận") ? "bg-warning text-dark" :
+                                                    order.Status.Contains("Chờ vận chuyển") ? "bg-info" :
+                                                    order.Status.Contains("Chờ giao hàng") ? "bg-primary" :
+                                                    order.Status.Contains("Đã giao") ? "bg-success" :
+                                                    order.Status.Contains("Đã hủy") ? "bg-danger" :
+                                                    order.Status.Contains("Trả hàng") ? "bg-secondary" : "bg-dark")">
+                @order.Status
+            </span>
+        </div>
 
+                <hr>
+
+        @foreach (var item in order.Items)
+                {
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@item.Image" class="rounded me-3" style="width:70px;height:70px;object-fit:cover;">
                         <div>
-                            <span class="badge btn-status
-                            @(order.Status == "Chờ xác nhận" ? "badge-warning" :
-                              order.Status == "Chờ vận chuyển" ? "badge-info" :
-                              order.Status == "Chờ giao hàng" ? "badge-primary" :
-                              order.Status == "Đã giao" ? "badge-success" :
-                              order.Status == "Đã hủy" ? "badge-danger" :
-                              order.Status == "Trả hàng/Hoàn tiền" ? "badge-secondary" : "badge-dark")">
-                                @order.Status
-                            </span>
+                            <h6 class="mb-1">@item.Title</h6>
+                            <small class="text-muted">
+                                @item.Price.ToString("N0")đ × @item.Quantity
+                            </small>
                         </div>
                     </div>
+                }
 
-                    <hr />
+                <hr>
 
-                    @foreach (var item in order.Items)
-                    {
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <img src="@item.Image" alt="Product" style="width:65px;height:65px;border-radius:8px;margin-right:12px;" />
-                                <div>
-                                    <strong>@item.Title</strong><br />
-                                    <small>Giá: @item.Price.ToString("N0")đ | SL: @item.Quantity</small>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="fs-5">Tổng tiền:</strong>
+                        <span class="text-danger fs-4 fw-bold">@order.FinalAmount.ToString("N0")đ</span>
+                    </div>
+                    <div>
+                        <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })"
+                           class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
 
-                    <hr />
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>Tổng tiền:</strong>
-                            <span class="text-danger font-weight-bold">@order.FinalAmount.ToString("N0")đ</span>
-                        </div>
-
-                        <div>
-                            <!-- Common Button: View Details -->
-                            <a href="@Url.Action("OrderDetails", "Checkout", new { orderId = order.Id })"
-                               class="btn btn-sm btn-outline-primary action-btn">Xem Chi Tiết</a>
-
-                            <!-- Dynamic Action Buttons -->
-                            @if (order.Status == "Chờ xác nhận")
-                            {
-                                <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-danger action-btn">Hủy đơn hàng</a>
-                            }
-                            else if (order.Status == "Chờ vận chuyển")
-                            {
-                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                            }
-                            else if (order.Status == "Chờ giao hàng")
-                            {
-                                <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-success action-btn">Xác nhận đã giao</a>
-                                <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                            }
-                            else if (order.Status == "Đã giao")
-                            {
-                                @foreach (var item in order.Items)
-                                {
-                                    <a href="@Url.Action("ReviewProduct", "Checkout", new { orderId = order.Id, productId = item.ProductId })"
-                                       class="btn btn-sm btn-outline-primary action-btn">
-                                        Đánh giá
-                                    </a>
-                                }
-                                <a class="btn btn-sm btn-outline-danger action-btn"
-                                   href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
-                            }
-
-                            else if (order.Status == "Trả hàng/Hoàn tiền")
-                            {
-                                <a href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-secondary action-btn">Lý do trả hàng</a>
-                                <a href="@Url.Action("Reorder", "Checkout", new { orderId = order.Id })"
-                                   class="btn btn-sm btn-outline-success action-btn">Mua lại</a>
-                            }
-                        </div>
+                        @if (order.Status == "Chờ xác nhận")
+                        {
+                            <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')">Hủy đơn</a>
+                        }
+                        else if (order.Status == "Đã giao")
+                        {
+                            <a href="@Url.Action("ReviewProduct", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-success btn-sm">Đánh giá</a>
+                        }
                     </div>
                 </div>
-            }
+            </div>
         }
+    }
+</div>
 
-    </div>
-    <div class="overlay" id="reviewOverlay"></div>
+<!-- Modal đánh giá (nếu bạn vẫn cần) -->
+<div class="overlay" id="reviewOverlay"></div>
+<div class="custom-dialog" id="reviewDialog">...</div>
 
-    <div class="custom-dialog" id="reviewDialog">
-
-        <button class="btn-close-custom" id="btnCloseX">X</button>
-
-        <div class="dialog-product-info">
-            <img src="" alt="Product" class="dialog-product-img" id="dlgImg">
-            <div class="product-details">
-                <div class="product-title" id="dlgTitle">Tên sản phẩm</div>
-                <div class="product-price" id="dlgPrice">0đ</div>
-            </div>
-            <div class="product-qty" id="dlgQty">X1</div>
-
-            <div style="position: absolute; bottom: 15px; right: 15px;">
-                <span style="color: #d9534f; font-weight: bold; font-size: 16px;">Tổng tiền: <span id="dlgTotal">0đ</span></span>
-            </div>
-        </div>
-
-        <div class="rating-row">
-            <div class="rating-label">Chất lượng sản phẩm:</div>
-            <div class="star-rating" id="productRating">
-                <i class="fa fa-star star" data-value="1"></i>
-                <i class="fa fa-star star" data-value="2"></i>
-                <i class="fa fa-star star" data-value="3"></i>
-                <i class="fa fa-star star" data-value="4"></i>
-                <i class="fa fa-star star" data-value="5"></i>
-            </div>
-        </div>
-        <div class="rating-row">
-            <div class="rating-label">Dịch vụ của người bán:</div>
-            <div class="star-rating" id="serviceRating">
-                <i class="fa fa-star star" data-value="1"></i>
-                <i class="fa fa-star star" data-value="2"></i>
-                <i class="fa fa-star star" data-value="3"></i>
-                <i class="fa fa-star star" data-value="4"></i>
-                <i class="fa fa-star star" data-value="5"></i>
-            </div>
-        </div>
-
-        <label class="section-title">Nhận xét:</label>
-        <div style="border: 1px solid #ddd; padding: 5px;">
-            <textarea class="lined-textarea" id="reviewComment" rows="4"></textarea>
-        </div>
-
-        <div class="media-upload-container">
-            <div class="media-box" data-type="image">
-                <label class="section-title" style="margin-top:-20px;margin-bottom:5px">Thêm ảnh</label>
-                <i class="fa fa-camera"></i>
-                <i class="fa fa-plus" style="font-size: 14px; position: absolute; margin-left: 20px; margin-top: -10px;"></i>
-            </div>
-            <div class="media-box" data-type="video">
-                <label class="section-title" style="margin-top:-20px;margin-bottom:5px">Thêm video</label>
-                <i class="fa fa-video"></i>
-                <i class="fa fa-plus" style="font-size: 14px; position: absolute; margin-left: 20px; margin-top: -10px;"></i>
-            </div>
-        </div>
-        <input type="file" id="reviewMedia" multiple style="display:none;">
-
-        <div class="dialog-actions">
-            <button class="btn-submit-review" id="btnSubmitReview">Gửi đánh giá</button>
-        </div>
-    </div>
+@section Scripts {
     <script src="~/js/PaymentHistory.js"></script>
-</body>
-</html>
+}

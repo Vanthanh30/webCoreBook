@@ -46,78 +46,57 @@ namespace webCore.Controllers
         [ServiceFilter(typeof(SetLoginStatusFilter))]
         public async Task<IActionResult> DetailProduct(string id)
         {
-            // Kiểm tra trạng thái đăng nhập từ session
-            var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
-
-            // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
-            ViewBag.IsLoggedIn = isLoggedIn;
-
+            // === 1. Kiểm tra ID hợp lệ ===
             if (string.IsNullOrEmpty(id))
             {
-                return NotFound("Product ID is required.");
+                return NotFound("Không tìm thấy sản phẩm – ID trống.");
             }
 
+            // === 2. Lấy sản phẩm ===
             var product = await _detailProductService.GetProductByIdAsync(id);
+
+            // Nếu không tìm thấy sản phẩm → trả về 404 đẹp, không để null
             if (product == null)
             {
-                return NotFound("Product not found.");
+                return NotFound("Sản phẩm bạn đang tìm không tồn tại hoặc đã bị xóa.");
             }
 
-            // Lấy các sản phẩm tương tự
+            // === 3. Truyền trạng thái đăng nhập (giữ nguyên logic cũ) ===
+            var userToken = HttpContext.Session.GetString("UserToken");
+            var userName = HttpContext.Session.GetString("UserName");
+
+            ViewBag.IsLoggedIn = !string.IsNullOrEmpty(userToken);
+            ViewBag.UserName = userName;
+            ViewBag.UserToken = userToken;
+
+            // === 4. Lấy sản phẩm tương tự (an toàn) ===
             var similarProducts = await GetSimilarProducts(product);
+            ViewBag.SimilarProducts = similarProducts ?? new List<Product_admin>();
 
-            // Gán danh sách sản phẩm tương tự vào ViewBag
-            ViewBag.SimilarProducts = similarProducts;
-
-            // Lấy thông tin phiên người dùng từ session (nếu có)
-            var userName = HttpContext.Session.GetString("UserName"); // Lấy tên người dùng từ session
-            var userToken = HttpContext.Session.GetString("UserToken"); // Lấy token từ session
-
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(userToken))
-            {
-                // Người dùng đã đăng nhập
-                ViewBag.UserName = userName;
-                ViewBag.UserToken = userToken;
-            }
-            else
-            {
-                // Người dùng chưa đăng nhập
-                ViewBag.UserName = null;
-                ViewBag.UserToken = null;
-            }
-
-            var breadcrumbs = new List<Category>();
-
-            // Thêm "Home" vào đầu breadcrumb
-            breadcrumbs.Add(new Category { Title = "Trang chủ", _id = "home" });
+            // === 5. Xử lý Breadcrumbs – AN TOÀN HOÀN TOÀN ===
+            var breadcrumbs = new List<Category>
+    {
+        new Category { Title = "Trang chủ", _id = "home" }
+    };
 
             string currentCategoryId = product.CategoryId;
 
-            // Kiểm tra nếu CategoryId là null hoặc rỗng
-            if (string.IsNullOrEmpty(currentCategoryId))
+            // Nếu sản phẩm không có danh mục → vẫn cho vào trang chi tiết, chỉ không có breadcrumb
+            if (!string.IsNullOrEmpty(currentCategoryId))
             {
-                return NotFound("Category not found.");
-            }
+                while (!string.IsNullOrEmpty(currentCategoryId))
+                {
+                    var category = await _categoryService.GetCategoryBreadcrumbByIdAsync(currentCategoryId);
+                    if (category == null) break; // thoát vòng lặp nếu không tìm thấy
 
-            // Lấy breadcrumb của các danh mục cha
-            while (!string.IsNullOrEmpty(currentCategoryId))
-            {
-                var category = await _categoryService.GetCategoryBreadcrumbByIdAsync(currentCategoryId);
-                if (category != null)
-                {
-                    breadcrumbs.Insert(1, category); // Thêm vào **sau "Trang chủ"**
-                    currentCategoryId = category.ParentId; // Lấy danh mục cha
-                }
-                else
-                {
-                    return NotFound("Category breadcrumb not found.");
+                    breadcrumbs.Insert(1, category);
+                    currentCategoryId = category.ParentId;
                 }
             }
 
-            // Lưu danh sách breadcrumb vào ViewBag
             ViewBag.Breadcrumbs = breadcrumbs;
 
-            // Trả về view và truyền thông tin sản phẩm
+            // === 6. Trả về view – Model chắc chắn không null ===
             return View(product);
         }
 

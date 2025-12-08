@@ -40,6 +40,29 @@
             const password = document.getElementById("password").value.trim();
             const errorBox = document.getElementById("errorBox");
 
+            // RESET lỗi
+            errorBox.style.display = "none";
+            errorBox.innerText = "";
+            errorBox.style.color = "red";
+
+            if (!username && !password) {
+                errorBox.style.display = "block";
+                errorBox.innerText = "Vui lòng nhập tài khoản và mật khẩu.";
+                return;
+            }
+
+            if (!username) {
+                errorBox.style.display = "block";
+                errorBox.innerText = "Vui lòng nhập tài khoản.";
+                return;
+            }
+
+            if (!password) {
+                errorBox.style.display = "block";
+                errorBox.innerText = "Vui lòng nhập mật khẩu.";
+                return;
+            }
+
             const payload = {
                 Username: username,
                 Password: password
@@ -57,7 +80,7 @@
                 if (!result.success) {
                     errorBox.style.display = "block";
                     errorBox.style.color = "red";
-                    errorBox.innerText = result.message;
+                     errorBox.innerText = "Sai tài khoản hoặc mật khẩu.";
                     return;
                 }
 

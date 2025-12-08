@@ -55,7 +55,7 @@ namespace webCore.Controllers
         // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
         public async Task<IActionResult> GetProductsByCategoryId(string categoryId)
         {
-            if (string.IsNullOrEmpty(categoryId))   
+            if (string.IsNullOrEmpty(categoryId))
             {
                 return BadRequest("Category ID is required.");
             }
@@ -115,19 +115,51 @@ namespace webCore.Controllers
             return PartialView("_BookListPartial", orderedGroupedProducts);
         }
 
-        public async Task<IActionResult> Search(string searchQuery)
+        [HttpGet]
+        public async Task<IActionResult> Search(string q)
         {
-            if (string.IsNullOrEmpty(searchQuery))
+            // Lấy tất cả dữ liệu như trang chủ
+            var categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.Categories = categories;
+
+            var groupedProducts = await _productService.GetProductsGroupedByFeaturedAsync();
+            ViewBag.GroupedProducts = groupedProducts;
+
+            var featuredProducts = await _productService.GetFeaturedProductsAsync();
+            ViewBag.FeaturedProducts = featuredProducts;
+
+            var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
+            ViewBag.BestsellerProducts = bestsellerProducts;
+
+            // === PHẦN TÌM KIẾM ===
+            ViewBag.SearchQuery = q?.Trim() ?? "";
+
+            if (!string.IsNullOrWhiteSpace(q))
             {
-                return PartialView("_ProductList", new List<Product_admin>());
+                var searchResults = await _productService.SearchProductsAsync(q);
+
+                // Tạo nhóm giống hệt trang chủ
+                var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
+
+                var flash = searchResults.Where(p => p.DiscountPercentage > 0).Take(20).ToList();
+                var newest = searchResults.Where(p => p.DiscountPercentage == 0).Take(20).ToList();
+                var suggest = searchResults.Except(flash).Except(newest).Take(20).ToList();
+
+                if (flash.Any()) grouped.Add(new("Nổi bật", flash));
+                if (newest.Any()) grouped.Add(new("Mới", newest));
+                if (suggest.Any()) grouped.Add(new("Gợi ý", suggest));
+
+                ViewBag.SearchResults = grouped; // Dùng để hiển thị thay thế
+                ViewBag.IsSearching = true;
+                ViewBag.ResultCount = searchResults.Count;
+            }
+            else
+            {
+                ViewBag.IsSearching = false;
             }
 
-            var allProducts = await _productService.GetProductsAsync();
-            var searchResults = allProducts
-                .Where(p => p.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            return PartialView("_ProductList", searchResults);
+            // TRẢ VỀ LUÔN TRANG CHỦ (Index.cshtml)
+            return View("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Sign_in(User loginUser)

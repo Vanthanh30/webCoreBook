@@ -1,76 +1,183 @@
-﻿.rounded-box {
-    border: 2px black;
-    border-radius: 15px;
-    padding: 20px;
-    margin-left:35px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+﻿/* wwwroot/css/detail_product.css */
+.product-wrapper {
+    max-width: 1260px;
+    max-width: 1260px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    overflow: hidden;
 }
-.row{
 
+.breadcrumb {
+    padding: 16px 30px;
+    background: #f8f9fa;
+    font-size: 14px;
+    color: #666;
+    border-bottom: 1px solid #eee;
 }
-.rounded-box h5{
-    font-size:35px;
-    color:blue;
+
+.main-row {
+    display: flex;
+    padding: 40px 40px 50px;
 }
-.book {
-    width: 310px;
-    height: 420px;
+
+.left-col {
+    flex: 0 0 460px;
+    text-align: center;
 }
-.image-container {
-    text-align: center; /* Căn giữa hình ảnh */
+
+    .left-col img {
+        max-width: 100%;
+        max-height: 520px;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+
+.right-col {
+    flex: 1;
+    padding-left: 50px;
 }
-.value {
-    width: 114px;
-    height: 29px;
+
+.product-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.price-current {
+    font-size: 38px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin-right: 15px;
+}
+
+.price-old {
+    font-size: 18px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.discount {
+    background: #e74c3c;
+    background: #e74c3c;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.quantity-row {
+    display: flex;
+    align-items: center;
+    margin: 35px 0;
+    font-size: 16px;
+}
+
+    .quantity-row label {
+        margin-right: 25px;
+        font-weight: 600;
+        min-width: 80px;
+    }
+
+.quantity-input {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 130px;
+}
+
+    .quantity-input button {
+        width: 40px;
+        height: 44px;
+        background: #f8f9fa;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .quantity-input input {
+        width: 50px;
+        height: 44px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        font-size: 16px;
+        background: #fff;
+    }
+
+.buttons-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.add_button,
+.buy_button {
+    height: 54px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
 .add_button {
-    font-size: 18px;
-    width: 190px;
-    height: 45px;
-    border-radius: 15px;
-    color: #66C5FF;
-    border: 3px solid #66C5FF;
-    background-color: #ffffff;
+    background: #fff;
+    color: #3498db;
+    border: 2.5px solid #3498db;
 }
+
+    .add_button:hover {
+        background: #eef7ff;
+    }
 
 .buy_button {
-    font-size: 18px;
-    width: 190px;
-    height: 45px;
-    border-radius: 15px;
-    color: #ffffff;
-    border: 3px solid #66C5FF;
-    background-color: #66C5FF;
+    background: #3498db;
+    color: #fff;
+    border: none;
 }
 
-.rounded-input {
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    padding: 5px;
-    width: 70px;
+    .buy_button:hover {
+        background: #2980b9;
+    }
+
+.description {
+    margin-top: 50px;
+    line-height: 1.8;
+    color: #444;
+    font-size: 15.5px;
 }
-.price {
-    text-decoration: line-through;
-    font-size: 16px;
-}
-.discount {
-    color: red;
-    text-decoration:none;
-    font-size: 16px;
-    margin-left: 5px; 
-}
-.section-custom {
-    max-width: 100%;
-    margin: 0 auto;
-}
-.input-group input {
-    width: 50px;
-}
-.quantity{
-    align-items:baseline;
-}
-.breadcrumbs {
-    margin-top: -35px;
+
+    .description h6 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+/* Responsive */
+@media (max-width: 992px) {
+    .main-row {
+        flex-direction: column;
+        padding: 30px;
+    }
+
+    .left-col {
+        flex: none;
+        margin-bottom: 30px;
+    }
+
+    .right-col {
+        padding-left: 0;
+    }
+
+    .buttons-row {
+        flex-direction: column;
+    }
 }

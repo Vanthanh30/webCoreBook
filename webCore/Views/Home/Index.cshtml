@@ -6,12 +6,17 @@
     var featuredProducts = ViewBag.FeaturedProducts as List<webCore.Models.Product_admin>;
     var bestsellerProducts = ViewBag.BestsellerProducts as List<webCore.Models.Product_admin>;
 
-    // Lấy đúng 3 nhóm: Nổi bật → Mới → Gợi ý (hoặc Bán chạy)
-    var orderedGroupedProducts = groupedProducts?
-        .Where(g => g.Key == "Nổi bật" || g.Key == "Mới" || g.Key == "Gợi ý" || g.Key == "Bán chạy")
-        .OrderBy(g => g.Key == "Nổi bật" ? 0 :
-                     g.Key == "Mới" ? 1 : 2)
-        .ToList() ?? new List<KeyValuePair<string, List<webCore.Models.Product_admin>>>();
+    // === SỬA CHÍNH TẠI ĐÂY ===
+    var isSearching = ViewBag.IsSearching == true;
+    var searchResults = ViewBag.SearchResults as List<KeyValuePair<string, List<Product_admin>>>;
+
+    var displayGroups = isSearching && searchResults != null && searchResults.Any()
+        ? searchResults
+        : groupedProducts?
+            .Where(g => g.Key == "Nổi bật" || g.Key == "Mới" || g.Key == "Gợi ý" || g.Key == "Bán chạy")
+            .OrderBy(g => g.Key == "Nổi bật" ? 0 : g.Key == "Mới" ? 1 : 2)
+            .Select(g => new KeyValuePair<string, List<Product_admin>>(g.Key, g.Value))
+            .ToList() ?? new List<KeyValuePair<string, List<Product_admin>>>();
 }
 
 <style>
@@ -185,24 +190,27 @@
                 <!-- Tab danh mục (cuộn ngang) -->
                 <div class="category-tabs-container mb-4">
                     <button class="scroll-arrow left" onclick="scrollTabs(-1)">‹</button>
-                    <div class="category-tabs">
-                        <a href="#" class="category-tab">Truyện Ngụ Ngôn</a>
-                        <a href="#" class="category-tab">Truyện Cười</a>
-                        <a href="#" class="category-tab">Sách Giáo Khoa</a>
-                        <a href="#" class="category-tab">Tiểu Thuyết</a>
-                        <a href="#" class="category-tab">Truyện Tranh</a>
-                        <a href="#" class="category-tab">Trinh Thám</a>
-                        <a href="#" class="category-tab">Sách Toeic</a>
-                        <a href="#" class="category-tab">Lập Trình</a>
+                    <div class="category-tabs" id="categoryTabs">
+                        @if (parentCategories != null)
+                        {
+                            foreach (var cat in parentCategories)
+                            {
+                                <a href="javascript:void(0)"
+                                   class="category-tab"
+                                   data-category-id="@cat._id"
+                                   onclick="loadProductsByCategoryId('@cat._id')">
+                                    @cat.Title
+                                </a>
+                            }
+                        }
                     </div>
                     <button class="scroll-arrow right" onclick="scrollTabs(1)">›</button>
                 </div>
-
                 <!-- 3 NHÓM SẢN PHẨM CHÍNH: NỔI BẬT - MỚI NHẤT - BÁN CHẠY -->
                 <div class="product-list">
-                    @if (orderedGroupedProducts.Any())
+                    @if (displayGroups.Any())
                     {
-                        foreach (var group in orderedGroupedProducts)
+                        foreach (var group in displayGroups)
                         {
                             var sectionTitle = group.Key switch
                             {
@@ -277,11 +285,11 @@
         const sub = document.getElementById('sub_' + parentId);
         const checkbox = document.getElementById('cat_' + parentId);
         if (sub) sub.classList.toggle('show', checkbox.checked);
-            subCategoryList.style.display = "none";
-            arrow.classList.remove("open");
-        }
-        currentCategoryId = categoryId;
+    }
 
+    function loadProductsByCategoryId(categoryId) {
+        currentCategoryId = categoryId;
+        fetch(`/Home/GetProductsByCategoryId?categoryId=${categoryId}`)
             .then(r => r.text())
             .then(html => document.querySelector('.product-list').innerHTML = html)
             .catch(err => console.error(err));
@@ -300,7 +308,7 @@
             location.reload();
         }
     });
-            behavior: 'smooth'
+
     connection.start().catch(err => console.error(err));
 
     // Các hàm cuộn
@@ -308,19 +316,16 @@
         const el = document.querySelector('.category-tabs');
         el.scrollBy({ left: dir * 200, behavior: 'smooth' });
     }
-        subItems.forEach(item => {
+
     function slideProducts(btn, dir) {
         const slider = btn.parentElement.querySelector('.products-slider');
         slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
     }
-            });
+
     function applyPriceFilter() {
         const from = document.getElementById('priceFrom').value;
         const to = document.getElementById('priceTo').value;
         alert(`Lọc giá từ ${from} đến ${to}`);
         // TODO: gọi AJAX lọc giá ở đây
     }
-</script>            case "Gợi ý": return "Gợi ý";
-            default: return ""; // Trả về chuỗi rỗng thay vì "Không nổi bật"
-        }
-    } }
+</script>
