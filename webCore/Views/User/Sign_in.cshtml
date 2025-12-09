@@ -2,76 +2,129 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
-          crossorigin="anonymous" />
+    <title>Đăng nhập - TYB Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous" />
     <link rel="stylesheet" href="~/css/sign_in.css" asp-append-version="true" />
-@*    <script src="/js/auth.js"></script>*@
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <!-- Logo Section -->
-            <div class="col-md-6 text-center">
-                <div class="logo">
-                    <img src="/image/logo.png" alt="TYB Book Logo" />
-                </div>
-            </div>
-            <!-- Login Form Section -->
-            <div class="col-md-6 login-box">
-                <h2 class="text-center mb-4">Đăng nhập</h2>
-
-                <div id="errorBox" class="alert alert-danger d-none"></div>
-
-                <form id="loginForm" onsubmit="return false;">
-                    <div class="form-group">
-                        <label for="email">Tài khoản:</label>
-                        <input type="email" class="form-control" id="email" placeholder="Email" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Mật khẩu:</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="Password" placeholder="Nhập mật khẩu" required />
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-                                    <i id="toggleIcon" class="fa fa-eye"></i>
-                                </button>
+    <div class="signin-container">
+        <div class="signin-wrapper">
+            <div class="signin-card">
+                <div class="row no-gutters">
+                    <!-- Left Side - Logo & Branding -->
+                    <div class="col-lg-5 col-md-6 d-none d-md-flex">
+                        <div class="logo-section">
+                            <div class="logo-wrapper">
+                                <img src="/image/logo.png" alt="TYB Book Logo" class="logo-image" />
+                            </div>
+                            <div class="branding-text">
+                                <h3 class="brand-name">
+                                    <span class="brand-tyb">TYB</span>
+                                    <span class="brand-book">BOOK</span>
+                                </h3>
+                                <p class="brand-slogan">Nơi hội tụ tri thức</p>
+                            </div>
+                            <div class="decorative-circles">
+                                <div class="circle circle-1"></div>
+                                <div class="circle circle-2"></div>
+                                <div class="circle circle-3"></div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block" onclick="login()">Đăng nhập</button>
-                    <div class="text-center mt-3">
-                        <a href="@Url.Action("SendOtpView", "ForgotPassword")" class="text-secondary">Quên mật khẩu?</a>
-                    </div>
 
-                    <button type="button" class="btn btn-warning btn-block mt-3"
-                            onclick="window.location.href='@Url.Action("Sign_up", "User")'">
-                        Tạo tài khoản mới
-                    </button>
-                </form>
+                    <!-- Right Side - Login Form -->
+                    <div class="col-lg-7 col-md-6">
+                        <div class="form-section">
+                            <!-- Mobile Logo -->
+                            <div class="mobile-logo d-md-none">
+                                <img src="/image/logo.png" alt="TYB Book" />
+                            </div>
+
+                            <div class="form-header">
+                                <h2 class="form-title">Đăng nhập</h2>
+                                <p class="form-subtitle">Chào mừng bạn trở lại!</p>
+                            </div>
+
+                            <div id="errorBox" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span id="errorMessage"></span>
+                                <button type="button" class="close" onclick="document.getElementById('errorBox').classList.add('d-none')">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+
+                            <form id="loginForm" onsubmit="return false;">
+                                <div class="form-group-custom">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope"></i>
+                                        Email
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="email"
+                                               class="form-control-custom"
+                                               id="email"
+                                               placeholder="example@email.com"
+                                               required />
+                                    </div>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock"></i>
+                                        Mật khẩu
+                                    </label>
+                                    <div class="input-wrapper password-wrapper">
+                                        <input type="password"
+                                               class="form-control-custom"
+                                               id="password"
+                                               name="Password"
+                                               placeholder="Nhập mật khẩu"
+                                               required />
+                                        <button class="toggle-password" type="button" onclick="togglePassword()">
+                                            <i id="toggleIcon" class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-options">
+                                    <a href="/ForgotPassword/SendOtpView" class="forgot-link">
+                                        <i class="fas fa-key"></i>
+                                        Quên mật khẩu?
+                                    </a>
+                                </div>
+
+                                <button type="submit" class="btn btn-signin" onclick="login()">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Đăng nhập
+                                </button>
+
+                                <div class="divider">
+                                    <span>hoặc</span>
+                                </div>
+
+                                <button type="button" class="btn btn-create-account" onclick="window.location.href='/User/Sign_up'">
+                                    <i class="fas fa-user-plus"></i>
+                                    Tạo tài khoản mới
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
         async function login() {
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
             const errorBox = document.getElementById("errorBox");
+            const errorMessage = document.getElementById("errorMessage");
 
             const payload = {
                 Email: email,
@@ -90,7 +143,7 @@
 
                 if (!data.success) {
                     errorBox.classList.remove("d-none");
-                    errorBox.innerText = data.message;
+                    errorMessage.innerText = data.message;
                     return;
                 }
 
@@ -99,10 +152,11 @@
 
             } catch (err) {
                 errorBox.classList.remove("d-none");
-                errorBox.innerText = "Lỗi kết nối server!";
+                errorMessage.innerText = "Lỗi kết nối server!";
             }
         }
-               function togglePassword() {
+
+        function togglePassword() {
             var passwordInput = document.getElementById("password");
             var icon = document.getElementById("toggleIcon");
 
@@ -116,7 +170,16 @@
                 icon.classList.add("fa-eye");
             }
         }
+
+        // Press Enter to submit
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginForm').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    login();
+                }
+            });
+        });
     </script>
 </body>
 </html>
-
