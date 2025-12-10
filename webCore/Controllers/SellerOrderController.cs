@@ -10,7 +10,6 @@ using webCore.MongoHelper;
 
 namespace webCore.Controllers
 {
-    [AuthorizeRole("Seller")]
     public class SellerOrderController : BaseController
     {
         private readonly SellerOrderService _orderService;
