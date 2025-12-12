@@ -19,7 +19,8 @@ namespace webCore.Models
 
         public string Message { get; set; }
         public DateTime SentAt { get; set; }
+        [BsonIgnoreIfNull]
+        public string RelatedOrderId { get; set; }
 
-    
     }
 }

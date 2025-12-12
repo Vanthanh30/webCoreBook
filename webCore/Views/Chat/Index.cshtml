@@ -170,10 +170,18 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
+    // ================== SIGNALR - FIXED VERSION ==================
     const currentUserId = $("#currentUserId").val();
     const selectedSellerId = $("#selectedSellerId").val();
     const selectedBuyerId = $("#selectedBuyerId").val();
     const isSeller = $("#isSeller").val() === "True";
+
+    console.log("Chat initialized:", {
+        currentUserId,
+        selectedSellerId,
+        selectedBuyerId,
+        isSeller
+    });
 
     // Auto scroll to bottom
     function scrollToBottom() {
@@ -209,25 +217,32 @@
                 now.getMinutes().toString().padStart(2, '0');
 
             $("#chatMessages").append(`
-                <div class="${msgClass}">
-                    ${message}
-                    <div class="msg-time">${timeStr}</div>
-                </div>
-            `);
+            <div class="${msgClass}">
+                ${message}
+                <div class="msg-time">${timeStr}</div>
+            </div>
+        `);
 
             scrollToBottom();
         });
 
         conn.start().then(function () {
-            console.log("SignalR connected");
+            console.log("SignalR connected successfully");
         }).catch(function (err) {
             console.error("SignalR connection error:", err);
         });
 
-        // ======= Hàm chung gửi tin nhắn =======
+        // ======= Hàm chung gửi tin nhắn - FIXED =======
         function sendMessage() {
             const msg = $("#messageInput").val().trim();
             if (!msg) return;
+
+            console.log("Sending message:", {
+                sellerId: selectedSellerId,
+                buyerId: selectedBuyerId,
+                currentUserId: currentUserId,
+                message: msg
+            });
 
             // Gửi qua SignalR
             conn.invoke("SendMessage", selectedSellerId, selectedBuyerId, currentUserId, msg)
@@ -235,14 +250,26 @@
                     console.error("Error sending message via SignalR:", err);
                 });
 
-            // Lưu vào database
-            $.post("/Chat/SendMessage", {
-                SellerId: selectedSellerId,
-                BuyerId: selectedBuyerId,
-                Message: msg
-            }).fail(function (err) {
-                console.error("Error saving message:", err);
-                alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
+            // ✅ FIXED: Lưu vào database với đầy đủ thông tin
+            $.ajax({
+                url: "/Chat/SendMessage",
+                type: "POST",
+                data: {
+                    SellerId: selectedSellerId,
+                    BuyerId: selectedBuyerId,
+                    Message: msg
+                },
+                success: function (response) {
+                    console.log("Message saved to database successfully");
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error saving message:", {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+                    alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
+                }
             });
 
             $("#messageInput").val("");

@@ -273,10 +273,6 @@ namespace webCore.Controllers
 
             return View(order);
         }
-        // Thêm method này vào CheckoutController
-
-        // Thêm method này vào CheckoutController.cs
-
         public async Task<IActionResult> ContactSeller(string orderId)
         {
             var userId = HttpContext.Session.GetString("UserId");
@@ -301,8 +297,12 @@ namespace webCore.Controllers
                 return BadRequest("Không tìm thấy thông tin người bán");
             }
 
+            // ✅ LƯU ORDERID VÀO SESSION
+            HttpContext.Session.SetString("RelatedOrderId", orderId);
+
+            Console.WriteLine($"[ContactSeller] OrderId: {orderId}, SellerId: {sellerId}, BuyerId: {userId}");
+
             // Redirect đến trang chat với sellerId
-            // Buyer sẽ chat với seller, nên truyền sellerId
             return RedirectToAction("Index", "Chat", new { sellerId = sellerId });
         }
 
