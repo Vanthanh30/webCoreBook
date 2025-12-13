@@ -13,11 +13,13 @@ namespace webCore.Controllers
     {
         private readonly ChatService _chatService;
         private readonly OrderService _orderService;
+        private readonly ShopService _shopService;
 
-        public ChatController(ChatService chatService, OrderService orderService)
+        public ChatController(ChatService chatService, OrderService orderService, ShopService shopService)
         {
             _chatService = chatService;
             _orderService = orderService;
+            _shopService = shopService;
         }
 
         // Trang chat - Hiển thị danh sách cuộc trò chuyện
@@ -122,24 +124,50 @@ namespace webCore.Controllers
                 }
                 else
                 {
-                    // Buyer: Lấy đơn từ seller này
-                    var allMyOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
-                    relatedOrders = allMyOrders
-                        .Where(o => o.Items != null && o.Items.Any(i => i.SellerId == selectedSellerId))
-                        .ToList();
+                    // ✅ Buyer: Lấy thông tin Shop từ SellerId
+                    var shop = await _shopService.GetShopByUserIdAsync(selectedSellerId);
+
+                    if (shop != null)
+                    {
+                        otherUserName = shop.ShopName ?? "Shop";
+                        otherUserAvatar = !string.IsNullOrEmpty(shop.ShopImage) && shop.ShopImage != "default-image-url"
+                            ? shop.ShopImage
+                            : "/image/macdinh.jpg";
+
+                        Console.WriteLine($"[Chat Index] Buyer - Found shop: {shop.ShopName}");
+                    }
+                    else
+                    {
+                        // Fallback: Nếu không tìm thấy shop, lấy từ đơn hàng
+                        var allMyOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+                        relatedOrders = allMyOrders
+                            .Where(o => o.Items != null && o.Items.Any(i => i.SellerId == selectedSellerId))
+                            .ToList();
+
+                        var firstOrder = relatedOrders.FirstOrDefault();
+                        if (firstOrder != null)
+                        {
+                            var item = firstOrder.Items.FirstOrDefault(i => i.SellerId == selectedSellerId);
+                            if (item != null)
+                            {
+                                otherUserName = $"Shop";
+                                otherUserAvatar = item.Image ?? "/image/macdinh.jpg";
+                            }
+                        }
+
+                        Console.WriteLine($"[Chat Index] Buyer - Shop not found, using fallback");
+                    }
+
+                    // Vẫn lấy relatedOrders để hiển thị số đơn hàng
+                    if (!relatedOrders.Any())
+                    {
+                        var allMyOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+                        relatedOrders = allMyOrders
+                            .Where(o => o.Items != null && o.Items.Any(i => i.SellerId == selectedSellerId))
+                            .ToList();
+                    }
 
                     Console.WriteLine($"[Chat Index] Buyer found {relatedOrders.Count} orders from seller {selectedSellerId}");
-
-                    var firstOrder = relatedOrders.FirstOrDefault();
-                    if (firstOrder != null)
-                    {
-                        var item = firstOrder.Items.FirstOrDefault(i => i.SellerId == selectedSellerId);
-                        if (item != null)
-                        {
-                            otherUserName = $"Shop: {item.Title}";
-                            otherUserAvatar = item.Image ?? "/image/macdinh.jpg";
-                        }
-                    }
                 }
             }
 
@@ -160,7 +188,7 @@ namespace webCore.Controllers
 
                 Console.WriteLine($"[Chat Index] Processing conversation with {conv.OtherUserId}");
 
-                // ✅ Lấy thông tin hiển thị từ đơn hàng
+                // ✅ Lấy thông tin hiển thị
                 if (isSeller)
                 {
                     // Seller: Hiển thị thông tin buyer
@@ -184,23 +212,30 @@ namespace webCore.Controllers
                 }
                 else
                 {
-                    // ✅ Buyer: Hiển thị thông tin seller
-                    var myOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
-                    var order = myOrders.FirstOrDefault(o => o.Items != null && o.Items.Any(i => i.SellerId == conv.OtherUserId));
+                    // ✅ Buyer: Hiển thị thông tin Shop
+                    var shop = await _shopService.GetShopByUserIdAsync(conv.OtherUserId);
 
-                    if (order != null)
+                    if (shop != null)
                     {
-                        var item = order.Items.FirstOrDefault(i => i.SellerId == conv.OtherUserId);
-                        display.DisplayName = item?.Title ?? "Shop";
-                        display.AvatarUrl = item?.Image ?? "/image/macdinh.jpg";
-                        display.OrderCount = myOrders.Count(o => o.Items != null && o.Items.Any(i => i.SellerId == conv.OtherUserId));
+                        display.DisplayName = shop.ShopName ?? "Shop";
+                        display.AvatarUrl = !string.IsNullOrEmpty(shop.ShopImage) && shop.ShopImage != "default-image-url"
+                            ? shop.ShopImage
+                            : "/image/macdinh.jpg";
+
+                        Console.WriteLine($"[Chat Index] Buyer view - Found shop: {shop.ShopName}");
                     }
                     else
                     {
+                        // Fallback
                         display.DisplayName = "Shop";
                         display.AvatarUrl = "/image/macdinh.jpg";
-                        display.OrderCount = 0;
+
+                        Console.WriteLine($"[Chat Index] Buyer view - Shop not found for seller {conv.OtherUserId}");
                     }
+
+                    // Đếm số đơn hàng
+                    var myOrders = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+                    display.OrderCount = myOrders.Count(o => o.Items != null && o.Items.Any(i => i.SellerId == conv.OtherUserId));
 
                     Console.WriteLine($"[Chat Index] Buyer view - Seller {conv.OtherUserId}: {display.DisplayName}, Orders: {display.OrderCount}");
                 }

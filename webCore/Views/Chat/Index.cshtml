@@ -40,16 +40,23 @@
                 {
                     var isActive = conv.OtherUserId == ViewBag.SelectedOtherUserId;
 
+                    // Convert to local time
+                    DateTime localTime;
+                    if (conv.LastMessageTime.Kind == DateTimeKind.Utc)
+                    {
+                        localTime = conv.LastMessageTime.ToLocalTime();
+                    }
+                    else
+                    {
+                        localTime = DateTime.SpecifyKind(conv.LastMessageTime, DateTimeKind.Utc).ToLocalTime();
+                    }
+
                     string chatUrl = ViewBag.IsSeller
                         ? Url.Action("Index", "Chat", new { buyerId = conv.OtherUserId })
                         : Url.Action("Index", "Chat", new { sellerId = conv.OtherUserId });
 
-                    <a href="@chatUrl"
-                       class="chat-list-item @(isActive ? "active" : "")"
-                       data-name="@conv.DisplayName">
-
+                    <a href="@chatUrl" class="chat-list-item @(isActive ? "active" : "")" data-name="@conv.DisplayName">
                         <img src="@conv.AvatarUrl" alt="Avatar" class="header-avatar">
-
                         <div class="chat-info">
                             <h6>@conv.DisplayName</h6>
                             <small class="text-muted">
@@ -57,19 +64,10 @@
                                 {
                                     @(conv.LastMessage.Length > 30 ? conv.LastMessage.Substring(0, 30) + "..." : conv.LastMessage)
                                 }
-                                else
-                                {
-                                    <text>Chưa có tin nhắn</text>
-                                }
                             </small>
-                            <div class="mt-1">
-                                <small class="badge badge-info">@conv.OrderCount đơn hàng</small>
-                                <small class="badge badge-primary">@conv.MessageCount tin nhắn</small>
-                            </div>
                         </div>
-
                         <div class="chat-time">
-                            <small>@conv.LastMessageTime.ToString("HH:mm")</small>
+                            <small>@localTime.ToString("HH:mm")</small>
                         </div>
                     </a>
                 }
@@ -103,12 +101,6 @@
                 </div>
             </div>
 
-            @if (Model.Item1.Any())
-            {
-                <div class="ms-auto">
-                    <small class="text-muted">@Model.Item1.Count đơn hàng</small>
-                </div>
-            }
         </div>
 
         <!-- MESSAGES -->
@@ -132,9 +124,10 @@
             {
                 @foreach (var msg in Model.Item2)
                 {
+                    var localTime = msg.SentAt.ToLocalTime();
                     <div class="@(msg.SenderId == ViewBag.CurrentUserId ? "msg-me" : "msg-other")">
                         @msg.Message
-                        <div class="msg-time">@msg.SentAt.ToString("HH:mm")</div>
+                        <div class="msg-time">@localTime.ToString("HH:mm")</div>
                     </div>
                 }
             }
@@ -170,18 +163,10 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
-    // ================== SIGNALR - FIXED VERSION ==================
     const currentUserId = $("#currentUserId").val();
     const selectedSellerId = $("#selectedSellerId").val();
     const selectedBuyerId = $("#selectedBuyerId").val();
     const isSeller = $("#isSeller").val() === "True";
-
-    console.log("Chat initialized:", {
-        currentUserId,
-        selectedSellerId,
-        selectedBuyerId,
-        isSeller
-    });
 
     // Auto scroll to bottom
     function scrollToBottom() {
@@ -217,32 +202,25 @@
                 now.getMinutes().toString().padStart(2, '0');
 
             $("#chatMessages").append(`
-            <div class="${msgClass}">
-                ${message}
-                <div class="msg-time">${timeStr}</div>
-            </div>
-        `);
+                <div class="${msgClass}">
+                    ${message}
+                    <div class="msg-time">${timeStr}</div>
+                </div>
+            `);
 
             scrollToBottom();
         });
 
         conn.start().then(function () {
-            console.log("SignalR connected successfully");
+            console.log("SignalR connected");
         }).catch(function (err) {
             console.error("SignalR connection error:", err);
         });
 
-        // ======= Hàm chung gửi tin nhắn - FIXED =======
+        // ======= Hàm chung gửi tin nhắn =======
         function sendMessage() {
             const msg = $("#messageInput").val().trim();
             if (!msg) return;
-
-            console.log("Sending message:", {
-                sellerId: selectedSellerId,
-                buyerId: selectedBuyerId,
-                currentUserId: currentUserId,
-                message: msg
-            });
 
             // Gửi qua SignalR
             conn.invoke("SendMessage", selectedSellerId, selectedBuyerId, currentUserId, msg)
@@ -250,26 +228,14 @@
                     console.error("Error sending message via SignalR:", err);
                 });
 
-            // ✅ FIXED: Lưu vào database với đầy đủ thông tin
-            $.ajax({
-                url: "/Chat/SendMessage",
-                type: "POST",
-                data: {
-                    SellerId: selectedSellerId,
-                    BuyerId: selectedBuyerId,
-                    Message: msg
-                },
-                success: function (response) {
-                    console.log("Message saved to database successfully");
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error saving message:", {
-                        status: status,
-                        error: error,
-                        response: xhr.responseText
-                    });
-                    alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
-                }
+            // Lưu vào database
+            $.post("/Chat/SendMessage", {
+                SellerId: selectedSellerId,
+                BuyerId: selectedBuyerId,
+                Message: msg
+            }).fail(function (err) {
+                console.error("Error saving message:", err);
+                alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
             });
 
             $("#messageInput").val("");

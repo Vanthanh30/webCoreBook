@@ -78,6 +78,7 @@
     text-decoration: none;
     color: #333;
     transition: 0.15s;
+    position: relative; /* THÊM DÒNG NÀY */
 }
 
     .chat-list-item:hover {
@@ -88,6 +89,14 @@
         background: #e8f1ff;
     }
 
+.chat-time {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 0.75rem;
+    color: #999;
+}
+
 .chat-avatar img {
     width: 45px;
     height: 45px;
@@ -96,6 +105,9 @@
 
 .chat-info {
     margin-left: 12px;
+    flex: 1; /* THÊM DÒNG NÀY để tránh text chồng lên giờ */
+    padding-right: 50px; /* THÊM DÒNG NÀY để tạo khoảng trống cho giờ */
+    min-width: 0; /* THÊM DÒNG NÀY để text có thể bị cắt */
 }
 
     .chat-info h6 {
@@ -106,6 +118,10 @@
 
     .chat-info small {
         color: #777;
+        display: block; /* THÊM DÒNG NÀY để text xuống dòng */
+        overflow: hidden; /* THÊM DÒNG NÀY */
+        text-overflow: ellipsis; /* THÊM DÒNG NÀY để hiển thị ... khi text dài */
+        white-space: nowrap; /* THÊM DÒNG NÀY */
     }
 
 /* ============================
@@ -164,6 +180,7 @@
     border-radius: 15px 15px 3px 15px;
     font-size: 15px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 /* Tin nhắn người khác */
@@ -175,6 +192,15 @@
     border-radius: 15px 15px 15px 3px;
     font-size: 15px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/* Thời gian tin nhắn */
+.msg-time {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    display: block;
 }
 
 /* ============================
