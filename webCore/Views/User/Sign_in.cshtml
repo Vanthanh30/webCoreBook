@@ -39,8 +39,16 @@
 
                 <form id="loginForm" onsubmit="return false;">
                     <div class="form-group">
-                        <label for="email">Tài khoản:</label>
+                        <label for="email">Email:</label>
                         <input type="email" class="form-control" id="email" placeholder="Email" required />
+                        <div id="emailError" class="text-danger"></div>
+
+                        @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
+                        {
+                            <div class="text-danger mt-1">
+                                @ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage
+                            </div>
+                        }
                     </div>
 
                     <div class="form-group">
@@ -116,6 +124,18 @@
                 icon.classList.add("fa-eye");
             }
         }
+        document.getElementById("email").addEventListener("input", function () {
+            const email = this.value.trim();
+            const emailError = document.getElementById("emailError");
+
+            const emailRegex = /^[A-Za-z0-9._%+-]+@@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+            if (!emailRegex.test(email)) {
+                emailError.innerText = "Email phải đúng định dạng [Tên_Email] @@ [Tên_Miền]";
+            } else {
+                emailError.innerText = "";
+            }
+        });
     </script>
 </body>
 </html>

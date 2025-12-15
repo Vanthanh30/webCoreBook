@@ -106,6 +106,10 @@ namespace webCore.MongoHelper
 
             return result.ModifiedCount > 0;
         }
+        public async Task<User> GetUserByPhoneAsync(string phone)
+        {
+            return await _userCollection.Find(u => u.Phone == phone).FirstOrDefaultAsync();
+        }
 
     }
 }

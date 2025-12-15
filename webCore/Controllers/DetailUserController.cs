@@ -80,6 +80,7 @@ public class DetailUserController : Controller
                 return RedirectToAction("SignIn", "User");
             }
 
+            
             // Lấy thông tin người dùng hiện tại từ MongoDB
             var currentUser = await _userService.GetUserByUsernameAsync(currentUserName);
             if (currentUser == null)
@@ -114,6 +115,19 @@ public class DetailUserController : Controller
                 {
                     await ProfileImage.CopyToAsync(ms);
                     currentUser.ProfileImage = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+                }
+            }
+
+
+            if (!string.IsNullOrEmpty(model.Phone))
+            {
+                var userByPhone = await _userService.GetUserByPhoneAsync(model.Phone);
+
+                // Nếu đã có người dùng khác có số điện thoại này
+                if (userByPhone != null && userByPhone.Id != currentUser.Id)
+                {
+                    ModelState.AddModelError("Phone", "Số điện thoại này đã được sử dụng. Vui lòng nhập số khác.");
+                    return View(model);
                 }
             }
 

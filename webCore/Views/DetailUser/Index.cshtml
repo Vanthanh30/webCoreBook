@@ -59,9 +59,16 @@
                         <!-- Phone -->
                         <div class="form-group col-md-6">
                             <label for="phone">Số điện thoại</label>
-                            <input type="tel" class="form-control" id="phone" name="Phone"
-                                   value="@(Model?.Phone ?? "")" placeholder="Nhập số điện thoại"
-                                   pattern="\d{10}" maxlength="10" title="Số điện thoại phải đủ 10 số" required />
+                            <input type="tel"
+                                   class="form-control"
+                                   id="phone"
+                                   name="Phone"
+                                   value="@(Model?.Phone ?? "")"
+                                   placeholder="Nhập số điện thoại"
+                                   pattern="0\d{9}"
+                                   maxlength="10"
+                                   title="Số điện thoại phải bắt đầu bằng số 0 và gồm 10 số"
+                                   required />
                             @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                         </div>
                     </div>
