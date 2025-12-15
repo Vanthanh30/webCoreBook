@@ -130,15 +130,22 @@
 
                         @if (order.Status == "Chờ xác nhận")
                         {
+                            <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-outline-secondary btn-sm">
+                                Liên hệ người bán
+                            </a>
                             <a href="@Url.Action("CancelOrder", "Checkout", new { orderId = order.Id })"
                                class="btn btn-outline-danger btn-sm"
                                onclick="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')">Hủy đơn</a>
+
                         }
-                        else if (order.Status == "Đã giao")
+
+                        @if (order.Status == "Đã giao")
                         {
                             <a href="@Url.Action("ReviewProduct", "Checkout", new { orderId = order.Id })"
                                class="btn btn-success btn-sm">Đánh giá</a>
                         }
+
                     </div>
                 </div>
             </div>
