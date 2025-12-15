@@ -16,12 +16,14 @@ public class DetailUserController : Controller
     private readonly MongoDBService _mongoDBService;
     private readonly UserService _userService;
     private readonly ProductService _productService;
+    private readonly CloudinaryService _cloudinaryService;
 
-    public DetailUserController(MongoDBService mongoDBService, UserService userService, ProductService productService)
+    public DetailUserController(MongoDBService mongoDBService, UserService userService, ProductService productService, CloudinaryService cloudinaryService)
     {
         _mongoDBService = mongoDBService;
         _productService = productService;
         _userService = userService;
+        _cloudinaryService = cloudinaryService;
     }
     // Phương thức tìm kiếm sản phẩm
     public async Task<IActionResult> Search(string searchQuery)
@@ -94,6 +96,7 @@ public class DetailUserController : Controller
             if (isPhone)
             {
                 ModelState.AddModelError("Phone", "Số điện thoại này đã được sử dụng bởi người dùng khác!");
+                ViewBag.ProfileImage = currentUser.ProfileImage;
                 return View(model);
             }
 
@@ -116,10 +119,12 @@ public class DetailUserController : Controller
             // Xử lý ảnh đại diện
             if (ProfileImage != null && ProfileImage.Length > 0)
             {
-                using (var ms = new MemoryStream())
+                var imageUrl = await _cloudinaryService.UploadImageAsync(ProfileImage);
+
+                // Nếu upload thành công (URL không rỗng), gán vào model
+                if (!string.IsNullOrEmpty(imageUrl))
                 {
-                    await ProfileImage.CopyToAsync(ms);
-                    currentUser.ProfileImage = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+                    currentUser.ProfileImage = imageUrl;
                 }
             }
 
@@ -133,6 +138,8 @@ public class DetailUserController : Controller
         catch (Exception ex)
         {
             TempData["Message"] = $"Đã xảy ra lỗi: {ex.Message}";
+            var user = await _userService.GetUserByIdAsync(HttpContext.Session.GetString("UserId"));
+            ViewBag.ProfileImage = user?.ProfileImage;
         }
 
         return View(model);
