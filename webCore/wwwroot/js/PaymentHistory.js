@@ -1,6 +1,7 @@
 ﻿const filters = document.querySelectorAll(".status-filter a");
 const orderCards = document.querySelectorAll(".order-card");
-
+const emptyState = document.getElementById("filterEmptyState");
+const emptyTitle = document.getElementById("emptyTitle");
 filters.forEach(btn => {
     btn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -61,11 +62,13 @@ function closeAndResetDialog() {
 
     // === LOGIC QUAN TRỌNG: Quay về tab "Đã giao" ===
     const targetStatus = 'Đã giao';
-    const deliveredBtn = document.querySelector(`.status-filter button[data-status='${targetStatus}']`);
+    const deliveredBtn = document.querySelector(
+        `.status-filter a[data-status='${targetStatus}']`
+    );
     if (deliveredBtn) {
-        // Trigger sự kiện click vào nút "Đã giao" để lọc lại
         deliveredBtn.click();
     }
+
 }
 
 $("#btnCloseX").on("click", function (e) {
@@ -131,7 +134,9 @@ function closeDialogLogic() {
     }, 200);
 
     // 3. Logic quan trọng: Tự động bấm vào tab "Đã giao"
-    const deliveredBtn = document.querySelector(".status-filter button[data-status='Đã giao']");
+    const deliveredBtn = document.querySelector(
+        `.status-filter a[data-status='Đã giao']`
+    );
     if (deliveredBtn) {
         deliveredBtn.click();
     }

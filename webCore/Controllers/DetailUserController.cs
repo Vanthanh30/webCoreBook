@@ -48,13 +48,13 @@ public class DetailUserController : Controller
 
         // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
         ViewBag.IsLoggedIn = isLoggedIn;
-        var userName = HttpContext.Session.GetString("UserName"); // Lấy thông tin UserName từ Session
-        if (string.IsNullOrEmpty(userName))
+        var userToken = HttpContext.Session.GetString("UserToken"); 
+        if (string.IsNullOrEmpty(userToken))
         {
             return RedirectToAction("SignIn", "User");
         }
-
-        var user = await _userService.GetUserByUsernameAsync(userName); // Lấy thông tin người dùng qua Username
+        var userId = HttpContext.Session.GetString("UserId");
+        var user = await _userService.GetUserByIdAsync(userId); 
         if (user == null)
         {
             TempData["Message"] = "Không tìm thấy thông tin người dùng.";
@@ -72,16 +72,14 @@ public class DetailUserController : Controller
     {
         try
         {
-            // Lấy tên người dùng từ session
-            string currentUserName = HttpContext.Session.GetString("UserName");
-            if (string.IsNullOrEmpty(currentUserName))
+            var userToken = HttpContext.Session.GetString("UserToken");
+            if (string.IsNullOrEmpty(userToken))
             {
-                TempData["Message"] = "Không tìm thấy tên người dùng.";
                 return RedirectToAction("SignIn", "User");
             }
-
+            var userId = HttpContext.Session.GetString("UserId");
             // Lấy thông tin người dùng hiện tại từ MongoDB
-            var currentUser = await _userService.GetUserByUsernameAsync(currentUserName);
+            var currentUser = await _userService.GetUserByIdAsync(userId);
             if (currentUser == null)
             {
                 TempData["Message"] = "Không tìm thấy thông tin người dùng.";
@@ -91,6 +89,14 @@ public class DetailUserController : Controller
             // Cập nhật thông tin người dùng
             currentUser.Name = model.Name;
             HttpContext.Session.SetString("UserName", model.Name); // Cập nhật session với tên mới
+            bool isPhone = await _userService.IsPhoneUsedAsync(model.Phone, userId);
+
+            if (isPhone)
+            {
+                ModelState.AddModelError("Phone", "Số điện thoại này đã được sử dụng bởi người dùng khác!");
+                return View(model);
+            }
+
             currentUser.Phone = model.Phone;
             currentUser.Gender = model.Gender;
 

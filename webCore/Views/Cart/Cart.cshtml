@@ -2,30 +2,43 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Giỏ hàng";
 }
-
 @functions {
     string FormatVND(decimal value)
     {
         return String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:#,##0.###} đ", value);
     }
 }
-
-@section Styles {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+          crossorigin="anonymous" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
-}
-
-<div class="cart-page">
+    <script src="/js/AddCart.js"></script>
+    @*<script src="/js/Quantity.js"></script>*@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/quantityCart.js"></script>
+</head>
+<body>
     <div class="container">
         <div class="row">
-            <div class="col-12">
+            <div class="col">
                 <div class="cart-title">
                     <h2 class="title">GIỎ HÀNG</h2>
                 </div>
-                <div class="edit-controls">
+                <div class="edit-controls text-right mb-3">
                     <button id="btn-edit" class="btn btn-primary btn-sm">Sửa</button>
                     <button id="btn-delete-selected" class="btn btn-danger btn-sm" style="display:none;">Xóa đã chọn</button>
                     <button id="btn-cancel-edit" class="btn btn-secondary btn-sm" style="display:none;">Hủy</button>
@@ -36,19 +49,17 @@
 
     <div class="container cart-container">
         <div class="row">
-            <div class="col-lg-8 col-md-12 mb-4">
+            <!-- Cart Table Section -->
+            <div class="col-md-8 section_1">
                 <div class="cart-table">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th class="product-col">
-                                    <input type="checkbox" class="select-all">
-                                    Chọn tất cả (<span id="cart-item-count">@Model.Count</span> sản phẩm)
-                                </th>
-                                <th class="price-col">Đơn giá</th>
-                                <th class="quantity-col">Số lượng</th>
-                                <th class="total-col">Thành tiền</th>
-                                <th class="action-col"></th>
+                                <th><input type="checkbox" class="select-all">Chọn tất cả (<span id="cart-item-count">@Model.Count</span> sản phẩm)</th>
+                                <th>Đơn giá</th> <!-- Cột mới cho đơn giá -->
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,30 +68,32 @@
                                 foreach (var item in Model)
                                 {
                                     var discountedPrice = item.Price * (1 - item.DiscountPercentage / 100);
-                                    var productId = item.ProductId.ToString();
+                                    var productId = item.ProductId.ToString();  // Chuyển ID sản phẩm thành string
 
                                     <tr class="cart-item" data-product-id="@productId">
-                                        <td class="product-info">
-                                            <div class="d-flex align-items-center">
-                                                <input type="checkbox" class="select-item edit-checkbox" data-price="@discountedPrice" data-quantity="@item.Quantity" data-id="@productId" @(ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId) ? "checked" : "") />
-                                                <img src="@item.Image" alt="@item.Title" class="cart-image" />
-                                                <div class="cart-item-details">
-                                                    <span class="product-title">@item.Title</span>
-                                                </div>
+                                        <td class="d-flex">
+                                            <input type="checkbox" class="select-item edit-checkbox"
+                                                   data-price="@discountedPrice"
+                                                   data-quantity="@item.Quantity"
+                                                   data-id="@productId"
+                                                   @if (ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId)) { @: checked
+                                                   } />
+
+                                            <img src="@item.Image" alt="@item.Title" class="cart-image" />
+                                            <div class="cart-item-details">
+                                                <span>@item.Title</span>
                                             </div>
                                         </td>
-                                        <td class="price-column" data-price="@item.Price.ToString("G", System.Globalization.CultureInfo.InvariantCulture)" data-discount="@item.DiscountPercentage.ToString("G", System.Globalization.CultureInfo.InvariantCulture)">
-                                            <div class="price-wrapper">
-                                                <span class="discounted-price">@discountedPrice.ToString("#,##0") đ</span>
-                                                @if (item.DiscountPercentage > 0)
-                                                {
-                                                    <small class="original-price">@item.Price.ToString("#,##0") đ</small>
-                                                }
+                                        <td class="price-column" data-price="@item.Price.ToString("G", System.Globalization.CultureInfo.InvariantCulture)"
+                                            data-discount="@item.DiscountPercentage.ToString("G", System.Globalization.CultureInfo.InvariantCulture)">
+                                            <span>@discountedPrice.ToString("#,##0") đ</span>
+                                            <div class="price">
+                                                <small>@item.Price.ToString("#,##0") đ</small>
                                             </div>
                                         </td>
                                         <td class="quantity-column">
-                                            <div class="quantity-control">
-                                                <div class="input-group">
+                                            <div class="d-flex quantity">
+                                                <div class="input-group mb-3">
                                                     <button class="btn btn-outline-secondary btn-minus" type="button">
                                                         <i class="bi bi-dash"></i>
                                                     </button>
@@ -91,10 +104,12 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="total-price" data-total="@((discountedPrice * item.Quantity).ToString("G", System.Globalization.CultureInfo.InvariantCulture))">
-                                            <strong>@((discountedPrice * item.Quantity).ToString("#,##0")) đ</strong>
+                                        <td class="price-column2" data-total="@((discountedPrice * item.Quantity).ToString("G", System.Globalization.CultureInfo.InvariantCulture))">
+                                            @((discountedPrice * item.Quantity).ToString("C"))
                                         </td>
-                                        <td class="action-column">
+
+
+                                        <td>
                                             <button class="btn btn-danger btn-sm delete-product">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -105,10 +120,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="5" class="text-center empty-cart">
-                                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-                                        <p>Giỏ hàng trống</p>
-                                    </td>
+                                    <td colspan="5" class="text-center">Giỏ hàng trống</td>
                                 </tr>
                             }
                         </tbody>
@@ -116,124 +128,125 @@
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-12">
+            <!-- Cart Summary Section -->
+
+            <div class="col-md-4 section_2">
                 <div class="cart-summary">
+
+                    <!-- Discount Section -->
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
-                        <h4><i class="fa-solid fa-tag"></i> Khuyến mãi</h4>
+                        <h4>Khuyến mãi</h4>
                         @if (ViewData["VoucherDiscount"] != null)
                         {
-                            <p id="voucher-discount" class="voucher-active">
-                                <i class="fa-solid fa-circle-check"></i> Giảm @ViewData["VoucherDiscount"]%
-                            </p>
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Giảm @ViewData["VoucherDiscount"]%</p>
                         }
                         else
                         {
-                            <p id="voucher-discount" class="voucher-inactive">
-                                <i class="fa-solid fa-circle-xmark"></i> Không có khuyến mãi
-                            </p>
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Không có khuyến mãi.</p>
                         }
-                        <a href="/VoucherClient/VoucherClient" class="apply-discount">
-                            <i class="fa-solid fa-ticket"></i> Chọn hoặc nhập khuyến mãi khác
-                        </a>
+                        <a href="@Url.Action("VoucherClient", "VoucherClient")" onclick="sessionStorage.setItem('ReturnUrl', 'cart')" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
                     </div>
 
                     <hr />
 
+                    <!-- Order Information -->
                     <h4>Thông tin đơn hàng</h4>
-                    <div class="order-details">
-                        <div class="order-row">
-                            <span>Thành tiền:</span>
-                            @if (ViewData["TotalAmount"] != null)
-                            {
-                                <span class="summary-amount">@ViewData["TotalAmount"]đ</span>
-                            }
-                            else
-                            {
-                                <span class="summary-amount">0đ</span>
-                            }
-                        </div>
+                    <p>
+                        Thành tiền:
+                        @if (ViewData["TotalAmount"] != null)
+                        {
+                            <span class="summary-amount">@ViewData["TotalAmount"]đ</span>
+                        }
+                        else
+                        {
+                            <span class="summary-amount">0đ</span>
+                        }
+                    </p>
 
-                        @{
-                            decimal totalAmount = 0;
-                            decimal voucherDiscount = 0;
+                    <!-- Tính khuyến mãi từ VoucherDiscount -->
+                    @{
+                        decimal totalAmount = 0;
+                        decimal voucherDiscount = 0;
 
-                            if (ViewData["TotalAmount"] != null)
-                            {
-                                totalAmount = (decimal)ViewData["TotalAmount"];
-                            }
-
-                            if (ViewData["VoucherDiscount"] != null)
-                            {
-                                voucherDiscount = decimal.Parse(ViewData["VoucherDiscount"].ToString());
-                            }
-
-                            decimal discountAmount = totalAmount * voucherDiscount / 100;
-                            decimal finalAmount = totalAmount - discountAmount;
+                        // Kiểm tra và lấy TotalAmount từ ViewData
+                        if (ViewData["TotalAmount"] != null)
+                        {
+                            totalAmount = (decimal)ViewData["TotalAmount"];
                         }
 
-                        <div class="order-row">
-                            <span>Khuyến mãi:</span>
-                            @if (discountAmount > 0)
-                            {
-                                <span class="summary-discount">-@discountAmount.ToString("#,##0")đ</span>
-                            }
-                            else
-                            {
-                                <span class="summary-discount">0đ</span>
-                            }
-                        </div>
+                        // Kiểm tra và lấy VoucherDiscount từ ViewData
+                        if (ViewData["VoucherDiscount"] != null)
+                        {
+                            voucherDiscount = decimal.Parse(ViewData["VoucherDiscount"].ToString());
 
-                        <hr />
+                        }
 
-                        <div class="order-row total-row">
-                            <span>Tổng tiền:</span>
-                            @if (finalAmount > 0)
-                            {
-                                <span class="summary-total">@finalAmount.ToString("#,##0")đ</span>
-                            }
-                            else
-                            {
-                                <span class="summary-total">0đ</span>
-                            }
-                        </div>
-                    </div>
+                        decimal discountAmount = totalAmount * voucherDiscount / 100;  // Khuyến mãi tính từ VoucherDiscount
+                    }
 
-                    <div class="btn-pay-wrapper">
-                        <form action="/Cart/Checkout" method="get">
-                            <button type="submit" class="btn btn-success btn-block btn-pay">
-                                <i class="fas fa-credit-card"></i> Thanh toán
-                            </button>
+                    <!-- Hiển thị phần trăm giảm giá -->
+                    <p>
+                        Khuyến mãi:
+                        @if (discountAmount > 0)
+                        {
+                            <span class="summary-discount">@discountAmount.ToString("C")</span>
+                        }
+                        else
+                        {
+                            <span class="summary-discount">0đ</span>
+                        }
+                    </p>
+
+                    <!-- Tính Tổng tiền sau khi áp dụng khuyến mãi -->
+                    @{
+                        decimal finalAmount = totalAmount - discountAmount;  // Tổng tiền sau khi áp dụng khuyến mãi
+                    }
+
+                    <p>
+                        Tổng tiền:
+                        @if (finalAmount > 0)
+                        {
+                            <span class="summary-total">@finalAmount.ToString("C")</span>
+                        }
+                        else
+                        {
+                            <span class="summary-total">0đ</span>
+                        }
+                    </p>
+
+                    <!-- Payment Button -->
+                    <div class="btn_pay mt-3">
+                        <form action="@Url.Action("Checkout", "Cart")" method="get">
+                            <button type="submit" class="btn btn-success btn-block btn-pay">Thanh toán</button>
                         </form>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-@section Scripts {
-    <script src="/js/AddCart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/js/quantityCart.js"></script>
     <script>
         $(document).ready(function () {
+
+            // ================== Chế độ Sửa / Hủy ==================
             $("#btn-edit").click(function () {
                 $("#btn-delete-selected").show();
                 $("#btn-cancel-edit").show();
                 $(this).hide();
-                $(".btn-pay").hide();
+                $(".btn-pay").hide(); // Ẩn nút thanh toán khi sửa
             });
 
             $("#btn-cancel-edit").click(function () {
                 $("#btn-delete-selected").hide();
                 $("#btn-cancel-edit").hide();
                 $("#btn-edit").show();
-                $(".btn-pay").show();
+                $(".btn-pay").show(); // Hiện lại nút thanh toán
                 $(".select-item").prop("checked", false);
                 $(".select-all").prop("checked", false);
             });
 
+            // ================== Checkbox hành vi chung ==================
             $(".select-all").change(function () {
                 $(".select-item").prop("checked", $(this).prop("checked"));
             });
@@ -244,6 +257,7 @@
                 }
             });
 
+            // ================== Xử lý Xóa sản phẩm đã chọn ==================
             $("#btn-delete-selected").click(function () {
                 var selectedIds = [];
                 $(".select-item:checked").each(function () {
@@ -267,10 +281,6 @@
                             });
                             alert("Đã xóa thành công!");
                             $("#cart-item-count").text($(".cart-item").length);
-
-                            if ($(".cart-item").length === 0) {
-                                location.reload();
-                            }
                         } else {
                             alert("Không thể xóa sản phẩm.");
                         }
@@ -278,12 +288,15 @@
                 });
             });
 
+            // ================== Kiểm tra chọn trước khi thanh toán ==================
             $(".btn-pay").click(function (e) {
                 if ($(".select-item:checked").length === 0) {
-                    e.preventDefault();
+                    e.preventDefault(); // Ngăn chuyển trang
                     alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
                 }
             });
         });
     </script>
-}
+
+</body>
+</html>

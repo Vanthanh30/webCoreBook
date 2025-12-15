@@ -80,7 +80,13 @@
         .then(data => {
             if (data.success) {
                 // Nếu yêu cầu thành công, chuyển hướng về trang giỏ hàng
-                window.location.href = '@Url.Action("Cart", "Cart")';
+                @*window.location.href = '@Url.Action("Cart", "Cart")';*@
+                const returnFlag = sessionStorage.getItem("ReturnUrl");
+                if (returnFlag === "cart") {
+                    window.location.href = '@Url.Action("Cart","Cart")';
+                } else if (returnFlag === "checkout") {
+                    window.location.href = '@Url.Action("Checkout","Cart")';
+                }
             } else {
                 // Hiển thị thông báo lỗi trong vùng thông báo
                 const errorMessage = document.getElementById('error-message');

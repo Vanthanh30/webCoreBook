@@ -153,7 +153,6 @@ namespace webCore.Controllers
             }
             // 2️⃣ LẤY USERID ĐỂ LOAD CART
             var userId = HttpContext.Session.GetString("UserId");
-
             // Lấy giỏ hàng của người dùng từ dịch vụ
             var cart = await _cartService.GetCartByUserIdAsync(userId);
 
@@ -205,13 +204,12 @@ namespace webCore.Controllers
             if (selectedProductIds == null || !selectedProductIds.Any())
             {
                 // Nếu không có sản phẩm nào được chọn, có thể ghi log hoặc trả về lỗi
+                HttpContext.Session.Remove("SelectedProductIds");
                 return Json(new { success = false, message = "No products selected" });
             }
 
-            // In ra danh sách các sản phẩm đã chọn (logging)
-            Console.WriteLine("Products selected: " + string.Join(", ", selectedProductIds));
-
             // Lưu danh sách sản phẩm đã chọn vào session
+            HttpContext.Session.SetString("CheckoutMode", "cart");
             HttpContext.Session.SetString("SelectedProductIds", JsonConvert.SerializeObject(selectedProductIds));
 
             // Trả về JSON xác nhận thành công
@@ -325,39 +323,53 @@ namespace webCore.Controllers
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
-            HttpContext.Session.Remove("CartItem");
-            // Kiểm tra trạng thái đăng nhập từ session
-            var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
-
-            // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
-            ViewBag.IsLoggedIn = isLoggedIn;
             var userToken = HttpContext.Session.GetString("UserToken");
             if (string.IsNullOrEmpty(userToken))
-            {
                 return RedirectToAction("Sign_in", "User");
-            }
+
             var userId = HttpContext.Session.GetString("UserId");
-            // Lấy giỏ hàng của người dùng từ dịch vụ
-            var cart = await _cartService.GetCartByUserIdAsync(userId);
 
-            if (cart == null || cart.Items == null || cart.Items.Count == 0)
+            var mode = HttpContext.Session.GetString("CheckoutMode");
+            List<CartItem> selectedItems = new List<CartItem>();
+            decimal totalAmount = 0;
+
+            if (mode == "cart")
             {
-                // Nếu giỏ hàng rỗng, trả về trang giỏ hàng
-                return RedirectToAction("Cart");
+                var cart = await _cartService.GetCartByUserIdAsync(userId);
+
+                if (cart == null || cart.Items == null || cart.Items.Count == 0)
+                    return RedirectToAction("Cart");
+
+                // Lấy danh sách ID đã chọn
+                var selectedProductIds = JsonConvert.DeserializeObject<List<string>>(
+                    HttpContext.Session.GetString("SelectedProductIds") ?? "[]"
+                );
+
+                selectedItems = cart.Items
+                    .Where(i => selectedProductIds.Contains(i.ProductId))
+                    .ToList();
+
+                totalAmount = selectedItems.Sum(i =>
+                    i.Price * (1 - i.DiscountPercentage / 100) * i.Quantity
+                );
             }
 
-            // Lấy thông tin voucher từ session
+            else if (mode == "buynow")
+            {
+                var json = HttpContext.Session.GetString("BuyNowItem");
+                if (json == null)
+                    return RedirectToAction("Cart");
+
+                var tempItem = JsonConvert.DeserializeObject<CartItem>(json);
+                selectedItems.Add(tempItem);
+
+                totalAmount =
+                    tempItem.Price *
+                    (1 - tempItem.DiscountPercentage / 100) *
+                    tempItem.Quantity;
+            }
+
             var voucherDiscount = HttpContext.Session.GetString("SelectedVoucher");
-
-            // Lấy danh sách các sản phẩm đã chọn từ session
-            var selectedProductIds = JsonConvert.DeserializeObject<List<string>>(HttpContext.Session.GetString("SelectedProductIds") ?? "[]");
-
-            // Lọc ra các sản phẩm đã chọn trong giỏ hàng để tính tổng tiền
-            var selectedItems = cart.Items.Where(item => selectedProductIds.Contains(item.ProductId)).ToList();
-
-            // Tính toán tổng tiền cho các sản phẩm đã chọn
-            decimal totalAmount = selectedItems.Sum(item => (item.Price * (1 - item.DiscountPercentage / 100)) * item.Quantity);
-            totalAmount = Math.Round(totalAmount, 2); // Làm tròn đến 2 chữ số sau dấu thập phân
             decimal discountAmount = 0;
 
             if (!string.IsNullOrEmpty(voucherDiscount))
@@ -367,14 +379,12 @@ namespace webCore.Controllers
             }
 
             decimal finalAmount = totalAmount - discountAmount;
+            HttpContext.Session.SetString("FinalAmount", finalAmount.ToString());
+            HttpContext.Session.SetString("TotalAmount", totalAmount.ToString());
+            HttpContext.Session.SetString("DiscountAmount", discountAmount.ToString());
 
-            // Cập nhật các giá trị cần hiển thị vào ViewData
-            ViewData["VoucherDiscount"] = voucherDiscount;  // Voucher giảm giá
-            ViewData["TotalAmount"] = totalAmount;           // Tổng tiền trước giảm giá
-            ViewData["FinalAmount"] = finalAmount;           // Tổng tiền sau giảm giá
-            ViewData["SelectedProductIds"] = selectedProductIds; // Danh sách các sản phẩm đã chọn
+            HttpContext.Session.SetString("CheckoutItems",JsonConvert.SerializeObject(selectedItems));
 
-            // Trả về view thanh toán và truyền thông tin vào view
             return View(new CheckoutViewModel
             {
                 Items = selectedItems,
@@ -384,12 +394,14 @@ namespace webCore.Controllers
                 VoucherDiscount = voucherDiscount
             });
         }
+
         [ServiceFilter(typeof(SetLoginStatusFilter))]
 
         [HttpGet]
         public async Task<IActionResult> BuyNow(string productId, int quantity)
         {
             HttpContext.Session.Remove("CartItem");
+
 
             // Kiểm tra trạng thái đăng nhập từ session
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
@@ -433,7 +445,6 @@ namespace webCore.Controllers
             ViewData["VoucherDiscount"] = voucherDiscount;  // Voucher giảm giá
             ViewData["TotalAmount"] = totalAmount;           // Tổng tiền trước giảm giá
             ViewData["FinalAmount"] = finalAmount;           // Tổng tiền sau giảm giá
-            string sellerId = product.SellerId;
             if (product.SellerId == userId)
                 return Json(new
                 {
@@ -441,31 +452,23 @@ namespace webCore.Controllers
                     message = "Bạn không thể thêm giỏ hàng sản phẩm của shop mình."
                 });
 
-            // Chuyển sản phẩm từ Product_admin sang CartItem
-            var cartItem = new CartItem
+            var tempItem = new CartItem
             {
                 ProductId = product.Id,
-                SellerId = sellerId,
-                Title = product.Title,
+                SellerId = product.SellerId,
+            Title = product.Title,
                 Price = product.Price,
                 DiscountPercentage = product.DiscountPercentage,
-                Quantity = quantity, // Giả sử mua 1 sản phẩm
-                Image = product.Image // Nếu có
+                Quantity = quantity,
+                Image = product.Image
             };
 
-            // Lưu thông tin vào session để chuyển sang trang thanh toán
-            HttpContext.Session.SetString("CartItem", JsonConvert.SerializeObject(cartItem));
+            // Lưu vào session
+            HttpContext.Session.SetString("CheckoutMode", "buynow");
+            HttpContext.Session.SetString("BuyNowItem", JsonConvert.SerializeObject(tempItem));
 
-            // Trả về view thanh toán và truyền thông tin vào view
-            return View("Checkout", new CheckoutViewModel
-            {
-                // Dùng List<CartItem> với 1 item duy nhất
-                Items = new List<CartItem> { cartItem },  // Danh sách CartItem với một sản phẩm được chọn
-                TotalAmount = totalAmount,
-                DiscountAmount = 0,  // Giảm giá (nếu có)
-                FinalAmount = finalAmount,
-                VoucherDiscount = voucherDiscount
-            });
+            // Chuyển sang checkout
+            return RedirectToAction("Checkout");
         }
 
     }

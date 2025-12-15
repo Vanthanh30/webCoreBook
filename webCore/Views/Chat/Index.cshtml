@@ -1,54 +1,76 @@
 ﻿@model Tuple<List<webCore.Models.Order>, List<webCore.Models.ChatMessage>>
+@using webCore.Controllers
 
 <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
-
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <input type="hidden" id="currentUserId" value="@ViewBag.CurrentUserId" />
-<input type="hidden" id="otherUserId" value="@ViewBag.OtherUserId" />
+<input type="hidden" id="selectedSellerId" value="@ViewBag.SelectedSellerId" />
+<input type="hidden" id="selectedBuyerId" value="@ViewBag.SelectedBuyerId" />
+<input type="hidden" id="isSeller" value="@ViewBag.IsSeller" />
 
 <div class="chat-container">
 
     <!-- ======================== SIDEBAR =========================== -->
     <div class="chat-sidebar">
         <div class="sidebar-header">
-            <h5>💬 Tin nhắn theo đơn hàng</h5>
+            <h5>💬 @(ViewBag.IsSeller ? "Người mua" : "Người bán")</h5>
 
             <div class="search-wrapper">
                 <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Tìm đơn hàng...">
+                <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm...">
             </div>
-
-            <select class="filter-select">
-                <option value="all">Tất cả</option>
-                <option value="unread">Có tin nhắn</option>
-            </select>
         </div>
 
-        <div class="chat-list">
-            @foreach (var order in Model.Item1)
+        <div class="chat-list" id="chatList">
+            @{
+                var conversationList = (List<ConversationDisplay>)ViewBag.ConversationList ?? new List<ConversationDisplay>();
+            }
+
+            @if (!conversationList.Any())
             {
-                var hasMsg = ViewBag.OrdersWithMessages != null &&
-                ((List<string>)ViewBag.OrdersWithMessages).Contains(order.Id.ToString());
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-chat-dots fs-1"></i>
+                    <p class="mt-2">Chưa có cuộc trò chuyện nào</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var conv in conversationList)
+                {
+                    var isActive = conv.OtherUserId == ViewBag.SelectedOtherUserId;
 
-                <a href="@Url.Action("Index", "Chat", new { orderId = order.Id })"
-                   class="chat-list-item @(order.Id.ToString() == (ViewBag.OrderId ?? "") ? "active" : "")">
-
-                    <div class="chat-avatar">
-                        <img src="/images/avatar-default.png" />
-                    </div>
-
-                    <div class="chat-info">
-                        <h6>@order.FullName</h6>
-                        <small>ID: @order.Id</small>
-                    </div>
-
-                    @if (hasMsg)
+                    // Convert to local time
+                    DateTime localTime;
+                    if (conv.LastMessageTime.Kind == DateTimeKind.Utc)
                     {
-                        <span class="badge bg-success">●</span>
+                        localTime = conv.LastMessageTime.ToLocalTime();
                     }
-                </a>
+                    else
+                    {
+                        localTime = DateTime.SpecifyKind(conv.LastMessageTime, DateTimeKind.Utc).ToLocalTime();
+                    }
+
+                    string chatUrl = ViewBag.IsSeller
+                        ? Url.Action("Index", "Chat", new { buyerId = conv.OtherUserId })
+                        : Url.Action("Index", "Chat", new { sellerId = conv.OtherUserId });
+
+                    <a href="@chatUrl" class="chat-list-item @(isActive ? "active" : "")" data-name="@conv.DisplayName">
+                        <img src="@conv.AvatarUrl" alt="Avatar" class="header-avatar">
+                        <div class="chat-info">
+                            <h6>@conv.DisplayName</h6>
+                            <small class="text-muted">
+                                @if (!string.IsNullOrEmpty(conv.LastMessage))
+                                {
+                                    @(conv.LastMessage.Length > 30 ? conv.LastMessage.Substring(0, 30) + "..." : conv.LastMessage)
+                                }
+                            </small>
+                        </div>
+                        <div class="chat-time">
+                            <small>@localTime.ToString("HH:mm")</small>
+                        </div>
+                    </a>
+                }
             }
         </div>
     </div>
@@ -60,45 +82,59 @@
         <div class="chat-header">
             <div class="d-flex align-items-center">
 
-                <img src="/images/avatar-default.png"
+                <img src="@ViewBag.OtherUserAvatar"
                      alt="Avatar"
                      class="header-avatar">
 
                 <div class="ms-3">
-                    <h6 class="mb-0">
-                        @(ViewBag.OrderId == null ? "Chọn đơn hàng để chat" : ViewBag.OtherUserId)
-                    </h6>
-
+                    <h6 class="mb-0">@ViewBag.OtherUserName</h6>
                     <small class="text-muted">
-                        @(ViewBag.OrderId == null ? "Chưa chọn" : "Online")
+                        @if (ViewBag.SelectedOtherUserId != null)
+                        {
+                            <text>Online</text>
+                        }
+                        else
+                        {
+                            <text>Chưa chọn</text>
+                        }
                     </small>
                 </div>
             </div>
+
         </div>
 
         <!-- MESSAGES -->
         <div class="chat-messages" id="chatMessages">
 
-            @if (ViewBag.OrderId == null)
+            @if (ViewBag.SelectedOtherUserId == null)
             {
                 <div class="text-center text-muted py-5">
                     <i class="bi bi-chat-dots fs-1"></i>
-                    <p class="mt-2">Chọn đơn hàng để bắt đầu trò chuyện</p>
+                    <p class="mt-2">Chọn @(ViewBag.IsSeller ? "người mua" : "người bán") để bắt đầu trò chuyện</p>
+                </div>
+            }
+            else if (!Model.Item2.Any())
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-chat-text fs-1"></i>
+                    <p class="mt-2">Chưa có tin nhắn. Hãy bắt đầu cuộc trò chuyện!</p>
                 </div>
             }
             else
             {
-                foreach (var msg in Model.Item2)
+                @foreach (var msg in Model.Item2)
                 {
+                    var localTime = msg.SentAt.ToLocalTime();
                     <div class="@(msg.SenderId == ViewBag.CurrentUserId ? "msg-me" : "msg-other")">
                         @msg.Message
+                        <div class="msg-time">@localTime.ToString("HH:mm")</div>
                     </div>
                 }
             }
         </div>
 
         <!-- INPUT -->
-        @if (ViewBag.OrderId != null)
+        @if (ViewBag.SelectedOtherUserId != null)
         {
             <div class="chat-input-area">
 
@@ -109,7 +145,8 @@
                     <input type="text"
                            class="form-control message-input"
                            id="messageInput"
-                           placeholder="Nhập tin nhắn...">
+                           placeholder="Nhập tin nhắn..."
+                           autocomplete="off">
 
                     <button class="btn btn-primary send-btn" id="sendBtn">
                         <i class="bi bi-send-fill"></i>
@@ -123,47 +160,98 @@
 
 <!-- ================== SIGNALR ================== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
-    const orderId = "@ViewBag.OrderId";
-    const currentUserId = "@ViewBag.CurrentUserId";
-    const otherUserId = "@ViewBag.OtherUserId";
+    const currentUserId = $("#currentUserId").val();
+    const selectedSellerId = $("#selectedSellerId").val();
+    const selectedBuyerId = $("#selectedBuyerId").val();
+    const isSeller = $("#isSeller").val() === "True";
 
-    if (orderId) {
+    // Auto scroll to bottom
+    function scrollToBottom() {
+        const chatMessages = $("#chatMessages");
+        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+    }
+
+    // Scroll to bottom on page load
+    $(document).ready(function () {
+        scrollToBottom();
+    });
+
+    // Search functionality
+    $("#searchInput").on("keyup", function () {
+        const value = $(this).val().toLowerCase();
+        $("#chatList .chat-list-item").filter(function () {
+            const name = $(this).data("name").toLowerCase();
+            $(this).toggle(name.indexOf(value) > -1);
+        });
+    });
+
+    if (selectedSellerId && selectedBuyerId) {
 
         const conn = new signalR.HubConnectionBuilder()
-            .withUrl("/chatHub?orderId=" + orderId)
+            .withUrl("/chatHub?sellerId=" + selectedSellerId + "&buyerId=" + selectedBuyerId)
             .build();
 
-        conn.on("ReceiveMessage", function (sender, message) {
+        conn.on("ReceiveMessage", function (senderId, message) {
+
+            const msgClass = senderId === currentUserId ? "msg-me" : "msg-other";
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
 
             $("#chatMessages").append(`
-                    <div class="${sender == currentUserId ? "msg-me" : "msg-other"}">
-                        ${message}
-                    </div>
-                `);
+                <div class="${msgClass}">
+                    ${message}
+                    <div class="msg-time">${timeStr}</div>
+                </div>
+            `);
 
-            $("#chatMessages").scrollTop($("#chatMessages")[0].scrollHeight);
+            scrollToBottom();
         });
 
-        conn.start();
+        conn.start().then(function () {
+            console.log("SignalR connected");
+        }).catch(function (err) {
+            console.error("SignalR connection error:", err);
+        });
 
-        $("#sendBtn").click(() => {
-
-            const msg = $("#messageInput").val();
+        // ======= Hàm chung gửi tin nhắn =======
+        function sendMessage() {
+            const msg = $("#messageInput").val().trim();
             if (!msg) return;
 
-            conn.invoke("SendMessage", orderId, currentUserId, msg);
+            // Gửi qua SignalR
+            conn.invoke("SendMessage", selectedSellerId, selectedBuyerId, currentUserId, msg)
+                .catch(function (err) {
+                    console.error("Error sending message via SignalR:", err);
+                });
 
+            // Lưu vào database
             $.post("/Chat/SendMessage", {
-                OrderId: orderId,
-                SenderId: currentUserId,
-                ReceiverId: otherUserId,
+                SellerId: selectedSellerId,
+                BuyerId: selectedBuyerId,
                 Message: msg
+            }).fail(function (err) {
+                console.error("Error saving message:", err);
+                alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
             });
 
             $("#messageInput").val("");
+        }
+
+        // === Click nút gửi ===
+        $("#sendBtn").click(function () {
+            sendMessage();
+        });
+
+        // === ENTER để gửi ===
+        $("#messageInput").on("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
     }
 

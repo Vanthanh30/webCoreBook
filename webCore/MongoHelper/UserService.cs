@@ -95,6 +95,31 @@ namespace webCore.MongoHelper
             var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
             return user;
         }
+        public async Task<User> GetUserByPhoneAsync(string phone)
+        {
+            var user = await _userCollection
+                .Find(u => u.Phone == phone)
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+        public async Task<bool> IsPhoneUsedAsync(string phone, string excludeUserId = null)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            // Tìm user trong DB theo số điện thoại
+            var user = await _userCollection
+                .Find(u => u.Phone == phone)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+                return false;
+
+            if (!string.IsNullOrEmpty(excludeUserId) && user.Id == excludeUserId)
+                return false;
+            return true;
+        }
 
         // Save user
         public async Task<bool> UpdatePasswordAsync(string email, string newPassword)

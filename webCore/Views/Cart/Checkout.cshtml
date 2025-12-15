@@ -119,25 +119,30 @@
             <div class="col-lg-4 col-md-12">
                 <div class="checkout-summary">
                     <!-- Voucher Section -->
-                    <div class="voucher-box">
-                        <h4><i class="fas fa-ticket-alt"></i> Khuyến mãi</h4>
-                        @if (ViewData["VoucherDiscount"] != null)
+@*                    @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
+                    {
+                        <div class="alert alert-info">
+                            <strong>Khuyến mãi:</strong> Giảm @Model.VoucherDiscount %
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <strong>Khuyến mãi:</strong> Không có khuyến mãi.
+                        </div>
+                    }*@
+                    <div class="discount-box">
+                        <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
+                        <h4>Khuyến mãi</h4>
+                        @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
                         {
-                            <div class="voucher-active">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Giảm @ViewData["VoucherDiscount"]%</span>
-                            </div>
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Giảm @Model.VoucherDiscount %</p>
                         }
                         else
                         {
-                            <div class="voucher-inactive">
-                                <i class="fas fa-times-circle"></i>
-                                <span>Chưa áp dụng khuyến mãi</span>
-                            </div>
+                            <p id="voucher-discount"><i class="fa-solid fa-tag"></i> Không có khuyến mãi.</p>
                         }
-                        <a href="/VoucherClient/VoucherClient" class="change-voucher">
-                            <i class="fas fa-edit"></i> Chọn hoặc nhập mã khác
-                        </a>
+                        <a href="@Url.Action("VoucherClient", "VoucherClient")" onclick="sessionStorage.setItem('ReturnUrl', 'checkout')" class="apply-discount">Chọn hoặc nhập khuyến mãi khác</a>
                     </div>
 
                     <hr class="summary-divider" />

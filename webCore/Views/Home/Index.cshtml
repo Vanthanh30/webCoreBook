@@ -54,6 +54,13 @@
             background: #1e90ff;
         }
     /* Xanh dương */
+    .price-select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
 </style>
 
 <div class="home-wrapper">
@@ -99,12 +106,17 @@
 
                     <!-- Lọc theo giá -->
                     <div class="filter-section filter-price-section">
-                        <div class="filter-title">Lọc theo giá</div>
-                        <div class="price-inputs">
-                            <input type="text" placeholder="--giá từ--" class="price-input" id="priceFrom">
-                            <input type="text" placeholder="--giá đến--" class="price-input" id="priceTo">
+                        <div class="filter-section filter-price-section">
+                            <div class="filter-title">Lọc theo giá</div>
+                            <select class="price-select" onchange="filterByPrice(this.value)">
+                                <option value="">-- Chọn mức giá --</option>
+                                <option value="0-50000">Dưới 50.000 đ</option>
+                                <option value="50000-100000">50.000 – 100.000 đ</option>
+                                <option value="100000-200000">100.000 – 200.000 đ</option>
+                                <option value="200000-500000">200.000 – 500.000 đ</option>
+                                <option value="500000-99999999">Trên 500.000 đ</option>
+                            </select>
                         </div>
-                        <button class="apply-filter-btn" onclick="applyPriceFilter()">ÁP DỤNG</button>
                     </div>
                 </div>
 
@@ -279,56 +291,49 @@
 <!-- SCRIPT -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
-    var currentCategoryId = "";
+    let currentCategoryId = "";
 
     function toggleSubCategories(parentId) {
         const sub = document.getElementById('sub_' + parentId);
         const checkbox = document.getElementById('cat_' + parentId);
-        if (sub) sub.classList.toggle('show', checkbox.checked);
-            subCategoryList.style.display = "none";
-            arrow.classList.remove("open");
+        if (sub && checkbox) {
+            sub.classList.toggle('show', checkbox.checked);
         }
+    }
+
+    function loadProductsByCategoryId(categoryId) {
         currentCategoryId = categoryId;
 
+        fetch(`/Home/GetProductsByCategoryId?categoryId=${categoryId}`)
             .then(r => r.text())
-            .then(html => document.querySelector('.product-list').innerHTML = html)
+            .then(html => {
+                document.querySelector('.product-list').innerHTML = html;
+            })
             .catch(err => console.error(err));
     }
 
-    // SignalR real-time update
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/productHub")
-        .build();
+    function filterByPrice(value) {
+        if (!value) return;
 
-    connection.on("ReceiveProductUpdate", function () {
-        console.log("Sản phẩm vừa được cập nhật!");
-        if (currentCategoryId) {
-            loadProductsByCategoryId(currentCategoryId);
-        } else {
-            location.reload();
-        }
-    });
-            behavior: 'smooth'
-    connection.start().catch(err => console.error(err));
+        const [min, max] = value.split('-');
 
-    // Các hàm cuộn
+        fetch(`/Home/GetProductsByPrice?min=${min}&max=${max}`)
+            .then(r => r.text())
+            .then(html => {
+                document.querySelector('.product-list').innerHTML = html;
+            })
+            .catch(err => console.error(err));
+    }
+
     function scrollTabs(dir) {
         const el = document.querySelector('.category-tabs');
         el.scrollBy({ left: dir * 200, behavior: 'smooth' });
     }
-        subItems.forEach(item => {
+
     function slideProducts(btn, dir) {
         const slider = btn.parentElement.querySelector('.products-slider');
         slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
     }
-            });
-    function applyPriceFilter() {
-        const from = document.getElementById('priceFrom').value;
-        const to = document.getElementById('priceTo').value;
-        alert(`Lọc giá từ ${from} đến ${to}`);
-        // TODO: gọi AJAX lọc giá ở đây
-    }
-</script>            case "Gợi ý": return "Gợi ý";
-            default: return ""; // Trả về chuỗi rỗng thay vì "Không nổi bật"
-        }
-    } }
+</script>
+} 
+}
