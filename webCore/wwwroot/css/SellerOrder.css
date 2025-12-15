@@ -1,4 +1,4 @@
-﻿/* ===================== ORDER CARD ===================== */
+﻿/* wwwroot/css/SellerOrder.css */
 .order-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -14,7 +14,7 @@
     background-color: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     align-items: center;
 }
 
@@ -35,18 +35,18 @@
     margin-bottom: 16px;
 }
 
-    /* Fix size image */
+    /* CỐ ĐỊNH KÍCH THƯỚC ẢNH - QUAN TRỌNG */
     .product-item img {
         width: 80px;
         height: 80px;
         object-fit: cover;
         border-radius: 6px;
         margin-right: 16px;
-        flex-shrink: 0;
+        flex-shrink: 0; /* không bị co lại */
         border: 1px solid #eee;
     }
 
-/* Info */
+/* Khu vực thông tin sản phẩm */
 .product-info {
     flex: 1;
     display: flex;
@@ -74,7 +74,7 @@
     font-size: 14px;
 }
 
-/* Total */
+/* Tổng tiền */
 .order-total {
     text-align: right;
     padding: 14px 20px;
@@ -83,7 +83,7 @@
     font-size: 16px;
 }
 
-/* Actions bottom */
+/* Nút hành động luôn ở góc dưới bên phải */
 .order-actions {
     margin-top: auto;
     text-align: right;
@@ -92,13 +92,13 @@
     z-index: 10;
 }
 
-/* Badge */
+/* Badge trạng thái */
 .badge {
     font-size: 13px;
     padding: 4px 8px;
 }
 
-/* Responsive */
+/* Responsive cho mobile */
 @media (max-width: 576px) {
     .product-item img {
         width: 70px;
@@ -108,68 +108,4 @@
     .order-body {
         padding: 15px;
     }
-}
-
-/* ===================== TABS ===================== */
-#orderTabs .nav-link {
-    color: #1976D2;
-    border: 1px solid #dce3e8;
-    border-radius: 6px;
-    padding: 8px 20px;
-    margin-right: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-}
-
-    #orderTabs .nav-link:hover {
-        background: #E3F2FD;
-        border-color: #90CAF9;
-    }
-
-    #orderTabs .nav-link.active {
-        background: #1976D2;
-        color: white;
-        font-weight: 600;
-        border-color: #1976D2;
-    }
-
-    #orderTabs .nav-link .badge {
-        margin-left: 8px;
-        border-radius: 50px;
-        min-width: 22px;
-        font-size: 13px;
-    }
-
-/* Badge Colors */
-.badge-secondary {
-    background-color: #616161 !important;
-    color: #fff;
-}
-
-.badge-warning {
-    background-color: #FFA000 !important;
-    color: #fff;
-}
-
-.badge-info {
-    background-color: #0288D1 !important;
-    color: #fff;
-}
-
-.badge-primary {
-    background-color: #3949AB !important;
-    color: #fff;
-}
-
-.badge-success {
-    background-color: #43A047 !important;
-    color: #fff;
-}
-
-.badge-danger {
-    background-color: #E53935 !important;
-    color: #fff;
 }
