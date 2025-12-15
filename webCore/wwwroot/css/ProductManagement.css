@@ -1,6 +1,4 @@
-﻿
-
-.form-container {
+﻿.form-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 30px;
@@ -35,7 +33,7 @@
         box-sizing: border-box;
         font-size: 16px;
         transition: border-color 0.3s;
-        height: 45px; 
+        height: 45px;
     }
 
     .form-container select {
@@ -53,8 +51,9 @@
     .form-container textarea {
         resize: vertical;
         height: 200px;
-        padding: 12px; 
+        padding: 12px;
     }
+
     .form-container input[type="file"] {
         margin-bottom: 20px;
         height: auto;
@@ -147,7 +146,6 @@
             border-color: #dc3545;
             color: white;
         }
-
 
 .product-pricing-group {
     display: grid;
@@ -262,47 +260,67 @@ h1 {
         background-color: #f8f9fa;
     }
 
+/* CẢI THIỆN CỘT HÀNH ĐỘNG - CĂN GIỮA CÁC ICON */
 .actions-header,
 .actions-cell {
-    text-align: right;
+    text-align: center !important;
 }
 
 .button-group {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 }
 
 .icon-btn {
     background: none;
     border: none;
     color: #555;
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
-    margin-left: 5px;
-    transition: color 0.3s;
-    display: inline-block;
+    margin: 0;
+    padding: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
 }
 
     .icon-btn:hover {
-        color: #000;
+        background-color: #f8f9fa;
+        transform: scale(1.15);
+    }
+
+.review-btn {
+    color: #f39c12 !important;
+}
+
+    .review-btn:hover {
+        color: #e67e22 !important;
+        background-color: #fff3e0 !important;
     }
 
 .edit-btn {
-    color: #ffa500;
+    color: #ffa500 !important;
 }
+
+    .edit-btn:hover {
+        color: #ff8c00 !important;
+        background-color: #fff4e6 !important;
+    }
 
 .delete-btn {
-    color: #e74c3c;
+    color: #e74c3c !important;
 }
 
-.edit-btn:hover {
-    color: #ff8c00;
-}
-
-.delete-btn:hover {
-    color: #c0392b;
-}
+    .delete-btn:hover {
+        color: #c0392b !important;
+        background-color: #ffebee !important;
+    }
 
 .status-active, .status-hoạt động {
     color: #28a745;

@@ -2,7 +2,7 @@
     ViewData["Title"] = "Sản phẩm của tôi";
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
 }
-<link rel="stylesheet" href="/css/ProductManagement.css" />
+<link rel="stylesheet" href="~/css/ProductManagement.css" />
 
 <div class="container">
     <h1>Danh sách sản phẩm của tôi</h1>
@@ -134,19 +134,21 @@
                                     <span class="${statusBadgeClass}">${statusText}</span>
                                 </td>
                                 <td>${getFeaturedText(product.featured)}</td>
-                                <td class="actions-cell">
-                                    ${reviewButtonHtml}
-                                    <a class="icon-btn edit-btn"
-                                        title="Chỉnh sửa"
-                                        href="/SellerProduct/EditProduct?id=${product.id}">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button"
-                                            class="icon-btn delete-btn"
-                                            title="Xóa"
-                                            onclick="deleteProduct('${product.id}', '${product.title}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                   <td class="actions-cell">
+                                    <div class="button-group">
+                                        ${reviewButtonHtml}
+                                        <a class="icon-btn edit-btn"
+                                            title="Chỉnh sửa"
+                                            href="/SellerProduct/EditProduct?id=${product.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="icon-btn delete-btn"
+                                                title="Xóa"
+                                                onclick="deleteProduct('${product.id}', '${product.title}')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
