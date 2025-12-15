@@ -71,17 +71,19 @@
                                     var productId = item.ProductId.ToString();  // Chuyển ID sản phẩm thành string
 
                                     <tr class="cart-item" data-product-id="@productId">
-                                        <td class="d-flex">
-                                            <input type="checkbox" class="select-item edit-checkbox"
-                                                   data-price="@discountedPrice"
-                                                   data-quantity="@item.Quantity"
-                                                   data-id="@productId"
-                                                   @if (ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId)) { @: checked
-                                                   } />
+                                        <td>
+                                            <div class="d-flex">
+                                                <input type="checkbox" class="select-item edit-checkbox"
+                                                       data-price="@discountedPrice"
+                                                       data-quantity="@item.Quantity"
+                                                       data-id="@productId"
+                                                       @if (ViewData["SelectedProductIds"] != null && ((List<string>)ViewData["SelectedProductIds"]).Contains(productId)) { @: checked
+                                                       } />
 
-                                            <img src="@item.Image" alt="@item.Title" class="cart-image" />
-                                            <div class="cart-item-details">
-                                                <span>@item.Title</span>
+                                                <img src="@item.Image" alt="@item.Title" class="cart-image" />
+                                                <div class="cart-item-details">
+                                                    <span>@item.Title</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="price-column" data-price="@item.Price.ToString("G", System.Globalization.CultureInfo.InvariantCulture)"
