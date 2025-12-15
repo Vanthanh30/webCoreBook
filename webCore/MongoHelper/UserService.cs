@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using webCore.Helpers;
 using webCore.Models;
 using webCore.Services;
 
@@ -124,13 +125,19 @@ namespace webCore.MongoHelper
         // Save user
         public async Task<bool> UpdatePasswordAsync(string email, string newPassword)
         {
+            var user = await GetAccountByEmailAsync(email);
+            if (user == null) return false;
+
+            // 🔐 HASH PASSWORD TẠI ĐÂY
+            string hashedPassword = PasswordHasher.HashPassword(newPassword);
+
             var filter = Builders<User>.Filter.Eq(u => u.Email, email);
-            var update = Builders<User>.Update.Set(u => u.Password, newPassword);
+            var update = Builders<User>.Update.Set(u => u.Password, hashedPassword);
 
             var result = await _userCollection.UpdateOneAsync(filter, update);
-
             return result.ModifiedCount > 0;
         }
+
 
     }
 }
