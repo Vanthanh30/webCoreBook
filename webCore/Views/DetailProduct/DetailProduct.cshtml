@@ -38,10 +38,22 @@
     <div class="main-row">
         <!-- Ảnh sản phẩm -->
         <div class="left-col">
-            <img src="@(string.IsNullOrWhiteSpace(Model.Image) ? "/image/no-image.jpg" : Model.Image)"
-                 alt="@Model.Title"
-                 onerror="this.src='/image/no-image.jpg'" />
+            @if (!string.IsNullOrWhiteSpace(Model.Image))
+            {
+                <img src="@Model.Image"
+                     alt="@Model.Title"
+                     loading="lazy"
+                     decoding="async" />
+            }
+            else
+            {
+                <div class="no-image">
+                    <i class="bi bi-image"></i>
+                    <span>Chưa có hình ảnh</span>
+                </div>
+            }
         </div>
+
 
         <!-- Thông tin sản phẩm -->
         <div class="right-col">
@@ -117,27 +129,52 @@
             {
                 <div class="col-lg-3 col-md-4 col-6">
                     <div class="text-center border rounded p-3 shadow-sm h-100 d-flex flex-column">
-                        <img src="@(string.IsNullOrWhiteSpace(p.Image) ? "/image/no-image.jpg" : p.Image)"
-                             class="img-fluid rounded"
-                             style="height:180px; object-fit:contain;"
-                             alt="@p.Title">
-                        <h6 class="my-3 flex-grow-1" style="font-size:15px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+
+                        <!-- Ảnh / Placeholder -->
+                        <div class="product-img-box">
+                            @if (!string.IsNullOrWhiteSpace(p.Image))
+                            {
+                                <img src="@p.Image"
+                                     class="img-fluid rounded"
+                                     alt="@p.Title"
+                                     loading="lazy"
+                                     decoding="async" />
+                            }
+                            else
+                            {
+                                <div class="no-image-placeholder">
+                                    <i class="bi bi-image"></i>
+                                    <span>Chưa có hình</span>
+                                </div>
+                            }
+                        </div>
+
+                        <h6 class="my-3 flex-grow-1"
+                            style="font-size:15px; overflow:hidden; display:-webkit-box;
+                   -webkit-line-clamp:2; -webkit-box-orient:vertical;">
                             @p.Title
                         </h6>
+
                         <div class="mb-2">
                             <div style="color:#e74c3c; font-weight:700; font-size:18px;">
                                 @String.Format("{0:N0} đ", p.Price * (1m - p.DiscountPercentage / 100m))
                             </div>
                             @if (p.DiscountPercentage > 0)
                             {
-                                <del style="color:#aaa; font-size:14px;">@String.Format("{0:N0} đ", p.Price)</del>
+                                <del style="color:#aaa; font-size:14px;">
+                                    @String.Format("{0:N0} đ", p.Price)
+                                </del>
                                 <span style="color:#e74c3c;"> -@p.DiscountPercentage%</span>
                             }
                         </div>
+
                         <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = p.Id })"
-                           class="btn btn-primary btn-sm mt-auto">Xem chi tiết</a>
+                           class="btn btn-primary btn-sm mt-auto">
+                            Xem chi tiết
+                        </a>
                     </div>
                 </div>
+
             }
         }
         else

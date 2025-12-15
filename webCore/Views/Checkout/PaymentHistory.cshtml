@@ -62,13 +62,14 @@
         }
         @foreach (var s in statuses)
         {
-            <a href="?status=@Uri.EscapeDataString(s)"
-               class="btn btn-outline-secondary @(ViewBag.CurrentStatus == s ? "active" : "")">
+            <a href="#"
+               data-status="@s"
+               class="btn btn-outline-secondary">
                 @s
             </a>
+
         }
     </div>
-
     <!-- ===================== NỘI DUNG CHÍNH ===================== -->
     @if (!Model?.Any() ?? true)
     {
@@ -84,7 +85,7 @@
         <!-- Danh sách đơn hàng -->
         foreach (var order in Model)
         {
-            <div class="order-card border bg-white p-4 mb-4 shadow">
+            <div class="order-card border bg-white p-4 mb-4 shadow" data-status="@order.Status">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <strong>Mã đơn:</strong> #@order.Id<br>
@@ -97,13 +98,13 @@
                                                     order.Status.Contains("Đã giao") ? "bg-success" :
                                                     order.Status.Contains("Đã hủy") ? "bg-danger" :
                                                     order.Status.Contains("Trả hàng") ? "bg-secondary" : "bg-dark")">
-                @order.Status
-            </span>
-        </div>
+                        @order.Status
+                    </span>
+                </div>
 
                 <hr>
 
-        @foreach (var item in order.Items)
+                @foreach (var item in order.Items)
                 {
                     <div class="d-flex align-items-center mb-3">
                         <img src="@item.Image" class="rounded me-3" style="width:70px;height:70px;object-fit:cover;">
@@ -143,6 +144,8 @@
             </div>
         }
     }
+
+
 </div>
 
 <!-- Modal đánh giá (nếu bạn vẫn cần) -->
