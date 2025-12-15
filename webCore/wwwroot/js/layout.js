@@ -3,6 +3,9 @@ var dropdownInitialized = false;
 
 // Initialize dropdown functionality
 function initializeUserDropdown() {
+    if (dropdownInitialized) return;
+    dropdownInitialized = true;
+
     console.log("=== Initializing user dropdown ===");
 
     // Get all DOM elements
@@ -101,6 +104,10 @@ function initializeUserDropdown() {
             e.preventDefault();
             try {
                 const res = await fetch("/api/seller/check-shop");
+                if (!res.ok) {
+                    window.location.href = "/User/Sign_in";
+                    return;
+                }
                 const data = await res.json();
 
                 if (!data.success) {
@@ -119,7 +126,7 @@ function initializeUserDropdown() {
         });
     }
 
-    console.log("✅ User dropdown initialized successfully");
+    console.log("User dropdown initialized successfully");
     return true;
 }
 
@@ -137,15 +144,6 @@ if (document.readyState === 'loading') {
     // DOM already loaded
     init();
 }
-
-// Also try on window load as backup
-window.addEventListener('load', function () {
-    console.log("=== Window load event ===");
-    // Small delay to ensure everything is ready
-    setTimeout(function () {
-        initializeUserDropdown();
-    }, 100);
-});
 
 // Handle logout
 async function handleLogout(event) {
@@ -168,16 +166,31 @@ async function handleLogout(event) {
 // Update cart item count
 function updateCartCount() {
     const cartCountElement = document.getElementById('cart-item-1');
+    if (!cartCountElement) return;
 
-    if (cartCountElement) {
-        fetch('/api/cart/count')
-            .then(response => response.json())
-            .then(data => {
-                cartCountElement.textContent = data.count || 0;
-            })
-            .catch(error => {
-                console.error('Error fetching cart count:', error);
-                cartCountElement.textContent = 0;
-            });
-    }
+    fetch('/api/cart/count')
+        .then(async response => {
+            if (!response.ok) {
+                // API không tồn tại / chưa login
+                return { count: 0 };
+            }
+
+            const text = await response.text();
+            if (!text) {
+                return { count: 0 };
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                return { count: 0 };
+            }
+        })
+        .then(data => {
+            cartCountElement.textContent = data.count ?? 0;
+        })
+        .catch(err => {
+            console.warn('Cart count error:', err);
+            cartCountElement.textContent = 0;
+        });
 }

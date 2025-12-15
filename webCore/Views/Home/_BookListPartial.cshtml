@@ -18,7 +18,7 @@
             <div class="products-slider-wrapper">
                 <button class="slider-arrow left" onclick="slideProducts(this, -1)">‹</button>
 
-                <div class="products-slider">
+                <div class="products-slider d-flex overflow-hidden">
                     @foreach (var product in group.Value)
                     {
                         <div class="product-box">
@@ -35,7 +35,12 @@
                                     @if (product.DiscountPercentage > 0)
                                     {
                                         <div class="product-price-old">@string.Format("{0:N0} đ", product.Price)</div>
-                                        <div class="product-price-new">@string.Format("{0:N0} đ", product.Price * (1 - product.DiscountPercentage / 100))</div>
+                                        <div class="product-price-new">
+                                            @string.Format(
+                                            "{0:N0} đ",
+                                                        product.Price * (1m - (decimal)product.DiscountPercentage / 100m)
+                                                        )
+                                        </div>
                                     }
                                     else
                                     {
