@@ -303,10 +303,8 @@
             else {
                 const starFilter = parseInt(currentFilter);
                 filteredReviews = allReviews.filter(r => {
-                    const q = r.qualityRating ?? 0;
-                    const s = r.serviceRating ?? 0;
-                    const avg = (q + s) / 2;
-                    return Math.round(avg) === starFilter;
+                    const q = Number(r.qualityRating) || 0;
+                    return q === starFilter;
                 });
             }
 
@@ -328,11 +326,8 @@
 
         /* REVIEW HTML */
         function generateReviewHTML(review) {
-            const q = review.qualityRating ?? 0;
-            const s = review.serviceRating ?? 0;
-            const avg = Math.round((q + s) / 2);
-
-            const stars = generateStars(avg);
+            const q = Number(review.qualityRating) || 0;
+            const stars = generateStars(q);
             const date = formatDate(review.createdAt);
 
             const avatar = review.userAvatar
@@ -363,8 +358,7 @@
                             </div>
 
                             <div class="rating-labels">
-                                <div>Chất lượng: ${q}/5</div>
-                                <div>Dịch vụ: ${s}/5</div>
+                            <div>Chất lượng: ${q}/5</div>
                             </div>
 
                             <div class="review-comment">
@@ -397,7 +391,7 @@
                 : 0;
 
             $('#overallScore').text(avgScore);
-            $('#overallStars').html(generateStars(Math.round(avgScore)));
+            $('#overallStars').html(generateStars(Math.floor(avgScore)));
             $('#totalReviews').text(`${count} đánh giá`);
 
             // ===== BREAKDOWN =====
