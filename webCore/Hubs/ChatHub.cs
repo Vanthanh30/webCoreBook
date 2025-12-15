@@ -1,56 +1,52 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using webCore.MongoHelper;
 
 namespace webCore.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage(string sellerId, string buyerId, string senderId, string message)
-        {
-            // Tạo tên group dựa trên sellerId và buyerId
-            var groupName = GetGroupName(sellerId, buyerId);
+        private readonly IMessageService _messageService;
 
-            // Gửi tin nhắn cho tất cả members trong group
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", senderId, message);
+        public ChatHub(IMessageService messageService)
+        {
+            _messageService = messageService;
         }
 
-        public override async Task OnConnectedAsync()
+        private string? GetUserIdFromSession()
         {
-            var sellerId = Context.GetHttpContext().Request.Query["sellerId"];
-            var buyerId = Context.GetHttpContext().Request.Query["buyerId"];
-
-            if (!string.IsNullOrEmpty(sellerId) && !string.IsNullOrEmpty(buyerId))
-            {
-                var groupName = GetGroupName(sellerId, buyerId);
-                await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-
-                System.Console.WriteLine($"User connected to group: {groupName}");
-            }
-
-            await base.OnConnectedAsync();
+            return Context.GetHttpContext()?.Session.GetString("UserId");
         }
 
-        public override async Task OnDisconnectedAsync(System.Exception exception)
+        public async Task JoinConversation(string conversationId)
         {
-            var sellerId = Context.GetHttpContext().Request.Query["sellerId"];
-            var buyerId = Context.GetHttpContext().Request.Query["buyerId"];
+            var userId = GetUserIdFromSession();
+            if (string.IsNullOrEmpty(userId))
+                throw new HubException("Unauthenticated");
 
-            if (!string.IsNullOrEmpty(sellerId) && !string.IsNullOrEmpty(buyerId))
-            {
-                var groupName = GetGroupName(sellerId, buyerId);
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+            if (!await _messageService.CanAccessAsync(conversationId, userId))
+                throw new HubException("Access denied");
 
-                System.Console.WriteLine($"User disconnected from group: {groupName}");
-            }
-
-            await base.OnDisconnectedAsync(exception);
+            await Groups.AddToGroupAsync(Context.ConnectionId, conversationId);
         }
 
-        // Tạo tên group duy nhất cho mỗi cặp seller-buyer
-        // Sử dụng format cố định để đảm bảo tính nhất quán
-        private string GetGroupName(string sellerId, string buyerId)
+        public async Task SendMessage(string conversationId, string content)
         {
-            return $"chat_{sellerId}_{buyerId}";
+            var userId = GetUserIdFromSession();
+            if (string.IsNullOrEmpty(userId))
+                throw new HubException("Unauthenticated");
+
+            if (string.IsNullOrWhiteSpace(content))
+                return;
+
+            if (!await _messageService.CanAccessAsync(conversationId, userId))
+                throw new HubException("Access denied");
+
+            var msg = await _messageService.SaveTextAsync(conversationId, userId, content);
+
+            await Clients.Group(conversationId)
+                .SendAsync("ReceiveMessage", msg);
         }
     }
 }

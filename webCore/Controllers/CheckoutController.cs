@@ -23,11 +23,13 @@ namespace webCore.Controllers
         private readonly CloudinaryService _cloudinaryService;
         private readonly ILogger<CheckoutController> _logger;
         private readonly ShopService _shopService;
+        private readonly IConversationService _conversationService;
+        private readonly IMessageService _messageService;
 
         public CheckoutController(CartService cartService, OrderService orderService,
     VoucherClientService voucherClientService, CategoryProduct_adminService categoryProduct_AdminService,
     ReviewService reviewService, UserService userService, CloudinaryService cloudinaryService,
-    ILogger<CheckoutController> logger, ShopService shopService)
+    ILogger<CheckoutController> logger, ShopService shopService, IConversationService conversationService, IMessageService messageService)
         {
             _cartService = cartService;
             _orderService = orderService;
@@ -38,6 +40,8 @@ namespace webCore.Controllers
             _cloudinaryService = cloudinaryService;
             _logger = logger;
             _shopService = shopService;
+            _conversationService = conversationService;
+            _messageService = messageService;
         }
 
 
@@ -197,38 +201,51 @@ namespace webCore.Controllers
 
             return View(order);
         }
+        [HttpGet]
         public async Task<IActionResult> ContactSeller(string orderId)
         {
-            var userId = HttpContext.Session.GetString("UserId");
-
-            if (string.IsNullOrEmpty(userId))
-            {
+            var buyerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(buyerId))
                 return RedirectToAction("Sign_in", "User");
-            }
 
+            // 1️⃣ LẤY ORDER
             var order = await _orderService.GetOrderByIdAsync(orderId);
-
             if (order == null)
+                return NotFound("Order not found");
+
+            // 2️⃣ LẤY SELLER + SHOP
+            var firstItem = order.Items.FirstOrDefault();
+            if (firstItem == null)
+                return BadRequest("Order has no items");
+
+            var sellerId = firstItem.SellerId;
+
+            // Lấy shop theo sellerId (đúng DB bạn)
+            var shop = await _shopService.GetShopByUserIdAsync(sellerId);
+            if (shop == null)
+                return BadRequest("Shop not found");
+
+            var conversation = await _conversationService.GetOrCreateAsync(
+                buyerId: buyerId,
+                sellerId: sellerId,
+                shopId: shop.Id
+            );
+
+            // 6️⃣ Gửi system message gắn Order (Shopee-style)
+            await _messageService.SaveSystemAsync(
+                conversationId: conversation.Id,
+                content: $"📦 Trao đổi về đơn hàng #{order.Id}",
+                orderId: order.Id.ToString()   
+            );
+
+            // 5️⃣ REDIRECT SANG CHAT + AUTO OPEN
+            return RedirectToAction("Index", "Chat", new
             {
-                return NotFound("Không tìm thấy đơn hàng");
-            }
-
-            // Lấy SellerId từ item đầu tiên
-            string sellerId = order.Items.FirstOrDefault()?.SellerId;
-
-            if (string.IsNullOrEmpty(sellerId))
-            {
-                return BadRequest("Không tìm thấy thông tin người bán");
-            }
-
-            // ✅ LƯU ORDERID VÀO SESSION
-            HttpContext.Session.SetString("RelatedOrderId", orderId);
-
-            Console.WriteLine($"[ContactSeller] OrderId: {orderId}, SellerId: {sellerId}, BuyerId: {userId}");
-
-            // Redirect đến trang chat với sellerId
-            return RedirectToAction("Index", "Chat", new { sellerId = sellerId });
+                mode = "buyer",
+                conversationId = conversation.Id
+            });
         }
+
 
 
         public IActionResult ReturnReason()

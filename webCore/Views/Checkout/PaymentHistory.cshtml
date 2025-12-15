@@ -121,7 +121,7 @@
     <div class="d-flex flex-wrap status-filter justify-content-center">
         @{
             var statuses = new List<string> {
-        "Tất cả", "Chờ xác nhận", "Chờ vận chuyển", "Chờ giao hàng",
+        "Tất cả", "Chờ xác nhận", "Chờ giao hàng",
         "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền"
         };
             var currentStatus = ViewBag.CurrentStatus as string ?? "Tất cả";
@@ -151,8 +151,7 @@
             switch (order.Status)
             {
                 case "Chờ xác nhận": statusClass = "badge-warning"; break;
-                case "Chờ vận chuyển": statusClass = "badge-info"; break;
-                case "Chờ giao hàng": statusClass = "badge-primary"; break;
+                case "Đang giao": statusClass = "badge-primary"; break;
                 case "Đã giao": statusClass = "badge-success"; break;
                 case "Đã hủy": statusClass = "badge-danger"; break;
                 case "Trả hàng/Hoàn tiền": statusClass = "badge-dark"; break;
@@ -208,12 +207,8 @@
                                 Hủy đơn hàng
                             </a>
                         }
-                        else if (order.Status == "Chờ vận chuyển")
-                        {
-                            <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
-                               class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
-                        }
-                        else if (order.Status == "Chờ giao hàng")
+
+                        else if (order.Status == "Đang giao")
                         {
                             <a href="@Url.Action("ConfirmDelivery", "Checkout", new { orderId = order.Id })"
                                class="btn btn-sm btn-outline-success action-btn">Đã nhận hàng</a>

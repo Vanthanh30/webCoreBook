@@ -1,258 +1,311 @@
-﻿@model Tuple<List<webCore.Models.Order>, List<webCore.Models.ChatMessage>>
-@using webCore.Controllers
+﻿@{
+    Layout = "_Layout";
+    var mode = (string)ViewBag.Mode ?? "buyer";
+    var userId = (string)ViewBag.UserId ?? "";
+}
 
-<link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+    .chat-wrap {
+        display: flex;
+        gap: 16px;
+        height: calc(100vh - 140px);
+    }
 
-<input type="hidden" id="currentUserId" value="@ViewBag.CurrentUserId" />
-<input type="hidden" id="selectedSellerId" value="@ViewBag.SelectedSellerId" />
-<input type="hidden" id="selectedBuyerId" value="@ViewBag.SelectedBuyerId" />
-<input type="hidden" id="isSeller" value="@ViewBag.IsSeller" />
+    .chat-left {
+        width: 320px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: auto;
+    }
 
-<div class="chat-container">
+    .chat-right {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-    <!-- ======================== SIDEBAR =========================== -->
-    <div class="chat-sidebar">
-        <div class="sidebar-header">
-            <h5>💬 @(ViewBag.IsSeller ? "Người mua" : "Người bán")</h5>
+    .chat-header {
+        padding: 12px 14px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-            <div class="search-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm...">
+    .chat-list-item {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+    }
+
+        .chat-list-item:hover {
+            background: #fafafa;
+        }
+
+        .chat-list-item.active {
+            background: #f3f6ff;
+        }
+
+    .chat-title {
+        font-weight: 600;
+    }
+
+    .chat-sub {
+        color: #666;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .chat-box {
+        flex: 1;
+        padding: 14px;
+        overflow: auto;
+        background: #fafafa;
+    }
+
+    .msg-row {
+        margin: 8px 0;
+        display: flex;
+    }
+
+        .msg-row.me {
+            justify-content: flex-end;
+        }
+
+    .bubble {
+        max-width: 70%;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid #eee;
+    }
+
+    .msg-row.me .bubble {
+        background: #e8f0ff;
+        border-color: #d7e3ff;
+    }
+
+    .system {
+        width: 100%;
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+        padding: 12px;
+        border-top: 1px solid #eee;
+        background: #fff;
+    }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .chat-input button {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            background: #2563eb;
+            color: #fff;
+        }
+
+    .badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eee;
+    }
+</style>
+
+<div class="chat-wrap">
+    <div class="chat-left">
+        <div class="chat-header">
+            <div class="chat-title">
+                @(mode == "seller" ? "💬 Kênh người bán" : "💬 Chat của tôi")
             </div>
+            <div class="badge">Mode: @mode</div>
         </div>
 
-        <div class="chat-list" id="chatList">
-            @{
-                var conversationList = (List<ConversationDisplay>)ViewBag.ConversationList ?? new List<ConversationDisplay>();
-            }
-
-            @if (!conversationList.Any())
-            {
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-chat-dots fs-1"></i>
-                    <p class="mt-2">Chưa có cuộc trò chuyện nào</p>
-                </div>
-            }
-            else
-            {
-                @foreach (var conv in conversationList)
-                {
-                    var isActive = conv.OtherUserId == ViewBag.SelectedOtherUserId;
-
-                    // Convert to local time
-                    DateTime localTime;
-                    if (conv.LastMessageTime.Kind == DateTimeKind.Utc)
-                    {
-                        localTime = conv.LastMessageTime.ToLocalTime();
-                    }
-                    else
-                    {
-                        localTime = DateTime.SpecifyKind(conv.LastMessageTime, DateTimeKind.Utc).ToLocalTime();
-                    }
-
-                    string chatUrl = ViewBag.IsSeller
-                        ? Url.Action("Index", "Chat", new { buyerId = conv.OtherUserId })
-                        : Url.Action("Index", "Chat", new { sellerId = conv.OtherUserId });
-
-                    <a href="@chatUrl" class="chat-list-item @(isActive ? "active" : "")" data-name="@conv.DisplayName">
-                        <img src="@conv.AvatarUrl" alt="Avatar" class="header-avatar">
-                        <div class="chat-info">
-                            <h6>@conv.DisplayName</h6>
-                            <small class="text-muted">
-                                @if (!string.IsNullOrEmpty(conv.LastMessage))
-                                {
-                                    @(conv.LastMessage.Length > 30 ? conv.LastMessage.Substring(0, 30) + "..." : conv.LastMessage)
-                                }
-                            </small>
-                        </div>
-                        <div class="chat-time">
-                            <small>@localTime.ToString("HH:mm")</small>
-                        </div>
-                    </a>
-                }
-            }
-        </div>
+        <div id="conversationList"></div>
     </div>
 
-    <!-- ====================== MAIN CHAT AREA ===================== -->
-    <div class="chat-main">
-
-        <!-- HEADER -->
+    <div class="chat-right">
         <div class="chat-header">
-            <div class="d-flex align-items-center">
-
-                <img src="@ViewBag.OtherUserAvatar"
-                     alt="Avatar"
-                     class="header-avatar">
-
-                <div class="ms-3">
-                    <h6 class="mb-0">@ViewBag.OtherUserName</h6>
-                    <small class="text-muted">
-                        @if (ViewBag.SelectedOtherUserId != null)
-                        {
-                            <text>Online</text>
-                        }
-                        else
-                        {
-                            <text>Chưa chọn</text>
-                        }
-                    </small>
-                </div>
+            <div>
+                <div class="chat-title" id="chatWith">Chọn cuộc hội thoại</div>
+                <div class="chat-sub" id="chatMeta"></div>
             </div>
-
         </div>
 
-        <!-- MESSAGES -->
-        <div class="chat-messages" id="chatMessages">
-
-            @if (ViewBag.SelectedOtherUserId == null)
-            {
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-chat-dots fs-1"></i>
-                    <p class="mt-2">Chọn @(ViewBag.IsSeller ? "người mua" : "người bán") để bắt đầu trò chuyện</p>
-                </div>
-            }
-            else if (!Model.Item2.Any())
-            {
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-chat-text fs-1"></i>
-                    <p class="mt-2">Chưa có tin nhắn. Hãy bắt đầu cuộc trò chuyện!</p>
-                </div>
-            }
-            else
-            {
-                @foreach (var msg in Model.Item2)
-                {
-                    var localTime = msg.SentAt.ToLocalTime();
-                    <div class="@(msg.SenderId == ViewBag.CurrentUserId ? "msg-me" : "msg-other")">
-                        @msg.Message
-                        <div class="msg-time">@localTime.ToString("HH:mm")</div>
-                    </div>
-                }
-            }
+        <div class="chat-box" id="chatBox">
+            <div class="system">Chọn một cuộc hội thoại bên trái để xem tin nhắn</div>
         </div>
 
-        <!-- INPUT -->
-        @if (ViewBag.SelectedOtherUserId != null)
-        {
-            <div class="chat-input-area">
-
-                <div class="chat-input-wrapper">
-                    <button class="btn btn-light btn-sm"><i class="bi bi-emoji-smile"></i></button>
-                    <button class="btn btn-light btn-sm"><i class="bi bi-image"></i></button>
-
-                    <input type="text"
-                           class="form-control message-input"
-                           id="messageInput"
-                           placeholder="Nhập tin nhắn..."
-                           autocomplete="off">
-
-                    <button class="btn btn-primary send-btn" id="sendBtn">
-                        <i class="bi bi-send-fill"></i>
-                    </button>
-                </div>
-            </div>
-        }
+        <div class="chat-input">
+            <input id="messageInput" placeholder="Nhập tin nhắn..." disabled />
+            <button id="sendBtn" onclick="send()" disabled>Gửi</button>
+        </div>
     </div>
 </div>
 
+<input type="hidden" id="mode" value="@mode" />
+<input type="hidden" id="currentUserId" value="@userId" />
 
-<!-- ================== SIGNALR ================== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
 <script>
+    const mode = document.getElementById("mode").value;
+    const currentUserId = document.getElementById("currentUserId").value;
 
-    const currentUserId = $("#currentUserId").val();
-    const selectedSellerId = $("#selectedSellerId").val();
-    const selectedBuyerId = $("#selectedBuyerId").val();
-    const isSeller = $("#isSeller").val() === "True";
+    let activeConversationId = null;
+    let connection = null;
 
-    // Auto scroll to bottom
-    function scrollToBottom() {
-        const chatMessages = $("#chatMessages");
-        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+    function esc(s) {
+        return (s || "").replace(/[&<>"']/g, m => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+        }[m]));
     }
 
-    // Scroll to bottom on page load
-    $(document).ready(function () {
-        scrollToBottom();
-    });
+    function renderConversationItem(c) {
+        const displayName = (mode === "seller")
+            ? `Khách: ${c.buyerName}`
+            : `Shop: ${c.shopName}`;
 
-    // Search functionality
-    $("#searchInput").on("keyup", function () {
-        const value = $(this).val().toLowerCase();
-        $("#chatList .chat-list-item").filter(function () {
-            const name = $(this).data("name").toLowerCase();
-            $(this).toggle(name.indexOf(value) > -1);
+        const last = c.lastMessage || "(chưa có tin nhắn)";
+        const time = c.updatedAt
+            ? new Date(c.updatedAt).toLocaleString()
+            : "";
+
+        return `
+        <div class="chat-list-item" data-id="${c.id}" data-name="${esc(displayName)}"
+             onclick="openConversation('${c.id}', this)">
+            <div class="chat-title">${esc(displayName)}</div>
+            <div class="chat-sub">${esc(last)}</div>
+            <div class="chat-sub">${esc(time)}</div>
+        </div>
+    `;
+    }
+
+
+    function setActiveListItem(conversationId) {
+        document.querySelectorAll(".chat-list-item").forEach(el => {
+            el.classList.toggle("active", el.getAttribute("data-id") === conversationId);
         });
-    });
+    }
 
-    if (selectedSellerId && selectedBuyerId) {
+    async function loadConversations() {
+        const res = await fetch(`/api/chat/conversations?mode=${encodeURIComponent(mode)}`);
+        if (!res.ok) return;
 
-        const conn = new signalR.HubConnectionBuilder()
-            .withUrl("/chatHub?sellerId=" + selectedSellerId + "&buyerId=" + selectedBuyerId)
-            .build();
+        const list = await res.json();
+        const html = list.map(renderConversationItem).join("");
+        document.getElementById("conversationList").innerHTML = html || `<div class="system" style="padding:12px;">Chưa có cuộc hội thoại</div>`;
+    }
 
-        conn.on("ReceiveMessage", function (senderId, message) {
-
-            const msgClass = senderId === currentUserId ? "msg-me" : "msg-other";
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
-                now.getMinutes().toString().padStart(2, '0');
-
-            $("#chatMessages").append(`
-                <div class="${msgClass}">
-                    ${message}
-                    <div class="msg-time">${timeStr}</div>
-                </div>
-            `);
-
-            scrollToBottom();
-        });
-
-        conn.start().then(function () {
-            console.log("SignalR connected");
-        }).catch(function (err) {
-            console.error("SignalR connection error:", err);
-        });
-
-        // ======= Hàm chung gửi tin nhắn =======
-        function sendMessage() {
-            const msg = $("#messageInput").val().trim();
-            if (!msg) return;
-
-            // Gửi qua SignalR
-            conn.invoke("SendMessage", selectedSellerId, selectedBuyerId, currentUserId, msg)
-                .catch(function (err) {
-                    console.error("Error sending message via SignalR:", err);
-                });
-
-            // Lưu vào database
-            $.post("/Chat/SendMessage", {
-                SellerId: selectedSellerId,
-                BuyerId: selectedBuyerId,
-                Message: msg
-            }).fail(function (err) {
-                console.error("Error saving message:", err);
-                alert("Không thể gửi tin nhắn. Vui lòng thử lại.");
-            });
-
-            $("#messageInput").val("");
+    function renderMessage(msg) {
+        // system message
+        if (msg.messageType === "system") {
+            return `<div class="system">📌 ${esc(msg.content)}</div>`;
         }
 
-        // === Click nút gửi ===
-        $("#sendBtn").click(function () {
-            sendMessage();
-        });
-
-        // === ENTER để gửi ===
-        $("#messageInput").on("keydown", function (e) {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        const mine = msg.senderId === currentUserId;
+        return `
+            <div class="msg-row ${mine ? "me" : "other"}">
+                <div class="bubble">${esc(msg.content)}</div>
+            </div>
+        `;
     }
 
+    async function loadMessages(conversationId) {
+        const res = await fetch(`/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=100`);
+        if (!res.ok) return;
+
+        const list = await res.json();
+        document.getElementById("chatBox").innerHTML = list.map(renderMessage).join("") || `<div class="system">Chưa có tin nhắn</div>`;
+        scrollBottom();
+    }
+
+    function scrollBottom() {
+        const box = document.getElementById("chatBox");
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function ensureSignalR() {
+        if (connection) return;
+
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveMessage", msg => {
+            // chỉ append vào chat đang mở
+            if (msg.conversationId !== activeConversationId) return;
+
+            const box = document.getElementById("chatBox");
+            box.insertAdjacentHTML("beforeend", renderMessage(msg));
+            scrollBottom();
+        });
+
+        await connection.start();
+    }
+
+    async function openConversation(conversationId, el) {
+        activeConversationId = conversationId;
+        setActiveListItem(conversationId);
+
+        document.getElementById("messageInput").disabled = false;
+        document.getElementById("sendBtn").disabled = false;
+
+        const name = el?.getAttribute("data-name");
+        document.getElementById("chatWith").innerText = name;
+        document.getElementById("chatMeta").innerText = `ConversationId: ${conversationId}`;
+
+        await ensureSignalR();
+
+        // join group (validate quyền trong Hub)
+        await connection.invoke("JoinConversation", conversationId);
+
+        await loadMessages(conversationId);
+    }
+
+    async function send() {
+        if (!activeConversationId) return;
+
+        const input = document.getElementById("messageInput");
+        const text = (input.value || "").trim();
+        if (!text) return;
+
+        await connection.invoke("SendMessage", activeConversationId, text);
+        input.value = "";
+        input.focus();
+
+        // refresh sidebar preview (đơn giản)
+        loadConversations();
+    }
+
+    // init
+    loadConversations();
+    const urlParams = new URLSearchParams(window.location.search);
+    const convoFromUrl = urlParams.get("conversationId");
+    //đợi load danh sách chat
+    if (convoFromUrl) {
+        setTimeout(() => {
+            const el = document.querySelector(
+                `.chat-list-item[data-id="${convoFromUrl}"]`
+            );
+            if (el) {
+                openConversation(convoFromUrl, el);
+            }
+        }, 200);
+    }
 </script>

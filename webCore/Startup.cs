@@ -96,6 +96,8 @@ namespace webCore
             services.AddScoped<ShopService>();
             services.AddScoped<ReviewService>();
             services.AddScoped<SellerOrderService>();
+            services.AddScoped<IConversationService, ConversationService>();
+            services.AddScoped<IMessageService, MessageService>();
 
             services.AddScoped<ChatService>();
             // Add session management
