@@ -365,5 +365,43 @@ namespace webCore.Controllers
                 return RedirectToAction("PaymentHistory");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> CancelOrder(string orderId)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Sign_in", "User");
+            }
+
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+
+            if (order != null && order.UserId == userId && order.Status == "Chờ xác nhận")
+            {
+                order.Status = "Đã hủy";
+                await _orderService.SaveOrderAsync(order);
+
+                if (order.Items != null)
+                {
+                    foreach (var item in order.Items)
+                    {
+                        var product = await _categoryProductAdminService.GetProductByIdAsync(item.ProductId);
+                        if (product != null)
+                        {
+                            product.Stock += item.Quantity;
+                            await _categoryProductAdminService.UpdateProductAsync(product);
+                        }
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Đơn hàng đã được hủy thành công.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể hủy đơn hàng này (Đã được xử lý hoặc không tồn tại).";
+            }
+
+            return RedirectToAction("PaymentHistory");
+        }
     }
 }

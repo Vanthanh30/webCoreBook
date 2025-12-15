@@ -20,10 +20,18 @@ namespace webCore.MongoHelper
         // Lưu đơn hàng
         public async Task SaveOrderAsync(Order order)
         {
-            await _orders.InsertOneAsync(order);
+            if (order.Id == ObjectId.Empty)
+            {
+                await _orders.InsertOneAsync(order);
+            }
+            else
+            {
+                // Đã có ID -> Cập nhật (Replace)
+                var filter = Builders<Order>.Filter.Eq(x => x.Id, order.Id);
+                await _orders.ReplaceOneAsync(filter, order, new ReplaceOptions { IsUpsert = true });
+            }
         }
 
-        // Lấy tất cả đơn hàng của buyer
         public async Task<List<Order>> GetOrdersByUserIdAsync(string userId)
         {
             var filter = Builders<Order>.Filter.Eq(o => o.UserId, userId);
@@ -32,7 +40,6 @@ namespace webCore.MongoHelper
                                 .ToListAsync();
         }
 
-        // Lấy tất cả đơn hàng có item thuộc seller
         public async Task<List<Order>> GetOrdersBySellerIdAsync(string sellerId)
         {
             var filter = Builders<Order>.Filter.ElemMatch(o => o.Items, i => i.SellerId == sellerId);
@@ -41,20 +48,17 @@ namespace webCore.MongoHelper
                                 .ToListAsync();
         }
 
-        // Lấy đơn hàng theo ID
         public async Task<Order> GetOrderByIdAsync(string id)
         {
             var filter = Builders<Order>.Filter.Eq(o => o.Id, ObjectId.Parse(id));
             return await _orders.Find(filter).FirstOrDefaultAsync();
         }
 
-        // Tổng đơn hàng
         public async Task<int> GetTotalOrdersAsync()
         {
             return (int)await _orders.CountDocumentsAsync(Builders<Order>.Filter.Empty);
         }
 
-        // Tổng doanh thu
         public async Task<decimal> GetTotalRevenueAsync()
         {
             var orders = await _orders.Find(Builders<Order>.Filter.Empty).ToListAsync();
