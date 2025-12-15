@@ -222,5 +222,20 @@ namespace webCore.Controllers
 
             return Ok(breadcrumbs);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetProductsByPrice(decimal min, decimal max)
+        {
+            var products = await _productService.GetProductsByFinalPriceRangeAsync(min, max);
+
+            var groupedProducts = new Dictionary<string, List<Product_admin>>();
+
+            var featured = products.Where(p => p.DiscountPercentage > 0).ToList();
+            var normal = products.Where(p => p.DiscountPercentage == 0).ToList();
+
+            if (featured.Any()) groupedProducts.Add("Nổi bật", featured);
+            if (normal.Any()) groupedProducts.Add("Mới", normal);
+
+            return PartialView("_BookListPartial", groupedProducts.ToList());
+        }
     }
 }

@@ -38,20 +38,12 @@
     <div class="main-row">
         <!-- Ảnh sản phẩm -->
         <div class="left-col">
-            @if (!string.IsNullOrWhiteSpace(Model.Image))
-            {
-                <img src="@Model.Image"
+            <div class="product-image-wrapper">
+                <img src="@(string.IsNullOrWhiteSpace(Model.Image) ? "" : Model.Image)"
                      alt="@Model.Title"
-                     loading="lazy"
-                     decoding="async" />
-            }
-            else
-            {
-                <div class="no-image">
-                    <i class="bi bi-image"></i>
-                    <span>Chưa có hình ảnh</span>
-                </div>
-            }
+                     class="product-main-image" />
+                <div class="image-placeholder">Ảnh</div>
+            </div>
         </div>
 
 
@@ -59,7 +51,7 @@
         <div class="right-col">
             <h1 class="product-title">@Model.Title</h1>
 
-            <!-- GIÁ – SỬA LỖI decimal / double -->
+            <!-- GIÁ -->
             <div style="margin:25px 0;">
                 <span class="price-current">
                     @String.Format("{0:N0}", Model.Price * (1m - Model.DiscountPercentage / 100m)) đ
@@ -100,7 +92,7 @@
                 <input type="hidden" id="quantityInput" value="1" />
             </div>
 
-            <!-- Mô tả sản phẩm – BẢO VỆ NULL -->
+            <!-- Mô tả sản phẩm -->
             <div class="description">
                 <h6>Mô tả sản phẩm</h6>
                 @if (string.IsNullOrWhiteSpace(Model.Description))
@@ -116,6 +108,54 @@
     </div>
 </div>
 
+<!-- PHẦN ĐÁNH GIÁ SẢN PHẨM -->
+<div class="reviews-section">
+    <div class="reviews-header">
+        <h2 class="reviews-title">Đánh giá sản phẩm</h2>
+    </div>
+
+    <!-- Rating Summary -->
+    <div class="rating-summary">
+        <div class="overall-rating">
+            <div class="overall-score" id="overallScore">0</div>
+            <div class="overall-stars" id="overallStars"></div>
+            <div class="total-reviews" id="totalReviews">0 đánh giá</div>
+        </div>
+
+        <div class="rating-breakdown" id="ratingBreakdown"></div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">Tất cả</button>
+        <button class="filter-tab" data-filter="5">5 <i class="bi bi-star-fill"></i></button>
+        <button class="filter-tab" data-filter="4">4 <i class="bi bi-star-fill"></i></button>
+        <button class="filter-tab" data-filter="3">3 <i class="bi bi-star-fill"></i></button>
+        <button class="filter-tab" data-filter="2">2 <i class="bi bi-star-fill"></i></button>
+        <button class="filter-tab" data-filter="1">1 <i class="bi bi-star-fill"></i></button>
+        <button class="filter-tab" data-filter="media">Có hình ảnh/video</button>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="reviews-list" id="reviewsList">
+        <div class="loading">
+            <i class="bi bi-arrow-clockwise"></i>
+            <p>Đang tải đánh giá...</p>
+        </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more-container" id="loadMoreContainer" style="display:none;">
+        <button class="load-more-btn" id="loadMoreBtn">Xem thêm đánh giá</button>
+    </div>
+</div>
+
+<!-- Media Modal -->
+<div class="media-modal" id="mediaModal">
+    <span class="media-modal-close" onclick="closeMediaModal()">&times;</span>
+    <div class="media-modal-content" id="mediaModalContent"></div>
+</div>
+
 <!-- Sản phẩm tương tự -->
 <div class="container my-5">
     <h4 class="fw-bold mb-4">Sản phẩm tương tự</h4>
@@ -129,52 +169,29 @@
             {
                 <div class="col-lg-3 col-md-4 col-6">
                     <div class="text-center border rounded p-3 shadow-sm h-100 d-flex flex-column">
-
-                        <!-- Ảnh / Placeholder -->
-                        <div class="product-img-box">
-                            @if (!string.IsNullOrWhiteSpace(p.Image))
-                            {
-                                <img src="@p.Image"
-                                     class="img-fluid rounded"
-                                     alt="@p.Title"
-                                     loading="lazy"
-                                     decoding="async" />
-                            }
-                            else
-                            {
-                                <div class="no-image-placeholder">
-                                    <i class="bi bi-image"></i>
-                                    <span>Chưa có hình</span>
-                                </div>
-                            }
+                        <div class="similar-product-image">
+                            <img src="@(string.IsNullOrWhiteSpace(p.Image) ? "" : p.Image)"
+                                 class="similar-img"
+                                 alt="@p.Title">
+                            <div class="similar-image-placeholder">Ảnh</div>
                         </div>
-
-                        <h6 class="my-3 flex-grow-1"
-                            style="font-size:15px; overflow:hidden; display:-webkit-box;
-                   -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                        <h6 class="my-3 flex-grow-1" style="font-size:15px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
                             @p.Title
                         </h6>
-
                         <div class="mb-2">
                             <div style="color:#e74c3c; font-weight:700; font-size:18px;">
                                 @String.Format("{0:N0} đ", p.Price * (1m - p.DiscountPercentage / 100m))
                             </div>
                             @if (p.DiscountPercentage > 0)
                             {
-                                <del style="color:#aaa; font-size:14px;">
-                                    @String.Format("{0:N0} đ", p.Price)
-                                </del>
+                                <del style="color:#aaa; font-size:14px;">@String.Format("{0:N0} đ", p.Price)</del>
                                 <span style="color:#e74c3c;"> -@p.DiscountPercentage%</span>
                             }
                         </div>
-
                         <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = p.Id })"
-                           class="btn btn-primary btn-sm mt-auto">
-                            Xem chi tiết
-                        </a>
+                           class="btn btn-primary btn-sm mt-auto">Xem chi tiết</a>
                     </div>
                 </div>
-
             }
         }
         else
@@ -187,7 +204,8 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $('.btn-plus').click(function () {
+
+              $('.btn-plus').click(function () {
             let val = parseInt($('#quantitypr').val()) + 1;
             if (val > 100) val = 100;
             if (val > @Model.Stock) val = @Model.Stock;
@@ -229,5 +247,241 @@
                 location.href = `/Cart/BuyNow?productId=${pid}&quantity=${qty}`;
             });
         });
+        /* ....*/
+        const productId = '@Model.Id';
+
+        let allReviews = [];
+        let filteredReviews = [];
+        let currentFilter = 'all';
+        let displayedCount = 3;
+        const incrementCount = 3;
+
+        /* LOAD REVIEWS */
+        async function loadReviews() {
+            try {
+                const res = await fetch(`/api/reviews/product/${productId}`);
+                if (!res.ok) throw new Error('Không thể tải đánh giá');
+
+                allReviews = await res.json();
+
+                if (allReviews.length === 0) {
+                    $('#reviewsList').html(`
+                        <div class="empty-reviews">
+                            <i class="bi bi-chat-left-text"></i>
+                            <h3>Chưa có đánh giá</h3>
+                            <p>Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                        </div>
+                    `);
+                    $('#loadMoreContainer').hide();
+                    updateSummary();
+                    return;
+                }
+
+                displayReviews();
+                updateSummary();
+            } catch (err) {
+                $('#reviewsList').html(`
+                    <div class="empty-reviews">
+                        <h3>Lỗi tải đánh giá</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `);
+            }
+        }
+
+        /* DISPLAY REVIEWS */
+        function displayReviews() {
+            const container = $('#reviewsList');
+
+            // FILTER
+            if (currentFilter === 'all') {
+                filteredReviews = allReviews;
+            }
+            else if (currentFilter === 'media') {
+                filteredReviews = allReviews.filter(r => r.mediaUrls && r.mediaUrls.length > 0);
+            }
+            else {
+                const starFilter = parseInt(currentFilter);
+                filteredReviews = allReviews.filter(r => {
+                    const q = r.qualityRating ?? 0;
+                    const s = r.serviceRating ?? 0;
+                    const avg = (q + s) / 2;
+                    return Math.round(avg) === starFilter;
+                });
+            }
+
+            if (filteredReviews.length === 0) {
+                container.html(`
+                    <div class="empty-reviews">
+                        <h3>Không có đánh giá phù hợp</h3>
+                    </div>
+                `);
+                $('#loadMoreContainer').hide();
+                return;
+            }
+
+            const reviewsToShow = filteredReviews.slice(0, displayedCount);
+            container.html(reviewsToShow.map(generateReviewHTML).join(''));
+
+            $('#loadMoreContainer').toggle(filteredReviews.length > displayedCount);
+        }
+
+        /* REVIEW HTML */
+        function generateReviewHTML(review) {
+            const q = review.qualityRating ?? 0;
+            const s = review.serviceRating ?? 0;
+            const avg = Math.round((q + s) / 2);
+
+            const stars = generateStars(avg);
+            const date = formatDate(review.createdAt);
+
+            const avatar = review.userAvatar
+                ? `<img src="${review.userAvatar}">`
+                : `<i class="bi bi-person-fill"></i>`;
+
+            const media = review.mediaUrls && review.mediaUrls.length
+                ? `<div class="review-media">
+                    ${review.mediaUrls.map(url => `
+                        <div class="media-item" onclick="openMedia('${url}', ${url.endsWith('.mp4')})">
+                            ${url.endsWith('.mp4') ? `<video src="${url}"></video>` : `<img src="${url}">`}
+                        </div>
+                    `).join('')}
+                  </div>`
+                : '';
+
+            return `
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="user-avatar">${avatar}</div>
+
+                        <div class="review-info">
+                            <div class="user-name">${review.userName || 'Khách hàng'}</div>
+
+                            <div class="review-meta">
+                                <div class="review-stars">${stars}</div>
+                                <div class="review-date">${date}</div>
+                            </div>
+
+                            <div class="rating-labels">
+                                <div>Chất lượng: ${q}/5</div>
+                                <div>Dịch vụ: ${s}/5</div>
+                            </div>
+
+                            <div class="review-comment">
+                                ${review.comment || 'Không có nhận xét'}
+                            </div>
+                        </div>
+                    </div>
+                    ${media}
+                </div>
+            `;
+        }
+
+        /* SUMMARY */
+               function updateSummary() {
+            let totalStars = 0;
+            let count = 0;
+
+            // ===== TÍNH TỔNG & TRUNG BÌNH =====
+            allReviews.forEach(r => {
+                const rating = Number(r.qualityRating);
+
+                if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+                    totalStars += rating;
+                    count++;
+                }
+            });
+
+            const avgScore = count > 0
+                ? (totalStars / count).toFixed(1)
+                : 0;
+
+            $('#overallScore').text(avgScore);
+            $('#overallStars').html(generateStars(Math.round(avgScore)));
+            $('#totalReviews').text(`${count} đánh giá`);
+
+            // ===== BREAKDOWN =====
+            const ratingCounts = [0, 0, 0, 0, 0];
+
+            allReviews.forEach(r => {
+                const rating = Number(r.qualityRating);
+                if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+                    ratingCounts[rating - 1]++;
+                }
+            });
+
+            let html = '';
+            for (let i = 4; i >= 0; i--) {
+                const percent = count > 0
+                    ? Math.round((ratingCounts[i] / count) * 100)
+                    : 0;
+
+                html += `
+                    <div class="rating-bar-item">
+                        <div class="star-label">${i + 1} <i class="bi bi-star-fill"></i></div>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" style="width:${percent}%"></div>
+                        </div>
+                        <div class="rating-count">${ratingCounts[i]}</div>
+                    </div>
+                `;
+            }
+
+            $('#ratingBreakdown').html(html);
+        }
+
+        /* UTIL  */
+        function generateStars(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += i <= rating
+                    ? '<i class="bi bi-star-fill"></i>'
+                    : '<i class="bi bi-star"></i>';
+            }
+            return html;
+        }
+
+        function formatDate(d) {
+            const date = new Date(d);
+            if (isNaN(date)) return 'N/A';
+            return `${date.getDate().toString().padStart(2,'0')}/${(date.getMonth()+1).toString().padStart(2,'0')}/${date.getFullYear()}`;
+        }
+
+        /* EVENTS */
+        $('.filter-tab').click(function () {
+            $('.filter-tab').removeClass('active');
+            $(this).addClass('active');
+            currentFilter = $(this).data('filter');
+            displayedCount = 3;
+            displayReviews();
+        });
+
+        $('#loadMoreBtn').click(function () {
+            displayedCount += incrementCount;
+            displayReviews();
+        });
+
+        /* MEDIA MODAL */
+        function openMedia(url, isVideo) {
+            $('#mediaModalContent').html(
+                isVideo
+                    ? `<video src="${url}" controls autoplay></video>`
+                    : `<img src="${url}">`
+            );
+            $('#mediaModal').addClass('active');
+        }
+
+        function closeMediaModal() {
+            $('#mediaModal').removeClass('active');
+            $('#mediaModalContent').html('');
+        }
+
+        $('#mediaModal').click(e => e.target.id === 'mediaModal' && closeMediaModal());
+
+        /* INIT */
+        $(function () {
+            loadReviews();
+        });
     </script>
+}
 }

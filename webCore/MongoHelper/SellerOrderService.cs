@@ -75,8 +75,8 @@ namespace webCore.MongoHelper
             {
                 { "All", allOrders.Count },
                 { "Pending", allOrders.Count(x => x.Status == "Chờ xác nhận") },
-                { "Packing", allOrders.Count(x => x.Status == "Chờ vận chuyển") },
-                { "Shipping", allOrders.Count(x => x.Status == "Chờ giao hàng") },
+                { "Packing", allOrders.Count(x => x.Status == "Chờ lấy hàng") },
+                { "Shipping", allOrders.Count(x => x.Status == "Đang giao") },
                 { "Completed", allOrders.Count(x => x.Status == "Đã giao") },
                 { "Return", allOrders.Count(x => x.Status == "Đã hủy" || x.Status == "Trả hàng") }
             };
@@ -98,7 +98,7 @@ namespace webCore.MongoHelper
         // Xác nhận đơn hàng
         public async Task<bool> ConfirmOrderAsync(string orderId)
         {
-            return await UpdateOrderStatusAsync(orderId, "Chờ vận chuyển");
+            return await UpdateOrderStatusAsync(orderId, "Chờ lấy hàng");
         }
 
         // Xác nhận nhiều đơn hàng
@@ -113,9 +113,10 @@ namespace webCore.MongoHelper
             return count;
         }
 
+        // Đánh dấu đã chuẩn bị hàng (chuyển sang đang giao)
         public async Task<bool> ReadyToShipAsync(string orderId)
         {
-            return await UpdateOrderStatusAsync(orderId, "Chờ giao hàng");
+            return await UpdateOrderStatusAsync(orderId, "Đang giao");
         }
 
         // Đánh dấu đã giao hàng
@@ -170,9 +171,9 @@ namespace webCore.MongoHelper
             return new Dictionary<string, int>
     {
         { "Chờ xác nhận", orders.Count(o => o.Status == "Chờ xác nhận" || o.Status == "Pending") },
-        { "Chờ vận chuyển", orders.Count(o => o.Status == "Chờ vận chuyển" || o.Status == "Processing") },
-        { "Chờ giao hàng", orders.Count(o => o.Status == "Chờ giao hàng" || o.Status == "Shipping") },
-        { "Đã giao", orders.Count(o => o.Status == "Đã giao" || o.Status == "Completed") },
+        { "Chờ lấy hàng", orders.Count(o => o.Status == "Chờ lấy hàng" || o.Status == "Processing") },
+        { "Đang giao", orders.Count(o => o.Status == "Đang giao" || o.Status == "Shipping") },
+        { "Đã giao", orders.Count(o => o.Status == "Đã giao" || o.Status == "Completed" || o.Status == "Delivered") },
         { "Đã hủy", orders.Count(o => o.Status == "Đã hủy" || o.Status == "Cancelled") }
     };
         }
@@ -187,7 +188,7 @@ namespace webCore.MongoHelper
                 Builders<Order>.Filter.ElemMatch(o => o.Items,
                     item => productIds.Contains(item.ProductId)),
                 Builders<Order>.Filter.In(o => o.Status,
-                    new[] { "Đã giao", "Completed" })
+                    new[] { "Đã giao", "Completed", "Delivered" })
             );
 
             var completedOrders = await _orders.Find(filter).ToListAsync();

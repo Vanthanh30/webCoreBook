@@ -1,6 +1,5 @@
-﻿/* wwwroot/css/detail_product.css */
+﻿
 .product-wrapper {
-    max-width: 1260px;
     max-width: 1260px;
     margin: 20px auto;
     background: #fff;
@@ -9,6 +8,7 @@
     overflow: hidden;
 }
 
+/* Breadcrumb */
 .breadcrumb {
     padding: 16px 30px;
     background: #f8f9fa;
@@ -17,11 +17,13 @@
     border-bottom: 1px solid #eee;
 }
 
+/* Main row */
 .main-row {
     display: flex;
     padding: 40px 40px 50px;
 }
 
+/* Cột trái - Ảnh sản phẩm */
 .left-col {
     flex: 0 0 460px;
     height: 520px; 
@@ -31,11 +33,23 @@
     justify-content: center;
 }
 
-    .left-col img {
+/* Wrapper cho ảnh chính - THÊM MỚI */
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .product-image-wrapper img {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-        border-radius: 12px;
     }
 .product-img-box {
     height: 180px;
@@ -68,11 +82,30 @@
         margin-bottom: 6px;
     }
 
+.image-placeholder {
+    display: none;
+    color: #999;
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    user-select: none;
+}
+
+.product-image-wrapper.no-image .image-placeholder {
+    display: block;
+}
+
+.product-image-wrapper.no-image img {
+    display: none;
+}
+
+/* Cột phải - Thông tin */
 .right-col {
     flex: 1;
     padding-left: 50px;
 }
 
+/* Tiêu đề sản phẩm */
 .product-title {
     font-size: 30px;
     font-weight: 700;
@@ -81,6 +114,7 @@
     line-height: 1.3;
 }
 
+/* Giá */
 .price-current {
     font-size: 38px;
     font-weight: 700;
@@ -96,7 +130,6 @@
 
 .discount {
     background: #e74c3c;
-    background: #e74c3c;
     color: #fff;
     padding: 5px 12px;
     border-radius: 6px;
@@ -104,6 +137,7 @@
     font-weight: 600;
 }
 
+/* Số lượng */
 .quantity-row {
     display: flex;
     align-items: center;
@@ -132,7 +166,12 @@
         border: none;
         font-size: 18px;
         cursor: pointer;
+        transition: background 0.2s;
     }
+
+        .quantity-input button:hover {
+            background: #e9ecef;
+        }
 
     .quantity-input input {
         width: 50px;
@@ -145,6 +184,7 @@
         background: #fff;
     }
 
+/* Nút hành động */
 .buttons-row {
     display: flex;
     gap: 16px;
@@ -170,6 +210,7 @@
 
     .add_button:hover {
         background: #eef7ff;
+        transform: translateY(-2px);
     }
 
 .buy_button {
@@ -180,8 +221,10 @@
 
     .buy_button:hover {
         background: #2980b9;
+        transform: translateY(-2px);
     }
 
+/* Mô tả */
 .description {
     margin-top: 50px;
     line-height: 1.8;
@@ -195,6 +238,42 @@
         margin-bottom: 20px;
     }
 
+/* Ảnh sản phẩm tương tự - THÊM MỚI */
+.similar-product-image {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+    .similar-product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+.similar-image-placeholder {
+    display: none;
+    color: #999;
+    font-size: 18px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.similar-product-image.no-image .similar-image-placeholder {
+    display: block;
+}
+
+.similar-product-image.no-image img {
+    display: none;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
     .main-row {
@@ -207,11 +286,516 @@
         margin-bottom: 30px;
     }
 
+    .product-image-wrapper {
+        height: 400px;
+    }
+
     .right-col {
         padding-left: 0;
     }
 
     .buttons-row {
         flex-direction: column;
+    }
+
+    .product-title {
+        font-size: 24px;
+    }
+
+    .price-current {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-wrapper {
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .main-row {
+        padding: 20px;
+    }
+
+    .product-image-wrapper {
+        height: 300px;
+    }
+
+    .product-title {
+        font-size: 20px;
+    }
+
+    .price-current {
+        font-size: 28px;
+    }
+
+    .quantity-row {
+        flex-wrap: wrap;
+    }
+
+        .quantity-row > span {
+            margin-left: 0 !important;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+    .similar-product-image {
+        height: 150px;
+    }
+}
+/* Reviews Section */
+.reviews-section {
+    max-width: 1260px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    padding: 40px;
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.reviews-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #222;
+}
+
+/* Rating Summary */
+.rating-summary {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.overall-rating {
+    text-align: center;
+    padding-right: 40px;
+    border-right: 2px solid #dee2e6;
+    min-width: 180px;
+}
+
+.overall-score {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffa500;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.overall-stars {
+    font-size: 24px;
+    color: #ffa500;
+    margin-bottom: 8px;
+}
+
+.total-reviews {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Rating Breakdown */
+.rating-breakdown {
+    flex: 1;
+}
+
+.rating-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+    .rating-bar-item:last-child {
+        margin-bottom: 0;
+    }
+
+.star-label {
+    font-size: 14px;
+    color: #666;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating-bar {
+    flex: 1;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background: #ffa500;
+    transition: width 0.3s ease;
+}
+
+.rating-count {
+    font-size: 14px;
+    color: #666;
+    width: 40px;
+    text-align: right;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 10px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    color: #666;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .filter-tab:hover {
+        border-color: #3498db;
+        color: #3498db;
+    }
+
+    .filter-tab.active {
+        background: #3498db;
+        color: #fff;
+        border-color: #3498db;
+    }
+
+    .filter-tab i {
+        font-size: 13px;
+    }
+
+/* Review List */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-item {
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    transition: box-shadow 0.3s;
+}
+
+    .review-item:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .review-item.hidden {
+        display: none;
+    }
+
+.review-header {
+    display: flex;
+    align-items: flex-start; /* ÉP lên trên */
+}
+.rating-right {
+    margin-left: auto;
+    text-align: right;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #999;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.review-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 15px;
+}
+
+.user-name {
+    margin-top: 0;
+    line-height: 1.2;
+    font-size: 16px;
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.review-stars {
+    display: flex;
+    gap: 2px;
+    color: #ffa500;
+    font-size: 16px;
+}
+
+.review-date {
+    color: #999;
+    font-size: 13px;
+}
+
+.rating-labels {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.rating-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+    .rating-label i {
+        color: #ffa500;
+    }
+
+.review-comment {
+    margin: 15px 0;
+    line-height: 1.6;
+    color: #444;
+    font-size: 15px;
+}
+
+.review-media {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.media-item {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    background: #f0f0f0;
+}
+
+    .media-item img,
+    .media-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .media-item.video::after {
+        content: '\F4F4';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 32px;
+        color: white;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+/* Load More Button */
+.load-more-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.load-more-btn {
+    padding: 12px 40px;
+    background: #fff;
+    color: #3498db;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .load-more-btn:hover {
+        background: #3498db;
+        color: #fff;
+    }
+
+    .load-more-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+/* Empty State */
+.empty-reviews {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+    .empty-reviews i {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+
+    .empty-reviews h3 {
+        font-size: 20px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+    .loading i {
+        font-size: 32px;
+        animation: spin 1s linear infinite;
+    }
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.media-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+    .media-modal.active {
+        display: flex;
+    }
+
+.media-modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    position: relative;
+}
+
+    .media-modal-content img,
+    .media-modal-content video {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+    }
+
+.media-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    background: rgba(0,0,0,0.5);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+    .media-modal-close:hover {
+        background: rgba(0,0,0,0.8);
+    }
+
+@media (max-width: 768px) {
+    .reviews-section {
+        padding: 25px 20px;
+        margin: 20px 10px;
+    }
+
+    .reviews-title {
+        font-size: 24px;
+    }
+
+    .rating-summary {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .overall-rating {
+        padding-right: 0;
+        border-right: none;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .filter-tabs {
+        gap: 8px;
+    }
+
+    .filter-tab {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .review-item {
+        padding: 20px;
+    }
+
+    .media-item {
+        width: 100px;
+        height: 100px;
+    }
+
+    .overall-score {
+        font-size: 40px;
+    }
+
+    .overall-stars {
+        font-size: 20px;
     }
 }

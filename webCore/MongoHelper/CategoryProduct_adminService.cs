@@ -45,7 +45,7 @@ namespace webCore.Services
         //Product
         public async Task<List<Product_admin>> GetProduct()
         {
-            return await _ProductCollection.Find(p => p.Deleted == false).ToListAsync();
+            return await _ProductCollection.Find(_ => true).ToListAsync();
         }
         internal async Task SaveProductAsync(Product_admin book)
         {

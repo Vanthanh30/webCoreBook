@@ -141,5 +141,20 @@ namespace webCore.MongoHelper
 
             return product;
         }
+        public async Task<List<Product_admin>> GetProductsByFinalPriceRangeAsync(decimal min, decimal max)
+        {
+            var products = await _productCollection
+                .Find(p => p.Deleted == false && p.Status == "Hoạt động")
+                .ToListAsync();
+
+            return products.Where(p =>
+            {
+                decimal finalPrice = p.DiscountPercentage > 0
+                    ? p.Price * (1m - (decimal)p.DiscountPercentage / 100m)
+                    : p.Price;
+
+                return finalPrice >= min && finalPrice <= max;
+            }).ToList();
+        }
     }
 }
