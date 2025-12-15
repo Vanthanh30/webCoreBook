@@ -15,17 +15,18 @@ namespace webCore.Models
         public string OrderId { get; set; }
 
         [BsonRepresentation(BsonType.String)]
+        public string ShopId { get; set; }
+
+        [BsonRepresentation(BsonType.String)]
         public string ProductId { get; set; }
 
         [BsonRepresentation(BsonType.String)]
         public string UserId { get; set; }
-        public string Name { get; set; } 
+        public string UserName { get; set; }
+        public string UserAvatar { get; set; }
 
         public string ProductTitle { get; set; }
         public string ProductImage { get; set; }
-
-        public string UserName { get; set; } 
-        public string UserAvatar { get; set; }
 
         public int QualityRating { get; set; } 
         public int ServiceRating { get; set; } 
