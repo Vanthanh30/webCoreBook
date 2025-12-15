@@ -168,29 +168,13 @@ function updateCartCount() {
     const cartCountElement = document.getElementById('cart-item-1');
     if (!cartCountElement) return;
 
-    fetch('/api/cart/count')
-        .then(async response => {
-            if (!response.ok) {
-                // API không tồn tại / chưa login
-                return { count: 0 };
-            }
-
-            const text = await response.text();
-            if (!text) {
-                return { count: 0 };
-            }
-
-            try {
-                return JSON.parse(text);
-            } catch {
-                return { count: 0 };
-            }
-        })
+    fetch('/Cart/GetCartItemCount')
+        .then(res => res.ok ? res.json() : { itemCount: 0 })
         .then(data => {
-            cartCountElement.textContent = data.count ?? 0;
+            cartCountElement.textContent = data.itemCount ?? 0;
         })
-        .catch(err => {
-            console.warn('Cart count error:', err);
+        .catch(() => {
             cartCountElement.textContent = 0;
         });
+
 }
