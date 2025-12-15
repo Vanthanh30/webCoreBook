@@ -105,7 +105,7 @@
                                             </div>
                                         </td>
                                         <td class="price-column2" data-total="@((discountedPrice * item.Quantity).ToString("G", System.Globalization.CultureInfo.InvariantCulture))">
-                                            @((discountedPrice * item.Quantity).ToString("C"))
+                                            @Math.Round(discountedPrice * item.Quantity).ToString("#,##0") đ
                                         </td>
 
 
@@ -132,7 +132,6 @@
 
             <div class="col-md-4 section_2">
                 <div class="cart-summary">
-
                     <!-- Discount Section -->
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
@@ -152,19 +151,7 @@
 
                     <!-- Order Information -->
                     <h4>Thông tin đơn hàng</h4>
-                    <p>
-                        Thành tiền:
-                        @if (ViewData["TotalAmount"] != null)
-                        {
-                            <span class="summary-amount">@ViewData["TotalAmount"]đ</span>
-                        }
-                        else
-                        {
-                            <span class="summary-amount">0đ</span>
-                        }
-                    </p>
 
-                    <!-- Tính khuyến mãi từ VoucherDiscount -->
                     @{
                         decimal totalAmount = 0;
                         decimal voucherDiscount = 0;
@@ -179,40 +166,31 @@
                         if (ViewData["VoucherDiscount"] != null)
                         {
                             voucherDiscount = decimal.Parse(ViewData["VoucherDiscount"].ToString());
-
                         }
 
-                        decimal discountAmount = totalAmount * voucherDiscount / 100;  // Khuyến mãi tính từ VoucherDiscount
+                        decimal discountAmount = totalAmount * voucherDiscount / 100;
+                        decimal finalAmount = totalAmount - discountAmount;
                     }
 
-                    <!-- Hiển thị phần trăm giảm giá -->
                     <p>
-                        Khuyến mãi:
-                        @if (discountAmount > 0)
-                        {
-                            <span class="summary-discount">@discountAmount.ToString("C")</span>
-                        }
-                        else
-                        {
-                            <span class="summary-discount">0đ</span>
-                        }
+                        Thành tiền:
+                        <span class="summary-amount">
+                            @Math.Round(totalAmount).ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) đ
+                        </span>
                     </p>
 
-                    <!-- Tính Tổng tiền sau khi áp dụng khuyến mãi -->
-                    @{
-                        decimal finalAmount = totalAmount - discountAmount;  // Tổng tiền sau khi áp dụng khuyến mãi
-                    }
+                    <p>
+                        Khuyến mãi:
+                        <span class="summary-discount">
+                            @Math.Round(discountAmount).ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) đ
+                        </span>
+                    </p>
 
                     <p>
                         Tổng tiền:
-                        @if (finalAmount > 0)
-                        {
-                            <span class="summary-total">@finalAmount.ToString("C")</span>
-                        }
-                        else
-                        {
-                            <span class="summary-total">0đ</span>
-                        }
+                        <span class="summary-total">
+                            @Math.Round(finalAmount).ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) đ
+                        </span>
                     </p>
 
                     <!-- Payment Button -->
@@ -221,7 +199,6 @@
                             <button type="submit" class="btn btn-success btn-block btn-pay">Thanh toán</button>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>

@@ -93,28 +93,6 @@
         vertical-align: middle;
     }
 
-/* Column Widths */
-.product-col {
-    width: 40%;
-}
-
-.price-col {
-    width: 15%;
-}
-
-.quantity-col {
-    width: 20%;
-}
-
-.total-col {
-    width: 15%;
-}
-
-.action-col {
-    width: 10%;
-    text-align: center;
-}
-
 /* Checkbox Styling */
 input[type="checkbox"] {
     width: 18px;
@@ -137,34 +115,45 @@ input[type="checkbox"] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.product-title {
-    font-size: 14px;
-    color: #212529;
-    font-weight: 500;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.cart-item-details {
+    flex: 1;
 }
 
-/* Price Column */
-.price-wrapper {
+    .cart-item-details span {
+        font-size: 14px;
+        color: #212529;
+        font-weight: 500;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+/* Price Display - ENHANCED */
+.price-display {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
-.discounted-price {
+.current-price {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: #dc3545;
 }
 
 .original-price {
     font-size: 13px;
-    color: #6c757d;
+    color: #999;
     text-decoration: line-through;
+}
+
+/* Item Total - ENHANCED */
+.item-total {
+    font-size: 17px;
+    font-weight: 700;
+    color: #212529;
 }
 
 /* Quantity Control */
@@ -205,12 +194,6 @@ input[type="checkbox"] {
             box-shadow: none;
             border-color: #dee2e6;
         }
-
-/* Total Price */
-.total-price strong {
-    font-size: 16px;
-    color: #212529;
-}
 
 /* Action Column */
 .delete-product {
@@ -255,118 +238,162 @@ input[type="checkbox"] {
         font-size: 18px;
         font-weight: 600;
         color: #212529;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
-/* Discount Box */
+/* Discount Box - ENHANCED */
 .discount-box {
     background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-    border: 1px solid #ffd4d4;
-    border-radius: 8px;
-    padding: 18px;
-    margin-bottom: 20px;
+    border: 2px solid #ffd4d4;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
 }
 
-    .discount-box h4 {
-        font-size: 16px;
+.discount-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+    .discount-header i {
+        font-size: 20px;
         color: #dc3545;
-        margin-bottom: 12px;
     }
+
+.discount-box h4 {
+    font-size: 16px;
+    color: #dc3545;
+    margin: 0;
+    font-weight: 700;
+}
 
 .voucher-active {
     color: #28a745;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
+    margin: 12px 0;
+    padding: 10px;
+    background: #d4edda;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+    .voucher-active i {
+        font-size: 16px;
+    }
 
 .voucher-inactive {
     color: #6c757d;
     font-size: 14px;
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .apply-discount {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: #0d6efd;
     text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-    margin-top: 10px;
+    font-weight: 600;
     transition: all 0.2s ease;
 }
 
     .apply-discount:hover {
         color: #0b5ed7;
         text-decoration: underline;
+        gap: 8px;
     }
 
-/* Order Details */
-.order-details {
-    margin-top: 15px;
-}
+    .apply-discount i {
+        font-size: 14px;
+    }
 
-.order-row {
+/* Order Summary Rows - ENHANCED */
+.order-summary-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 12px 0;
     font-size: 15px;
 }
 
-    .order-row span:first-child {
+    .order-summary-row .label {
         color: #6c757d;
+        font-weight: 500;
     }
 
-    .order-row span:last-child {
-        font-weight: 600;
+    .order-summary-row .value {
+        font-weight: 700;
         color: #212529;
+        font-size: 16px;
     }
 
-    .order-row hr {
-        margin: 15px 0;
-        border-top: 2px solid #e9ecef;
-    }
-
-.summary-discount {
+.discount-value {
     color: #dc3545 !important;
+}
+
+.summary-divider {
+    margin: 15px 0;
+    border: none;
+    border-top: 2px solid #e9ecef;
 }
 
 .total-row {
     padding-top: 15px;
-    font-size: 18px;
-    font-weight: bold;
+    padding-bottom: 5px;
 }
 
-.summary-total {
-    color: #dc3545 !important;
-    font-size: 22px !important;
-}
+    .total-row .label {
+        font-size: 17px;
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .total-row .value {
+        color: #dc3545 !important;
+        font-size: 24px !important;
+        font-weight: 800 !important;
+    }
 
 /* Payment Button */
-.btn-pay-wrapper {
+.btn_pay {
     margin-top: 25px;
 }
 
 .btn-pay {
     width: 100%;
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 700;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
     .btn-pay:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+        color: white;
     }
 
     .btn-pay i {
-        margin-right: 8px;
+        font-size: 18px;
     }
 
 /* Responsive Design */
@@ -397,7 +424,7 @@ input[type="checkbox"] {
         height: 60px;
     }
 
-    .product-title {
+    .cart-item-details span {
         font-size: 13px;
     }
 
@@ -423,7 +450,7 @@ input[type="checkbox"] {
             font-size: 13px;
         }
 
-    .summary-total {
+    .total-row .value {
         font-size: 20px !important;
     }
 }
@@ -433,11 +460,7 @@ input[type="checkbox"] {
         padding: 20px 0;
     }
 
-    .product-col {
-        width: 100%;
-    }
-
-    .cart-table thead th:not(.product-col) {
+    .cart-table thead th {
         font-size: 12px;
         padding: 10px 5px;
     }
@@ -445,5 +468,13 @@ input[type="checkbox"] {
     .cart-table tbody td {
         padding: 15px 5px;
         font-size: 13px;
+    }
+
+    .discount-box {
+        padding: 15px;
+    }
+
+    .cart-summary {
+        padding: 20px;
     }
 }
