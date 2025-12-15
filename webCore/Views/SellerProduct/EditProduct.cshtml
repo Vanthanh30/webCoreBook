@@ -80,8 +80,8 @@
                 <input type="number" id="Stock" name="Stock" required placeholder="0" min="0" />
             </div>
         </div>
-        <label>Trạng thái</label>
-        <div class="status">
+        <label id="statusLabel">Trạng thái</label>
+        <div class="status" id="statusContainer">
             <input type="radio" id="statusActive" name="Status" value="Hoạt động" />
             <label for="statusActive" class="active">Hoạt động</label>
 
@@ -148,12 +148,18 @@
             });
 
             const statusRadios = document.getElementsByName('Status');
+            const statusContainer = document.getElementById('statusContainer');
+            const statusLabel = document.getElementById('statusLabel');
             statusRadios.forEach(radio => {
                 if (radio.value === product.status) {
                     radio.checked = true;
                 }
             });
-
+            if (product.status === "Chờ duyệt") {
+                statusLabel.style.display = "none";
+                statusContainer.style.display = "none";
+               
+            }
             const categorySelect = document.getElementById('CategoryId');
             categorySelect.innerHTML = '<option value="">-- Chọn danh mục --</option>';
             categories.forEach(cat => {

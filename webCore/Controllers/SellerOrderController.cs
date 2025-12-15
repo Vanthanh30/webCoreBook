@@ -31,7 +31,6 @@ namespace webCore.Controllers
             var roles = HttpContext.Session.GetString("UserRoles");
             if (string.IsNullOrEmpty(roles))
                 return false;
-
             // UserRoles được lưu dạng "Buyer,Seller" hoặc "Seller"
             var roleList = roles.Split(',').Select(r => r.Trim()).ToList();
             return roleList.Contains("Seller");
