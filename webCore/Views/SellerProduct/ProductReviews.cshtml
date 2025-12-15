@@ -1,0 +1,319 @@
+﻿@model List<webCore.Models.Review>
+@{
+    ViewData["Title"] = "Đánh giá sản phẩm";
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
+
+    var product = ViewBag.Product as webCore.Models.Product_admin;
+
+    var starCounts = ViewBag.StarCounts as Dictionary<int, int>;
+    int currentFilter = ViewBag.CurrentRatingFilter ?? 0;
+
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+}
+
+<style>
+    .review-header {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .product-info {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+        .product-info img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+    .rating-overview {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .avg-score {
+        text-align: center;
+        color: #ee4d2d;
+    }
+
+        .avg-score .score {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .avg-score .stars {
+            font-size: 18px;
+        }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-filter {
+        border: 1px solid #ddd;
+        background: #fff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        color: #333;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .btn-filter:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .btn-filter.active {
+            border-color: #ee4d2d;
+            color: #ee4d2d;
+            background: #fff5f1;
+        }
+
+    .review-item {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+    }
+
+    .review-content {
+        margin-top: 10px;
+        color: #333;
+    }
+
+    .review-media {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .media-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin-top: 30px;
+    }
+
+    .page-item {
+        margin: 0 5px;
+    }
+
+    .page-link {
+        display: block;
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        text-decoration: none;
+        background: #fff;
+    }
+
+    .page-item.active .page-link {
+        background-color: #ee4d2d;
+        border-color: #ee4d2d;
+        color: #fff;
+    }
+
+    .page-item.disabled .page-link {
+        color: #ccc;
+        pointer-events: none;
+        background: #f8f9fa;
+    }
+
+    .user-profile {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-info-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .review-meta {
+        display: flex;
+        align-items: center;
+        margin-top: 2px;
+    }
+
+    .review-date {
+        font-size: 13px;
+        color: #888;
+        margin-left: 10px;
+        padding-left: 10px;
+        border-left: 1px solid #ddd;
+        line-height: 1;
+    }
+</style>
+
+<div class="container py-4">
+    <a href="@Url.Action("ProductManagement", "SellerProduct")" class="text-muted mb-3 d-inline-block">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+    </a>
+
+    <div class="review-header">
+        <div class="product-info">
+            @if (product != null)
+            {
+                <img src="@product.Image" alt="@product.Title" onerror="this.src='/images/no-image.png'">
+                <div>
+                    <h5 class="mb-1">@product.Title</h5>
+                    <span class="text-muted small">Danh mục: @product.CategoryTitle</span>
+                </div>
+            }
+        </div>
+
+        <div class="rating-overview">
+            <div class="avg-score">
+                <div class="score">@ViewBag.AverageRating<span style="font-size:18px">/5</span></div>
+                <div class="stars">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="fas fa-star @(i <= Math.Round((double)ViewBag.AverageRating) ? "text-warning" : "text-muted")"></i>
+                    }
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <a href="@Url.Action("ProductReviews", new { productId = product?.Id, rating = 0, page = 1 })"
+                   class="btn-filter @(currentFilter == 0 ? "active" : "")">
+                    Tất cả (@ViewBag.TotalReviews)
+                </a>
+                @for (int i = 5; i >= 1; i--)
+                {
+                    <a href="@Url.Action("ProductReviews", new { productId = product?.Id, rating = i, page = 1 })"
+                       class="btn-filter @(currentFilter == i ? "active" : "")">
+                        @i Sao (@(starCounts != null && starCounts.ContainsKey(i) ? starCounts[i] : 0))
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="review-item">
+                <div class="user-profile">
+                    <img src="@item.UserAvatar" class="avatar" onerror="this.src='https://res.cloudinary.com/demo/image/upload/d_avatar.png/non_existing_id.png'">
+
+                    <div class="user-info-col">
+                        <div style="font-weight:600; font-size: 14px;">@item.UserName</div>
+
+                        <div class="review-meta">
+                            <div class="text-warning" style="font-size:12px">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= item.QualityRating)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-star text-muted"></i>
+                                    }
+                                }
+                            </div>
+
+                            <div class="review-date">
+                                @item.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-content">
+                    @item.Comment
+                </div>
+
+                @if (item.MediaUrls != null && item.MediaUrls.Any())
+                {
+                    <div class="review-media">
+                        @foreach (var media in item.MediaUrls)
+                        {
+                            if (media.EndsWith(".mp4") || media.EndsWith(".webm"))
+                            {
+                                <video src="@media" class="media-thumb" controls></video>
+                            }
+                            else
+                            {
+                                <img src="@media" class="media-thumb" onclick="window.open(this.src)">
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (totalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = currentPage - 1 })">
+                            &laquo;
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = i })">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = currentPage + 1 })">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="far fa-comment-dots fa-3x mb-3"></i>
+            <p>Chưa có đánh giá nào cho bộ lọc này.</p>
+        </div>
+    }
+</div>

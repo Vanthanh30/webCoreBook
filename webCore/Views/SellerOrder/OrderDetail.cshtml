@@ -1,6 +1,35 @@
-﻿@{
+﻿@model webCore.Models.Order
+@{
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
     ViewData["Title"] = "Chi tiết đơn hàng";
+
+    string statusBadgeClass = "bg-secondary";
+    string statusIcon = "fa-clipboard-list";
+    string statusText = Model.Status;
+
+    switch (Model.Status)
+    {
+        case "Chờ xác nhận":
+            statusBadgeClass = "bg-warning text-dark";
+            statusIcon = "fa-clock";
+            break;
+        case "Đã xác nhận":
+            statusBadgeClass = "bg-info text-white";
+            statusIcon = "fa-box-open";
+            break;
+        case "Đang giao":
+            statusBadgeClass = "bg-primary text-white";
+            statusIcon = "fa-truck";
+            break;
+        case "Đã giao":
+            statusBadgeClass = "bg-success text-white";
+            statusIcon = "fa-check-circle";
+            break;
+        case "Đã hủy":
+            statusBadgeClass = "bg-danger text-white";
+            statusIcon = "fa-times-circle";
+            break;
+    }
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -9,34 +38,59 @@
 
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="border rounded p-3 bg-white shadow-sm">
+            <div class="border rounded p-3 bg-white shadow-sm h-100">
                 <h6 class="mb-3 text-secondary">
                     <i class="fas fa-user me-2"></i>Thông tin khách hàng
                 </h6>
                 <table class="table table-sm table-borderless mb-0 text-muted small">
-                    <tr><td width="100">Mã đơn:</td><td class="fw-bold text-dark">FERDKG8JDVEJ</td></tr>
-                    <tr><td>Tên:</td><td class="text-dark">Nguyễn Thị Thảo</td></tr>
-                    <tr><td>SĐT:</td><td class="text-dark">0901 234 567</td></tr>
-                    <tr><td>Địa chỉ:</td><td class="text-dark">123A Đường G, P.5, Q.3, TP.HCM</td></tr>
-                    <tr><td>Ngày tạo:</td><td class="text-dark">05/03/2025 14:30</td></tr>
-                    <tr><td>Ngày giao:</td><td class="text-dark">06/03/2025</td></tr>
+                    <tr>
+                        <td width="120">Mã đơn:</td>
+                        <td class="fw-bold text-dark text-break">@Model.Id</td>
+                    </tr>
+                    <tr>
+                        <td>Tên:</td>
+                        <td class="text-dark">@Model.FullName</td>
+                    </tr>
+                    <tr>
+                        <td>SĐT:</td>
+                        <td class="text-dark">@Model.PhoneNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Địa chỉ:</td>
+                        <td class="text-dark">@Model.Address</td>
+                    </tr>
+                    <tr>
+                        <td>Ngày tạo:</td>
+                        <td class="text-dark">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
                 </table>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="border rounded p-3 bg-white shadow-sm">
-                <h6 class="mb-3 text-primary">
-                    <i class="fas fa-truck me-2"></i>Vận chuyển
+            <div class="border rounded p-3 bg-white shadow-sm h-100 d-flex flex-column justify-content-center align-items-center">
+                <h6 class="mb-3 text-primary w-100 text-start">
+                    <i class="fas fa-truck me-2"></i>Trạng thái đơn hàng
                 </h6>
 
                 <div class="text-center mb-3">
-                    <span class="badge bg-primary text-white px-3 py-2">
-                        <i class="fas fa-truck me-1"></i> Đang trên đường giao
+                    <span class="badge @statusBadgeClass px-3 py-2 fs-6">
+                        <i class="fas @statusIcon me-1"></i> @statusText
                     </span>
-                    <div class="text-muted small mt-1">Dự kiến: <strong class="text-dark">10/03/2025</strong></div>
-                </div>
 
+                    @if (Model.Status == "Đang giao")
+                    {
+                        <div class="text-muted small mt-2">Đang vận chuyển đến khách hàng</div>
+                    }
+                    else if (Model.Status == "Đã giao")
+                    {
+                        <div class="text-success small mt-2">Đơn hàng đã hoàn tất</div>
+                    }
+                    else if (Model.Status == "Đã hủy")
+                    {
+                        <div class="text-danger small mt-2">Đơn hàng đã bị hủy</div>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -46,41 +100,57 @@
             <h5 class="mb-0">
                 <i class="fas fa-shopping-bag text-primary me-2"></i>Chi tiết sản phẩm
             </h5>
-            <span class="text-muted small">Tổng 2 sản phẩm</span>
+            <span class="text-muted small">Tổng @Model.Items.Count sản phẩm</span>
         </div>
 
         <div class="card-body p-0">
             <div style="max-height: calc(100vh - 500px); overflow-y: auto;">
                 <table class="table table-hover mb-0">
                     <tbody>
-                        <tr class="border-bottom">
-                            <td class="py-3 ps-4" width="90">
-                                <img src="/image/book_cover_placeholder.png" class="rounded" style="width:80px;height:80px;object-fit:cover;">
-                            </td>
-                            <td class="py-3 align-middle small">
-                                <div class="fw-bold text-dark">Take note - Ghi chép thông minh</div>
-                                <div class="text-muted">Phân loại: Bìa cứng, Xanh</div>
-                            </td>
-                            <td class="py-3 text-center align-middle text-muted small">×2</td>
-                            <td class="py-3 text-end align-middle pe-4">
-                                <strong class="text-danger">400.000đ</strong>
-                            </td>
-                        </tr>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                decimal discountRate = (decimal)(item.DiscountPercentage) / 100m;
+                                decimal discountedPrice = item.Price * (1 - discountRate);
+                                decimal lineTotal = discountedPrice * item.Quantity;
 
-                        <tr class="border-bottom">
-                            <td class="py-3 ps-4">
-                                <img src="/image/book_cover_placeholder.png" class="rounded" style="width:80px;height:80px;object-fit:cover;">
-                            </td>
-                            <td class="py-3 align-middle small">
-                                <div class="fw-bold text-dark">Atomic Habits (Tiếng Việt)</div>
-                                <div class="text-muted">Nhà xuất bản Kim Đồng</div>
-                            </td>
-                            <td class="py-3 text-center align-middle text-muted small">×1</td>
-                            <td class="py-3 text-end align-middle pe-4">
-                                <strong class="text-danger">135.000đ</strong>
-                            </td>
-                        </tr>
-
+                                <tr class="border-bottom">
+                                    <td class="py-3 ps-4" width="90">
+                                        <img src="@item.Image" class="rounded" style="width:80px;height:80px;object-fit:cover;">
+                                    </td>
+                                    <td class="py-3 align-middle small">
+                                        <div class="fw-bold text-dark">@item.Title</div>
+                                        @if (item.DiscountPercentage > 0)
+                                        {
+                                            <div class="text-danger small">Giảm @item.DiscountPercentage%</div>
+                                        }
+                                    </td>
+                                    <td class="py-3 text-center align-middle text-muted small">
+                                        ×@item.Quantity
+                                    </td>
+                                    <td class="py-3 text-end align-middle pe-4">
+                                        @if (item.DiscountPercentage > 0)
+                                        {
+                                            <div class="text-muted text-decoration-line-through small">
+                                                @((item.Price * item.Quantity).ToString("N0"))đ
+                                            </div>
+                                            <strong class="text-danger">@lineTotal.ToString("N0")đ</strong>
+                                        }
+                                        else
+                                        {
+                                            <strong class="text-danger">@lineTotal.ToString("N0")đ</strong>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">Không có sản phẩm nào</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -91,15 +161,16 @@
                         <div class="d-flex justify-content-end align-items-end">
                             <div class="text-end me-5">
                                 <div class="text-muted mb-1">Tổng tiền hàng:</div>
-                                <div class="text-muted mb-1">Phí vận chuyển:</div>
-                                <div class="text-muted mb-2">Giảm giá/Khuyến mãi:</div>
+                                <div class="text-muted mb-1">Phí vận chuyển:</div> <div class="text-muted mb-2">Giảm giá/Khuyến mãi:</div>
                                 <div class="h4 fw-bold text-danger mt-3">Tổng thanh toán:</div>
                             </div>
                             <div class="text-end">
-                                <div class="mb-1">535.000đ</div>
+                                <div class="mb-1">@Model.TotalAmount.ToString("N0")đ</div>
+
                                 <div class="text-success mb-1">Miễn phí</div>
-                                <div class="mb-2 text-success">-0đ</div>
-                                <div class="h3 fw-bold text-danger">535.000đ</div>
+
+                                <div class="mb-2 text-success">-@Model.DiscountAmount.ToString("N0")đ</div>
+                                <div class="h3 fw-bold text-danger">@Model.FinalAmount.ToString("N0")đ</div>
                             </div>
                         </div>
                     </div>
@@ -107,9 +178,36 @@
             </div>
         </div>
     </div>
+
     <div class="text-center">
-        <a href="@Url.Action("OrderManagement", "Seller")" class="btn btn-light border px-5">
+        <a href="@Url.Action("OrderManagement", "SellerOrder")" class="btn btn-light border px-5">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </a>
+
+        @if (Model.Status == "Chờ xác nhận")
+        {
+            <button onclick="confirmOrder('@Model.Id')" class="btn btn-primary px-5 ms-2">
+                <i class="fas fa-check"></i> Xác nhận đơn
+            </button>
+        }
     </div>
 </div>
+
+<script>
+    function confirmOrder(id) {
+        if(confirm('Bạn có chắc muốn xác nhận đơn hàng này?')) {
+            fetch('/SellerOrder/ConfirmOrder?orderId=' + id, {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    }
+</script>

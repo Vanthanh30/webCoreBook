@@ -2,7 +2,7 @@
     ViewData["Title"] = "Sản phẩm của tôi";
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
 }
-<link rel="stylesheet" href="/css/ProductManagement.css" />
+<link rel="stylesheet" href="~/css/ProductManagement.css" />
 
 <div class="container">
     <h1>Danh sách sản phẩm của tôi</h1>
@@ -102,8 +102,17 @@
                 const statusClass = isActive ? 'status-active' : 'status-inactive';
                 const statusText = isActive ? 'Hoạt động' : product.status;
                 const statusBadgeClass = isActive ? 'status-active' : 'status-inactive';
-
                 const finalPrice = product.price * (1 - product.discountPercentage / 100);
+                let reviewButtonHtml = '';
+                if (product.status === 'Hoạt động') {
+                    reviewButtonHtml = `
+                <a class="icon-btn review-btn"
+                   title="Xem đánh giá"
+                   href="/SellerProduct/ProductReviews?productId=${product.id}"
+                   style="color: #f39c12; margin-right: 5px;"> <i class="fas fa-star"></i>
+                </a>
+            `;
+                }
 
                 const row = `
                             <tr data-product-id="${product.id}">
@@ -111,8 +120,7 @@
                                 <td>
                                     <img src="${product.image || '/images/no-image.png'}"
                                         alt="${product.title}"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
-                                        onerror="this.src='/images/no-image.png'" />
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>
                                 </td>
                                 <td>${product.categoryTitle}</td>
                                 <td>
@@ -126,18 +134,21 @@
                                     <span class="${statusBadgeClass}">${statusText}</span>
                                 </td>
                                 <td>${getFeaturedText(product.featured)}</td>
-                                <td class="actions-cell">
-                                    <a class="icon-btn edit-btn"
-                                        title="Chỉnh sửa"
-                                        href="/SellerProduct/EditProduct?id=${product.id}">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button"
-                                            class="icon-btn delete-btn"
-                                            title="Xóa"
-                                            onclick="deleteProduct('${product.id}', '${product.title}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                   <td class="actions-cell">
+                                    <div class="button-group">
+                                        ${reviewButtonHtml}
+                                        <a class="icon-btn edit-btn"
+                                            title="Chỉnh sửa"
+                                            href="/SellerProduct/EditProduct?id=${product.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="icon-btn delete-btn"
+                                                title="Xóa"
+                                                onclick="deleteProduct('${product.id}', '${product.title}')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
