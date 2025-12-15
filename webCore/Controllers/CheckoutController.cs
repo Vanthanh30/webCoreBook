@@ -22,11 +22,12 @@ namespace webCore.Controllers
         private readonly UserService _userService;
         private readonly CloudinaryService _cloudinaryService;
         private readonly ILogger<CheckoutController> _logger;
+        private readonly ShopService _shopService;
 
         public CheckoutController(CartService cartService, OrderService orderService,
     VoucherClientService voucherClientService, CategoryProduct_adminService categoryProduct_AdminService,
     ReviewService reviewService, UserService userService, CloudinaryService cloudinaryService,
-    ILogger<CheckoutController> logger)
+    ILogger<CheckoutController> logger, ShopService shopService)
         {
             _cartService = cartService;
             _orderService = orderService;
@@ -36,6 +37,7 @@ namespace webCore.Controllers
             _userService = userService;
             _cloudinaryService = cloudinaryService;
             _logger = logger;
+            _shopService = shopService;
         }
 
 
@@ -400,11 +402,14 @@ namespace webCore.Controllers
 
                 // Get user info
                 var currentUser = await _userService.GetUserByIdAsync(userId);
+                var shop = await _shopService.GetShopByUserIdAsync(item.SellerId);
+                string shopId = shop?.Id;
 
                 // Create review
                 var review = new Review
                 {
                     OrderId = orderId,
+                    ShopId = shopId,
                     ProductId = productId,
                     UserId = userId,
                     UserName = currentUser?.Name ?? "Khách hàng",

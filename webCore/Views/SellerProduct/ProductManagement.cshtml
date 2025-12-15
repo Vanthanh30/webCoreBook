@@ -102,8 +102,17 @@
                 const statusClass = isActive ? 'status-active' : 'status-inactive';
                 const statusText = isActive ? 'Hoạt động' : product.status;
                 const statusBadgeClass = isActive ? 'status-active' : 'status-inactive';
-
                 const finalPrice = product.price * (1 - product.discountPercentage / 100);
+                let reviewButtonHtml = '';
+                if (product.status === 'Hoạt động') {
+                    reviewButtonHtml = `
+                <a class="icon-btn review-btn"
+                   title="Xem đánh giá"
+                   href="/SellerProduct/ProductReviews?productId=${product.id}"
+                   style="color: #f39c12; margin-right: 5px;"> <i class="fas fa-star"></i>
+                </a>
+            `;
+                }
 
                 const row = `
                             <tr data-product-id="${product.id}">
@@ -127,6 +136,7 @@
                                 </td>
                                 <td>${getFeaturedText(product.featured)}</td>
                                 <td class="actions-cell">
+                                    ${reviewButtonHtml}
                                     <a class="icon-btn edit-btn"
                                         title="Chỉnh sửa"
                                         href="/SellerProduct/EditProduct?id=${product.id}">
