@@ -109,11 +109,6 @@
         const sellerId = localStorage.getItem("SellerId") || "";
         formData.append("SellerId", sellerId);
 
-        const discountInput = document.getElementById("DiscountPercentage");
-        if (!discountInput.value || discountInput.value.trim() === "") {
-            formData.set("DiscountPercentage", "0");
-        }
-
         document.getElementById("errorAlert").style.display = "none";
         document.getElementById("successAlert").style.display = "none";
         document.getElementById("errorList").innerHTML = "";
