@@ -4,8 +4,12 @@
     Layout = "~/Views/Shared/_SellerLayout.cshtml";
 
     var product = ViewBag.Product as webCore.Models.Product_admin;
+
     var starCounts = ViewBag.StarCounts as Dictionary<int, int>;
-    int currentFilter = ViewBag.CurrentRatingFilter ?? 0; // 0 nghĩa là Tất cả
+    int currentFilter = ViewBag.CurrentRatingFilter ?? 0;
+
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
 }
 
 <style>
@@ -90,26 +94,6 @@
         border: 1px solid #eee;
     }
 
-    .user-profile {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .review-date {
-        font-size: 12px;
-        color: #888;
-        margin-left: auto;
-    }
-
     .review-content {
         margin-top: 10px;
         color: #333;
@@ -129,6 +113,74 @@
         cursor: pointer;
         border: 1px solid #ddd;
     }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin-top: 30px;
+    }
+
+    .page-item {
+        margin: 0 5px;
+    }
+
+    .page-link {
+        display: block;
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        text-decoration: none;
+        background: #fff;
+    }
+
+    .page-item.active .page-link {
+        background-color: #ee4d2d;
+        border-color: #ee4d2d;
+        color: #fff;
+    }
+
+    .page-item.disabled .page-link {
+        color: #ccc;
+        pointer-events: none;
+        background: #f8f9fa;
+    }
+
+    .user-profile {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-info-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .review-meta {
+        display: flex;
+        align-items: center;
+        margin-top: 2px;
+    }
+
+    .review-date {
+        font-size: 13px;
+        color: #888;
+        margin-left: 10px;
+        padding-left: 10px;
+        border-left: 1px solid #ddd;
+        line-height: 1;
+    }
 </style>
 
 <div class="container py-4">
@@ -138,11 +190,14 @@
 
     <div class="review-header">
         <div class="product-info">
-            <img src="@product.Image" alt="@product.Title" onerror="this.src='/images/no-image.png'">
-            <div>
-                <h5 class="mb-1">@product.Title</h5>
-                <span class="text-muted small">Danh mục: @product.CategoryTitle</span>
-            </div>
+            @if (product != null)
+            {
+                <img src="@product.Image" alt="@product.Title" onerror="this.src='/images/no-image.png'">
+                <div>
+                    <h5 class="mb-1">@product.Title</h5>
+                    <span class="text-muted small">Danh mục: @product.CategoryTitle</span>
+                </div>
+            }
         </div>
 
         <div class="rating-overview">
@@ -157,15 +212,15 @@
             </div>
 
             <div class="filter-buttons">
-                <a href="@Url.Action("ProductReviews", new { productId = product.Id })"
+                <a href="@Url.Action("ProductReviews", new { productId = product?.Id, rating = 0, page = 1 })"
                    class="btn-filter @(currentFilter == 0 ? "active" : "")">
                     Tất cả (@ViewBag.TotalReviews)
                 </a>
                 @for (int i = 5; i >= 1; i--)
                 {
-                    <a href="@Url.Action("ProductReviews", new { productId = product.Id, rating = i })"
+                    <a href="@Url.Action("ProductReviews", new { productId = product?.Id, rating = i, page = 1 })"
                        class="btn-filter @(currentFilter == i ? "active" : "")">
-                        @i Sao (@starCounts[i])
+                        @i Sao (@(starCounts != null && starCounts.ContainsKey(i) ? starCounts[i] : 0))
                     </a>
                 }
             </div>
@@ -179,16 +234,30 @@
             <div class="review-item">
                 <div class="user-profile">
                     <img src="@item.UserAvatar" class="avatar" onerror="this.src='https://res.cloudinary.com/demo/image/upload/d_avatar.png/non_existing_id.png'">
-                    <div>
-                        <div style="font-weight:600">@item.UserName</div>
-                        <div class="text-warning" style="font-size:12px">
-                            @for (int i = 0; i < item.QualityRating; i++)
-                            {
-                                <i class="fas fa-star"></i>
-                            }
+
+                    <div class="user-info-col">
+                        <div style="font-weight:600; font-size: 14px;">@item.UserName</div>
+
+                        <div class="review-meta">
+                            <div class="text-warning" style="font-size:12px">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= item.QualityRating)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-star text-muted"></i>
+                                    }
+                                }
+                            </div>
+
+                            <div class="review-date">
+                                @item.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")
+                            </div>
                         </div>
                     </div>
-                    <div class="review-date">@item.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</div>
                 </div>
 
                 <div class="review-content">
@@ -212,6 +281,32 @@
                     </div>
                 }
             </div>
+        }
+
+        @if (totalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = currentPage - 1 })">
+                            &laquo;
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = i })">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("ProductReviews", new { productId = product.Id, rating = currentFilter == 0 ? null : (int?)currentFilter, page = currentPage + 1 })">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         }
     }
     else

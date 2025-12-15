@@ -41,11 +41,9 @@ namespace webCore.Controllers
         }
 
 
-        // Action để hiển thị form nhập thông tin thanh toán
         [HttpGet]
         public async Task<IActionResult> PaymentInfo()
         {
-            // Kiểm tra trạng thái đăng nhập từ session
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
             ViewBag.IsLoggedIn = isLoggedIn;
 
@@ -56,19 +54,15 @@ namespace webCore.Controllers
             }
             var userId = HttpContext.Session.GetString("UserId");
 
-            // Kiểm tra xem có CartItem được lưu trong session (dành cho BuyNow)
             var cartItemSession = HttpContext.Session.GetString("CartItem");
 
             if (!string.IsNullOrEmpty(cartItemSession))
             {
-                // Trường hợp BuyNow: xử lý với một sản phẩm cụ thể
                 var cartItem = JsonConvert.DeserializeObject<CartItem>(cartItemSession);
 
-                // Tính toán giá trị
                 decimal totalAmount = cartItem.Price * cartItem.Quantity * (1 - cartItem.DiscountPercentage / 100);
                 decimal finalAmount = totalAmount;
 
-                // Trả về View với dữ liệu cho sản phẩm BuyNow
                 return View(new PaymentInfoViewModel
                 {
                     Items = new List<CartItem> { cartItem },
@@ -77,23 +71,18 @@ namespace webCore.Controllers
                 });
             }
 
-            // Nếu không có CartItem trong session, xử lý như Checkout (toàn bộ giỏ hàng)
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             if (cart == null || cart.Items == null || cart.Items.Count == 0)
             {
-                // Nếu giỏ hàng rỗng, chuyển về trang giỏ hàng
                 return RedirectToAction("Cart");
             }
 
-            // Lấy danh sách các sản phẩm đã chọn từ session
             var selectedProductIds = JsonConvert.DeserializeObject<List<string>>(HttpContext.Session.GetString("SelectedProductIds") ?? "[]");
             var selectedItems = cart.Items.Where(item => selectedProductIds.Contains(item.ProductId)).ToList();
 
-            // Tính toán tổng tiền
             decimal totalAmountCheckout = selectedItems.Sum(item => (item.Price * (1 - item.DiscountPercentage / 100)) * item.Quantity);
             decimal finalAmountCheckout = totalAmountCheckout;
 
-            // Trả về View với dữ liệu cho giỏ hàng
             return View(new PaymentInfoViewModel
             {
                 Items = selectedItems,
@@ -103,14 +92,12 @@ namespace webCore.Controllers
         }
 
 
-        // Action để xử lý thông tin thanh toán và lưu vào MongoDB
         [HttpPost]
         public async Task<IActionResult> ConfirmPayment(PaymentInfoViewModel model)
         {
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
             ViewBag.IsLoggedIn = isLoggedIn;
 
-            // Lấy UserId từ session
             var userToken = HttpContext.Session.GetString("UserToken");
             if (string.IsNullOrEmpty(userToken))
             {
@@ -118,7 +105,6 @@ namespace webCore.Controllers
             }
             var userId = HttpContext.Session.GetString("UserId");
 
-            // Xử lý luồng BuyNow
             var cartItemSession = HttpContext.Session.GetString("CartItem");
             if (!string.IsNullOrEmpty(cartItemSession))
             {
@@ -147,7 +133,6 @@ namespace webCore.Controllers
                 return RedirectToAction("PaymentHistory", "Checkout");
             }
 
-            // Xử lý luồng Checkout
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             if (cart == null || cart.Items == null || cart.Items.Count == 0)
             {
@@ -204,10 +189,8 @@ namespace webCore.Controllers
         }
         private async Task SaveOrderAndUpdateStockAsync(Order order, List<CartItem> items)
         {
-            // Lưu đơn hàng vào MongoDB
             await _orderService.SaveOrderAsync(order);
 
-            // Cập nhật số lượng tồn kho
             foreach (var item in items)
             {
                 var product = await _categoryProductAdminService.GetProductByIdAsync(item.ProductId);
@@ -218,7 +201,6 @@ namespace webCore.Controllers
                 }
             }
 
-            // Nếu là giỏ hàng, xóa các sản phẩm đã mua
             if (!string.IsNullOrEmpty(order.UserId))
             {
                 await _cartService.RemoveItemsFromCartAsync(order.UserId, items.Select(i => i.ProductId).ToList());
@@ -232,7 +214,6 @@ namespace webCore.Controllers
         {
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
 
-            // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
             ViewBag.IsLoggedIn = isLoggedIn;
 
             var userToken = HttpContext.Session.GetString("UserToken");
@@ -247,16 +228,13 @@ namespace webCore.Controllers
             if (orders == null || !orders.Any())
                 return View(new List<Order>());
 
-            // Lọc theo trạng thái nếu có
             if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
                 orders = orders.Where(o => o.Status == status).ToList();
             }
 
-            // Gửi trạng thái hiện tại để hiển thị active nút lọc
             ViewBag.CurrentStatus = status ?? "Tất cả";
 
-            // Sắp xếp đơn hàng mới nhất lên đầu
             return View(orders.OrderByDescending(o => o.CreatedAt).ToList());
         }
 
@@ -267,21 +245,17 @@ namespace webCore.Controllers
 
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
 
-            // Kiểm tra đăng nhập
             if (!isLoggedIn)
             {
                 return RedirectToAction("Sign_in", "User");
             }
 
 
-            // Truyền thông tin vào ViewBag hoặc Model để sử dụng trong View
             ViewBag.IsLoggedIn = isLoggedIn;
-            // Tìm đơn hàng theo ID
             var order = await _orderService.GetOrderByIdAsync(orderId);
 
             if (order == null)
             {
-                // Xử lý nếu không tìm thấy đơn hàng
                 return NotFound("Không tìm thấy đơn hàng");
             }
 
@@ -314,11 +288,9 @@ namespace webCore.Controllers
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId)) return RedirectToAction("Sign_in", "User");
 
-            // Lấy đơn hàng
             var order = await _orderService.GetOrderByIdAsync(orderId);
             if (order == null) return NotFound("Không tìm thấy đơn hàng");
 
-            // Tìm sản phẩm cụ thể trong đơn hàng đó để đánh giá
             var item = order.Items.FirstOrDefault(p => p.ProductId == productId);
             if (item == null) return NotFound("Sản phẩm không tồn tại trong đơn hàng này");
 
@@ -354,7 +326,6 @@ namespace webCore.Controllers
             {
                 _logger.LogInformation($"Starting review submission for Order: {orderId}, Product: {productId}");
 
-                // Upload media files
                 List<string> uploadedUrls = new List<string>();
                 if (mediaFiles != null && mediaFiles.Count > 0)
                 {
@@ -383,7 +354,6 @@ namespace webCore.Controllers
                     _logger.LogInformation($"Successfully uploaded {uploadedUrls.Count} files");
                 }
 
-                // Get order and item
                 var order = await _orderService.GetOrderByIdAsync(orderId);
                 if (order == null)
                 {
@@ -400,12 +370,10 @@ namespace webCore.Controllers
                     return RedirectToAction("PaymentHistory");
                 }
 
-                // Get user info
                 var currentUser = await _userService.GetUserByIdAsync(userId);
                 var shop = await _shopService.GetShopByUserIdAsync(item.SellerId);
                 string shopId = shop?.Id;
 
-                // Create review
                 var review = new Review
                 {
                     OrderId = orderId,

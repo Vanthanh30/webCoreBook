@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DnsClient;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,19 +34,16 @@ namespace webCore.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> ProductReviews(string productId, int? rating)
+        public async Task<IActionResult> ProductReviews(string productId, int? rating, int page = 1)
         {
+            int pageSize = 1;
             var product = await _productService.GetProductByIdAsync(productId);
             if (product == null) return NotFound("Sản phẩm không tồn tại");
 
             var allReviews = await _reviewService.GetByProductIdAsync(productId);
 
             var totalReviews = allReviews.Count;
-            double averageRating = 0;
-            if (totalReviews > 0)
-            {
-                averageRating = allReviews.Average(r => r.QualityRating);
-            }
+            double averageRating = totalReviews > 0 ? allReviews.Average(r => r.QualityRating) : 0;
 
             var starCounts = new Dictionary<int, int>
             {
@@ -56,19 +54,31 @@ namespace webCore.Controllers
                 { 1, allReviews.Count(r => r.QualityRating == 1) }
             };
 
-            var displayReviews = allReviews;
+            var filteredReviews = allReviews; // Dùng biến trung gian
             if (rating.HasValue && rating.Value > 0)
             {
-                displayReviews = allReviews.Where(r => r.QualityRating == rating.Value).ToList();
+                filteredReviews = allReviews.Where(r => r.QualityRating == rating.Value).ToList();
             }
+
+            int totalItems = filteredReviews.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            page = Math.Max(1, page);
+            if (totalPages > 0) page = Math.Min(page, totalPages);
+            var pagedReviews = filteredReviews
+                        .OrderByDescending(r => r.CreatedAt) 
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
 
             ViewBag.Product = product;
             ViewBag.AverageRating = Math.Round(averageRating, 1); 
             ViewBag.TotalReviews = totalReviews;
             ViewBag.StarCounts = starCounts;
             ViewBag.CurrentRatingFilter = rating ?? 0;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
-            return View(displayReviews);
+            return View(pagedReviews);
         }
     }
 }
