@@ -86,7 +86,11 @@
                         data-image="@Model.Image">
                     Thêm vào giỏ hàng
                 </button>
-                <button class="buy_button" id="btnBuyNow" data-productid="@Model.Id">
+                <button class="buy_button"
+                        id="btnBuyNow"
+                        data-productid="@Model.Id"
+                        data-sellerid="@Model.SellerId"
+                        data-currentuserid="@ViewBag.UserId">
                     Mua ngay
                 </button>
                 <input type="hidden" id="quantityInput" value="1" />
@@ -251,9 +255,38 @@
         $(function () {
             $('.add_button').click(function () { addToCart(this); });
             $('#btnBuyNow').click(function () {
+
                 const pid = $(this).data('productid');
+                const sellerId = $(this).data('sellerid');
+                const currentUserId = $(this).data('currentuserid');
                 const qty = $('#quantitypr').val();
-                location.href = `/Cart/BuyNow?productId=${pid}&quantity=${qty}`;
+
+                if (sellerId === currentUserId) {
+                    alert("⚠️ Bạn không thể mua sản phẩm của shop mình.");
+                    return;
+                }
+                $.ajax({
+                    url: '/Cart/BuyNow',
+                    method: 'GET',
+                    data: {
+                        productId: pid,
+                        quantity: qty
+                    },
+                    success: function (res) {
+
+                        if (res && res.success === false) {
+                            alert(res.message);
+                            return;
+                        }
+
+                        if (typeof res === "string") {
+                            window.location.href = '/Cart/Checkout';
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra khi mua ngay.");
+                    }
+                });
             });
         });
 
