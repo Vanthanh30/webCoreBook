@@ -79,11 +79,11 @@
                                         Mật khẩu
                                     </label>
                                     <div class="input-wrapper password-wrapper">
-                                        <input type="password"
-                                               class="form-control-custom"
-                                               id="password"
-                                               name="Password"
-                                               placeholder="Nhập mật khẩu"
+                                        <input type="password" 
+                                               class="form-control-custom" 
+                                               id="password" 
+                                               name="Password" 
+                                               placeholder="Nhập mật khẩu" 
                                                required />
                                         <button class="toggle-password" type="button" onclick="togglePassword()">
                                             <i id="toggleIcon" class="fas fa-eye"></i>
@@ -120,41 +120,60 @@
     </div>
 
     <script>
-        async function login() {
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const errorBox = document.getElementById("errorBox");
-            const errorMessage = document.getElementById("errorMessage");
+       async function login() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorBox = document.getElementById("errorBox");
+        const errorMessage = document.getElementById("errorMessage");
 
-            const payload = {
-                Email: email,
-                Password: password
-            };
+        errorBox.classList.add("d-none");
+        errorMessage.innerText = "";
 
-            try {
-                const res = await fetch('/api/UserApi/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    credentials: "include"
-                });
+        // Regex kiểm tra email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-                const data = await res.json();
-
-                if (!data.success) {
-                    errorBox.classList.remove("d-none");
-                    errorMessage.innerText = data.message;
-                    return;
-                }
-
-                // Redirect
-                window.location.href = "/Home/Index";
-
-            } catch (err) {
-                errorBox.classList.remove("d-none");
-                errorMessage.innerText = "Lỗi kết nối server!";
-            }
+        // Validate email
+        if (!emailRegex.test(email)) {
+            errorBox.classList.remove("d-none");
+            errorMessage.innerText = "Email không đúng định dạng (ví dụ: ten@email.com)";
+            return;
         }
+
+        // Validate password
+        if (password.length < 5) {
+            errorBox.classList.remove("d-none");
+            errorMessage.innerText = "Mật khẩu phải có ít nhất 5 ký tự";
+            return;
+        }
+
+        const payload = {
+            Email: email,
+            Password: password
+        };
+
+        try {
+            const res = await fetch('/api/UserApi/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                credentials: "include"
+            });
+
+            const data = await res.json();
+
+            if (!data.success) {
+                errorBox.classList.remove("d-none");
+                errorMessage.innerText = data.message;
+                return;
+            }
+
+            window.location.href = "/Home/Index";
+
+        } catch (err) {
+            errorBox.classList.remove("d-none");
+            errorMessage.innerText = "Lỗi kết nối server!";
+        }
+    }
 
         function togglePassword() {
             var passwordInput = document.getElementById("password");

@@ -66,7 +66,9 @@
                                                id="email"
                                                name="Email"
                                                placeholder="example@email.com"
-                                               required />
+                                               required
+                                               pattern="^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                               title="Email phải đúng định dạng tên@gmail.com" />
                                     </div>
                                     <div id="emailError" class="error-message"></div>
                                 </div>
@@ -83,7 +85,8 @@
                                                id="password"
                                                name="Password"
                                                placeholder="Nhập mật khẩu"
-                                               required />
+                                               required
+                                               minlength="6" />
                                         <button class="toggle-password" type="button" onclick="toggleEye('password', 'passwordEye')">
                                             <i id="passwordEye" class="fas fa-eye"></i>
                                         </button>
@@ -160,6 +163,20 @@
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
             const confirm = document.getElementById("confirmPassword").value.trim();
+
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById("emailError").innerText =
+                    "Email không đúng định dạng (ví dụ: ten@gmail.com)";
+                return;
+            }
+
+    // ✅ Validate password length (>= 5)
+            if (password.length < 6) {
+                document.getElementById("confirmError").innerText =
+                    "Mật khẩu phải có ít nhất 6 ký tự";
+                return;
+            }
 
             // Kiểm tra mật khẩu khớp
             if (password !== confirm) {
