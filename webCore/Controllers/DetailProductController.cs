@@ -18,19 +18,29 @@ namespace webCore.Controllers
         private readonly ProductService _productService;
         private readonly CategoryService _categoryService;
         private readonly ReviewService _reviewService;
+        private readonly UserService _userService;
+        private readonly ShopService _shopService;
+        private readonly IConversationService _conversationService;
+        private readonly IMessageService _messageService;
 
         public DetailProductController(
             MongoDBService mongoDBService,
             DetailProductService detailProductService,
             ProductService productService,
             CategoryService categoryService,
-            ReviewService reviewService)
+            ReviewService reviewService,
+            UserService userService,
+            ShopService shopService, IConversationService conversationService, IMessageService messageService)
         {
             _mongoDBService = mongoDBService;
             _detailProductService = detailProductService;
             _productService = productService;
             _categoryService = categoryService;
             _reviewService = reviewService;
+            _userService = userService;
+            _shopService = shopService;
+            _conversationService = conversationService;
+            _messageService = messageService;
         }
 
         // Phương thức tìm kiếm sản phẩm
@@ -242,6 +252,62 @@ namespace webCore.Controllers
             var similarProducts = await _detailProductService.GetProductsByCategoryAsync(product.CategoryId);
             similarProducts = similarProducts.Where(p => p.Id != product.Id).ToList();
             return similarProducts.Take(10).ToList();
+        }
+
+        public async Task<IActionResult> ContactSellerFromProduct(string productId)
+        {
+            // 1️⃣ CHECK LOGIN
+            var buyerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(buyerId))
+                return RedirectToAction("Sign_in", "User");
+
+            // 2️⃣ LẤY PRODUCT
+            var product = await _productService.GetProductByIdAsync(productId);
+            if (product == null)
+                return NotFound("Product not found");
+
+            // 3️⃣ LẤY SHOP
+            var shop = await _shopService.GetShopByUserIdAsync(product.SellerId);
+            if (shop == null)
+                return NotFound("Shop not found");
+
+            var sellerId = shop.UserId;
+            if (product.SellerId == buyerId)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "⚠️ Bạn không thể chat với sản phẩm của chính shop bạn"
+                });
+            }
+            // 4️⃣ GET OR CREATE CONVERSATION
+            var conversation = await _conversationService.GetOrCreateAsync(
+                buyerId: buyerId,
+                sellerId: sellerId,
+                shopId: shop.Id
+            );
+
+            // 5️⃣ TẠO SYSTEM MESSAGE (CHỈ 1 LẦN)
+            var messages = await _messageService.GetMessagesAsync(conversation.Id, 1);
+            if (messages.Count == 0)
+            {
+                await _messageService.SaveSystemAsync(
+                    conversation.Id,
+                    $"📌 Trao đổi về sản phẩm: {product.Title}",
+                    productId: product.Id
+                );
+            }
+
+            // 6️⃣ REDIRECT VÀO CHAT + AUTO OPEN
+            return Json(new
+            {
+                success = true,
+                redirect = Url.Action("Index", "Chat", new
+                {
+                    mode = "buyer",
+                    conversationId = conversation.Id
+                })
+            });
         }
     }
 }

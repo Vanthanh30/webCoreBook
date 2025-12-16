@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using System;
+using System.Linq;
 
 namespace webCore.MongoHelper
 {
@@ -17,20 +18,36 @@ namespace webCore.MongoHelper
             // Kết nối MongoDB từ cấu hình
             var mongoClient = new MongoClient(configuration["MongoDB:ConnectionString"]);
             var mongoDatabase = mongoClient.GetDatabase(configuration["MongoDB:DatabaseName"]);
-            _userAdminCollection = mongoDatabase.GetCollection<User>("Users"); // Tên collection là "Orders"
+            _userAdminCollection = mongoDatabase.GetCollection<User>("Users");
         }
 
-        // Lấy tất cả
-        public async Task<List<User>> GetAllUsersAsync()
+        // Lấy tất cả người dùng (không bao gồm Admin)
+        public async Task<List<User>> GetAllUsersAsync(List<string> excludeRoleIds = null)
         {
-            return await _userAdminCollection.Find(user => true).ToListAsync();
+            // Lấy tất cả user trước
+            var allUsers = await _userAdminCollection.Find(user => true).ToListAsync();
+
+            if (excludeRoleIds != null && excludeRoleIds.Count > 0)
+            {
+                // Lọc bằng LINQ: loại bỏ user có bất kỳ RoleId nào nằm trong danh sách Admin
+                // RoleId là List<string>, nên phải kiểm tra xem có giao với excludeRoleIds không
+                return allUsers
+                    .Where(u =>
+                        u.RoleId != null &&
+                        u.RoleId.Count > 0 &&
+                        !u.RoleId.Any(roleId => excludeRoleIds.Contains(roleId))
+                    )
+                    .ToList();
+            }
+
+            return allUsers;
         }
+
         public async Task<User> GetUserByIdAsync(string id)
         {
-            // Chuyển đổi id (string) sang Guid và truy vấn người dùng trong cơ sở dữ liệu
-           // var userId = Guid.Parse(id); // Chuyển đổi id sang Guid
             return await _userAdminCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<bool> UpdateUserStatusAsync(string id, int newStatus)
         {
             try
@@ -41,12 +58,8 @@ namespace webCore.MongoHelper
                     throw new ArgumentException("ID không hợp lệ.", nameof(id));
                 }
 
-                // Chuyển đổi id từ string sang Guid
-               // var userId = Guid.Parse(id);
-
                 // Tìm người dùng trong cơ sở dữ liệu
                 var user = await _userAdminCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
-
                 if (user == null)
                 {
                     throw new Exception("Người dùng không tồn tại.");
@@ -55,7 +68,7 @@ namespace webCore.MongoHelper
                 // Kiểm tra nếu status hiện tại là null, thiết lập giá trị mặc định là 1 nếu null
                 if (!user.Status.HasValue)
                 {
-                    user.Status = 1;  // Nếu chưa có giá trị, set mặc định là 1
+                    user.Status = 1;
                 }
 
                 // Tạo bộ lọc để xác định người dùng cần cập nhật
@@ -66,7 +79,6 @@ namespace webCore.MongoHelper
 
                 // Thực hiện cập nhật
                 var result = await _userAdminCollection.UpdateOneAsync(filter, update);
-
                 return result.ModifiedCount > 0;
             }
             catch (Exception ex)
@@ -75,8 +87,6 @@ namespace webCore.MongoHelper
                 return false;
             }
         }
-
-
-
     }
 }
+
