@@ -121,7 +121,7 @@
     <div class="d-flex flex-wrap status-filter justify-content-center">
         @{
             var statuses = new List<string> {
-        "Tất cả", "Chờ xác nhận", "Chờ giao hàng",
+        "Tất cả", "Chờ xác nhận", "Đang giao",
         "Đã giao", "Đã hủy", "Trả hàng/Hoàn tiền"
         };
             var currentStatus = ViewBag.CurrentStatus as string ?? "Tất cả";
@@ -206,6 +206,8 @@
                                onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
                                 Hủy đơn hàng
                             </a>
+                            <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = order.Id })"
+                               class="btn btn-sm btn-outline-secondary action-btn">Liên hệ người bán</a>
                         }
 
                         else if (order.Status == "Đang giao")
