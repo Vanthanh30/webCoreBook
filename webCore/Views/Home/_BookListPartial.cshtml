@@ -5,57 +5,60 @@
 {
     foreach (var group in Model)
     {
-        var sectionClass = group.Key == "Nổi bật" ? "flash-sale" :
-                          group.Key == "Mới" ? "new" : "bestseller";
-        var sectionTitle = group.Key == "Nổi bật" ? "FLASH SALE" :
-                          group.Key == "Mới" ? "MỚI NHẤT" : "BÁN CHẠY";
+        // ✅ Mapping giống hệt Index.cshtml
+        var sectionTitle = group.Key switch
+        {
+            "Nổi bật" => "NỔI BẬT",
+            "Mới" => "MỚI NHẤT",
+            "Bán chạy" => "BÁN CHẠY",
+            "Gợi ý" => "GỢI Ý",
+            _ => group.Key.ToUpper()
+        };
 
-        <div class="product-section" data-section-type="@group.Key">
-            <div class="section-badge @sectionClass">
-                @sectionTitle
-            </div>
+        var sectionClass = group.Key switch
+        {
+            "Nổi bật" => "featured",
+            "Mới" => "new",
+            "Bán chạy" => "bestseller",
+            "Gợi ý" => "bestseller",
+            _ => "bestseller"
+        };
 
-            <div class="products-slider-wrapper">
+        <div class="product-section mb-5" data-section-type="@group.Key">
+            <h2 class="section-badge @sectionClass">@sectionTitle</h2>
+
+            <div class="products-slider-wrapper position-relative">
                 <button class="slider-arrow left" onclick="slideProducts(this, -1)">‹</button>
-
                 <div class="products-slider d-flex overflow-hidden">
                     @foreach (var product in group.Value)
                     {
-                        <div class="product-box">
-                            <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })">
+                        <div class="product-box me-3 flex-shrink-0" style="width: 220px;">
+                            <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })" class="text-decoration-none">
                                 @if (product.DiscountPercentage > 0)
                                 {
                                     <span class="product-discount-badge">-@product.DiscountPercentage%</span>
                                 }
-                                <div class="product-img-wrapper">
-                                    <img src="@product.Image" alt="@product.Title">
+                                <div class="product-img-wrapper bg-light rounded">
+                                    <img src="@product.Image" alt="@product.Title" class="w-100 rounded" loading="lazy" style="height: 280px; object-fit: cover;">
                                 </div>
-                                <div class="product-details">
-                                    <h3 class="product-name">@product.Title</h3>
+                                <div class="product-details mt-2">
+                                    <h3 class="product-name text-dark mb-1" style="font-size: 14px; height: 40px; overflow: hidden;">@product.Title</h3>
                                     @if (product.DiscountPercentage > 0)
                                     {
-                                        <div class="product-price-old">@string.Format("{0:N0} đ", product.Price)</div>
-                                        <div class="product-price-new">
-                                            @string.Format(
-                                            "{0:N0} đ",
-                                                        product.Price * (1m - (decimal)product.DiscountPercentage / 100m)
-                                                        )
+                                        <div class="product-price-old text-muted"><del>@string.Format("{0:N0} đ", product.Price)</del></div>
+                                        <div class="product-price-new text-danger fw-bold">
+                                            @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
                                         </div>
                                     }
                                     else
                                     {
-                                        <div class="product-price-single">@string.Format("{0:N0} đ", product.Price)</div>
-                                    }
-                                    @if (group.Key == "Nổi bật")
-                                    {
-                                        <div class="product-stock">Đã bán 10</div>
+                                        <div class="product-price-single text-danger fw-bold">@string.Format("{0:N0} đ", product.Price)</div>
                                     }
                                 </div>
                             </a>
                         </div>
                     }
                 </div>
-
                 <button class="slider-arrow right" onclick="slideProducts(this, 1)">›</button>
             </div>
         </div>
@@ -63,5 +66,5 @@
 }
 else
 {
-    <p class="text-center">Không có sản phẩm nào để hiển thị.</p>
+    <p class="text-center py-5 fs-4 text-muted">Không có sản phẩm nào để hiển thị.</p>
 }

@@ -4,7 +4,7 @@
     var parentCategories = categories?.Where(c => c.ParentId == null).ToList();
     var groupedProducts = ViewBag.GroupedProducts as Dictionary<string, List<webCore.Models.Product_admin>>;
     var featuredProducts = ViewBag.FeaturedProducts as List<webCore.Models.Product_admin>;
-    var bestsellerProducts = ViewBag.BestsellerProducts as List<webCore.Models.Product_admin>;
+    var flashSaleProducts = ViewBag.FlashSaleProducts as List<webCore.Models.Product_admin>;
 
     // === SỬA CHÍNH TẠI ĐÂY ===
     var isSearching = ViewBag.IsSearching == true;
@@ -121,12 +121,12 @@
                 </div>
 
                 <!-- FLASH SALE CHỈ HIỆN Ở SIDEBAR -->
-                @if (bestsellerProducts != null && bestsellerProducts.Any())
+                @if (flashSaleProducts != null && flashSaleProducts.Any())
                 {
                     <div class="flash-sale-sidebar mt-4">
                         <div class="flash-sale-badge">FLASH SALE</div>
                         <div class="flash-sale-items">
-                            @foreach (var product in bestsellerProducts.Take(3))
+                            @foreach (var product in flashSaleProducts)
                             {
                                 <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = product.Id })" class="flash-item">
                                     @if (product.DiscountPercentage > 0)
@@ -136,18 +136,11 @@
                                     <img src="@product.Image" alt="@product.Title" loading="lazy">
                                     <div class="flash-item-info">
                                         <div class="flash-item-title text-truncate">@product.Title</div>
-                                        @if (product.DiscountPercentage > 0)
-                                        {
-                                            <div class="flash-item-old-price">@string.Format("{0:N0} đ", product.Price)</div>
-                                            <div class="flash-item-price text-danger fw-bold">
-                                                @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="flash-item-price text-danger fw-bold">@string.Format("{0:N0} đ", product.Price)</div>
-                                        }
-                                        <small class="text-muted">Đã bán 10+</small>
+                                        <div class="flash-item-old-price">@string.Format("{0:N0} đ", product.Price)</div>
+                                        <div class="flash-item-price text-danger fw-bold">
+                                            @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
+                                        </div>
+                                        <small class="text-muted">Giảm @product.DiscountPercentage%</small>
                                     </div>
                                 </a>
                             }

@@ -46,38 +46,26 @@ namespace webCore.Controllers
             ViewBag.FeaturedProducts = featuredProducts;
 
             // Lấy danh sách sản phẩm bán chạy
-            var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
-            ViewBag.BestsellerProducts = bestsellerProducts;
+            var flashSaleProducts = await _productService.GetTopDiscountProductsAsync(3);
+            ViewBag.FlashSaleProducts = flashSaleProducts;
 
             return View(); // Trả về View Index.cshtml
         }
-
-        // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
         public async Task<IActionResult> GetProductsByCategoryId(string categoryId)
         {
             if (string.IsNullOrEmpty(categoryId))
             {
                 return BadRequest("Category ID is required.");
             }
-
-            // --- BẮT ĐẦU SỬA ĐỔI ---
-
-            // 1. Lấy tất cả danh mục để kiểm tra quan hệ cha-con
             var allCategories = await _categoryService.GetCategoriesAsync();
-
-            // 2. Tìm danh sách các ID danh mục con của categoryId hiện tại
             var childCategoryIds = allCategories
                 .Where(c => c.ParentId == categoryId)
                 .Select(c => c._id)
                 .ToList();
 
             List<Product_admin> products = new List<Product_admin>();
-
-            // 3. Logic: Nếu có con (là Cha) thì lấy cả cha lẫn con. Nếu không (là Con) thì chỉ lấy nó.
             if (childCategoryIds.Any())
             {
-                // A. Trường hợp chọn Danh mục Cha:
-
                 var parentProducts = await _productService.GetProductsByCategoryIdAsync(categoryId);
                 products.AddRange(parentProducts);
 
@@ -89,27 +77,34 @@ namespace webCore.Controllers
             }
             else
             {
-
                 products = await _productService.GetProductsByCategoryIdAsync(categoryId);
             }
-
             products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
-
             var groupedProducts = new Dictionary<string, List<Product_admin>>();
 
-            var featuredProducts = products.Where(p => p.DiscountPercentage > 0).ToList();
-            var newProducts = products.Where(p => p.DiscountPercentage == 0 && p.Price > 0).Take(10).ToList();
-            var suggestedProducts = products.Except(featuredProducts).Except(newProducts).ToList();
+            var featuredGroups = products
+                .GroupBy(p => p.Featured switch
+                {
+                    1 => "Nổi bật",      
+                    2 => "Mới",         
+                    3 => "Gợi ý",       
+                    _ => "Gợi ý"       
+                })
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            if (featuredProducts.Any()) groupedProducts.Add("Nổi bật", featuredProducts);
-            if (newProducts.Any()) groupedProducts.Add("Mới", newProducts);
-            if (suggestedProducts.Any()) groupedProducts.Add("Gợi ý", suggestedProducts);
+            // Thêm vào dictionary theo thứ tự ưu tiên
+            if (featuredGroups.ContainsKey("Nổi bật"))
+                groupedProducts.Add("Nổi bật", featuredGroups["Nổi bật"]);
 
+            if (featuredGroups.ContainsKey("Mới"))
+                groupedProducts.Add("Mới", featuredGroups["Mới"]);
+
+            if (featuredGroups.ContainsKey("Gợi ý"))
+                groupedProducts.Add("Gợi ý", featuredGroups["Gợi ý"]);
+
+            // Chuyển sang List với thứ tự đã định
             var orderedGroupedProducts = groupedProducts
-                .OrderBy(group =>
-                    group.Key == "Nổi bật" ? 0 :
-                    group.Key == "Mới" ? 1 :
-                    group.Key == "Gợi ý" ? 2 : int.MaxValue)
+                .Select(kvp => new KeyValuePair<string, List<Product_admin>>(kvp.Key, kvp.Value))
                 .ToList();
 
             return PartialView("_BookListPartial", orderedGroupedProducts);
@@ -128,8 +123,9 @@ namespace webCore.Controllers
             var featuredProducts = await _productService.GetFeaturedProductsAsync();
             ViewBag.FeaturedProducts = featuredProducts;
 
-            var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
-            ViewBag.BestsellerProducts = bestsellerProducts;
+            // ✅ Sửa: Dùng GetTopDiscountProductsAsync thay vì GetBestsellerProductsAsync
+            var flashSaleProducts = await _productService.GetTopDiscountProductsAsync(3);
+            ViewBag.FlashSaleProducts = flashSaleProducts;
 
             // === PHẦN TÌM KIẾM ===
             ViewBag.SearchQuery = q?.Trim() ?? "";
@@ -138,18 +134,30 @@ namespace webCore.Controllers
             {
                 var searchResults = await _productService.SearchProductsAsync(q);
 
-                // Tạo nhóm giống hệt trang chủ
+                // ✅ Nhóm theo Featured từ database thay vì theo DiscountPercentage
                 var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
 
-                var flash = searchResults.Where(p => p.DiscountPercentage > 0).Take(20).ToList();
-                var newest = searchResults.Where(p => p.DiscountPercentage == 0).Take(20).ToList();
-                var suggest = searchResults.Except(flash).Except(newest).Take(20).ToList();
+                var featuredGroups = searchResults
+                    .GroupBy(p => p.Featured switch
+                    {
+                        1 => "Nổi bật",
+                        2 => "Mới",
+                        3 => "Gợi ý",
+                        _ => "Gợi ý"
+                    })
+                    .ToDictionary(g => g.Key, g => g.ToList());
 
-                if (flash.Any()) grouped.Add(new("Nổi bật", flash));
-                if (newest.Any()) grouped.Add(new("Mới", newest));
-                if (suggest.Any()) grouped.Add(new("Gợi ý", suggest));
+                // Thêm theo thứ tự: Nổi bật -> Mới -> Gợi ý
+                if (featuredGroups.ContainsKey("Nổi bật"))
+                    grouped.Add(new KeyValuePair<string, List<Product_admin>>("Nổi bật", featuredGroups["Nổi bật"]));
 
-                ViewBag.SearchResults = grouped; // Dùng để hiển thị thay thế
+                if (featuredGroups.ContainsKey("Mới"))
+                    grouped.Add(new KeyValuePair<string, List<Product_admin>>("Mới", featuredGroups["Mới"]));
+
+                if (featuredGroups.ContainsKey("Gợi ý"))
+                    grouped.Add(new KeyValuePair<string, List<Product_admin>>("Gợi ý", featuredGroups["Gợi ý"]));
+
+                ViewBag.SearchResults = grouped;
                 ViewBag.IsSearching = true;
                 ViewBag.ResultCount = searchResults.Count;
             }
@@ -228,12 +236,25 @@ namespace webCore.Controllers
             var products = await _productService.GetProductsByFinalPriceRangeAsync(min, max);
 
             var groupedProducts = new Dictionary<string, List<Product_admin>>();
+            var featuredGroups = products
+                .GroupBy(p => p.Featured switch
+                {
+                    1 => "Nổi bật",
+                    2 => "Mới",
+                    3 => "Gợi ý",
+                    _ => "Gợi ý"
+                })
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            var featured = products.Where(p => p.DiscountPercentage > 0).ToList();
-            var normal = products.Where(p => p.DiscountPercentage == 0).ToList();
+            // Thêm vào dictionary theo thứ tự ưu tiên
+            if (featuredGroups.ContainsKey("Nổi bật"))
+                groupedProducts.Add("Nổi bật", featuredGroups["Nổi bật"]);
 
-            if (featured.Any()) groupedProducts.Add("Nổi bật", featured);
-            if (normal.Any()) groupedProducts.Add("Mới", normal);
+            if (featuredGroups.ContainsKey("Mới"))
+                groupedProducts.Add("Mới", featuredGroups["Mới"]);
+
+            if (featuredGroups.ContainsKey("Gợi ý"))
+                groupedProducts.Add("Gợi ý", featuredGroups["Gợi ý"]);
 
             return PartialView("_BookListPartial", groupedProducts.ToList());
         }
