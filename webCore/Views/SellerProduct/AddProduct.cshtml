@@ -8,8 +8,7 @@
     <h2>Thêm mới sản phẩm</h2>
 
     <div class="alert alert-danger" style="display: none;" id="errorAlert">
-        <ul id="errorList">
-            </ul>
+        <ul id="errorList"></ul>
     </div>
 
     <div class="alert alert-success" style="display: none;" id="successAlert">
@@ -48,7 +47,7 @@
         <select id="CategoryId" name="categoryId" class="form-control" required>
             <option value="">-- Chọn danh mục --</option>
         </select>
-        
+
         <div class="product-pricing-group">
             <div class="form-group-item">
                 <label for="Price">Giá bán (VNĐ) *</label>
@@ -57,7 +56,7 @@
 
             <div class="form-group-item">
                 <label for="DiscountPercentage">Giảm giá (%)</label>
-                <input type="number" id="DiscountPercentage" name="DiscountPercentage" placeholder="0" min="0" max="100" />
+                <input type="number" id="DiscountPercentage" name="DiscountPercentage" placeholder="0" min="0" max="100" value="0" />
             </div>
 
             <div class="form-group-item">
@@ -106,6 +105,18 @@
             formData.append("Image", imageFile);
         }
 
+        // ✅ Xử lý DiscountPercentage: nếu rỗng hoặc không hợp lệ thì set = 0
+        const discountInput = document.getElementById("DiscountPercentage");
+        let discountValue = parseFloat(discountInput.value);
+
+        if (isNaN(discountValue) || discountValue < 0) {
+            discountValue = 0;
+        } else if (discountValue > 100) {
+            discountValue = 100;
+        }
+
+        formData.set("DiscountPercentage", discountValue);
+
         const sellerId = localStorage.getItem("SellerId") || "";
         formData.append("SellerId", sellerId);
 
@@ -129,9 +140,9 @@
             document.getElementById("successAlert").style.display = "block";
             form.reset();
             document.getElementById("imagePreview").style.display = "none";
-            
+
             setTimeout(() => {
-                window.location.href = '/SellerProduct/ProductManagement'; 
+                window.location.href = '/SellerProduct/ProductManagement';
             }, 1000);
 
         } catch (err) {
