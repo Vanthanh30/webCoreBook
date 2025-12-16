@@ -40,21 +40,16 @@
     </table>
 
     <nav aria-label="Page navigation" id="pagination" style="display: none;">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">Trước</a>
-            </li>
-            <li class="page-item active">
-                <a class="page-link" href="#">1</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">Tiếp theo</a>
-            </li>
-        </ul>
+
     </nav>
 </div>
 
 <script>
+
+    let allProducts = [];      
+    let currentPage = 1;       
+    const itemsPerPage = 5;     
+
     function formatPrice(price) {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -84,82 +79,131 @@
                 return;
             }
 
-            const products = result.data;
+            allProducts = result.data;
 
-            if (products.length === 0) {
+            if (allProducts.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('productTable').style.display = 'none';
+                document.getElementById('pagination').style.display = 'none';
                 return;
             }
 
             document.getElementById('productTable').style.display = 'table';
             document.getElementById('pagination').style.display = 'block';
 
-            const tbody = document.getElementById('productTableBody');
-            tbody.innerHTML = '';
-
-            products.forEach(product => {
-                const isActive = product.status === 'Hoạt động' || product.status === 'Đã duyệt';
-                const statusClass = isActive ? 'status-active' : 'status-inactive';
-                const statusText = isActive ? 'Hoạt động' : product.status;
-                const statusBadgeClass = isActive ? 'status-active' : 'status-inactive';
-                const finalPrice = product.price * (1 - product.discountPercentage / 100);
-                let reviewButtonHtml = '';
-                if (product.status === 'Hoạt động') {
-                    reviewButtonHtml = `
-                <a class="icon-btn review-btn"
-                   title="Xem đánh giá"
-                   href="/SellerProduct/ProductReviews?productId=${product.id}"
-                   style="color: #f39c12; margin-right: 5px;"> <i class="fas fa-star"></i>
-                </a>
-            `;
-                }
-
-                const row = `
-                            <tr data-product-id="${product.id}">
-                                <td>${product.title}</td>
-                                <td>
-                                    <img src="${product.image || '/images/no-image.png'}"
-                                        alt="${product.title}"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>
-                                </td>
-                                <td>${product.categoryTitle}</td>
-                                <td>
-                                    ${product.discountPercentage > 0
-                        ? `<span style="text-decoration: line-through; color: #999;">${formatPrice(product.price)}</span><br>${formatPrice(finalPrice)}`
-                        : formatPrice(product.price)}
-                                </td>
-                                <td>${product.discountPercentage > 0 ? product.discountPercentage + '%' : '-'}</td>
-                                <td>${product.stock}</td>
-                                <td class="${statusClass}">
-                                    <span class="${statusBadgeClass}">${statusText}</span>
-                                </td>
-                                <td>${getFeaturedText(product.featured)}</td>
-                                   <td class="actions-cell">
-                                    <div class="button-group">
-                                        ${reviewButtonHtml}
-                                        <a class="icon-btn edit-btn"
-                                            title="Chỉnh sửa"
-                                            href="/SellerProduct/EditProduct?id=${product.id}">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button"
-                                                class="icon-btn delete-btn"
-                                                title="Xóa"
-                                                onclick="deleteProduct('${product.id}', '${product.title}')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                tbody.innerHTML += row;
-            });
+            renderTable(1);
 
         } catch (error) {
             console.error('Error loading products:', error);
             document.getElementById('loadingSpinner').style.display = 'none';
             alert('Lỗi kết nối server!');
         }
+    }
+
+    function renderTable(page) {
+        if (page < 1) page = 1;
+        const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+        if (page > totalPages) page = totalPages;
+
+        currentPage = page;
+
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const productsToShow = allProducts.slice(start, end);
+
+        const tbody = document.getElementById('productTableBody');
+        tbody.innerHTML = '';
+
+        productsToShow.forEach(product => {
+            const isActive = product.status === 'Hoạt động' || product.status === 'Đã duyệt';
+            const statusClass = isActive ? 'status-active' : 'status-inactive';
+            const statusText = isActive ? 'Hoạt động' : product.status;
+            const statusBadgeClass = isActive ? 'status-active' : 'status-inactive';
+            const finalPrice = product.price * (1 - product.discountPercentage / 100);
+
+            let reviewButtonHtml = '';
+            if (product.status === 'Hoạt động') {
+                reviewButtonHtml = `
+                            <a class="icon-btn review-btn" title="Xem đánh giá"
+                               href="/SellerProduct/ProductReviews?productId=${product.id}">
+                               <i class="fas fa-star"></i>
+                            </a>`;
+            } else {
+                reviewButtonHtml = `<span class="btn-placeholder"></span>`;
+            }
+
+            const row = `
+                        <tr data-product-id="${product.id}">
+                            <td>${product.title}</td>
+                            <td>
+                                <img src="${product.image || '/images/no-image.png'}"
+                                     alt="${product.title}"
+                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" this.src='/images/no-image.png';"/>
+                            </td>
+                            <td>${product.categoryTitle}</td>
+                            <td>
+                                ${product.discountPercentage > 0
+                    ? `<span style="text-decoration: line-through; color: #999;">${formatPrice(product.price)}</span><br>${formatPrice(finalPrice)}`
+                    : formatPrice(product.price)}
+                            </td>
+                            <td>${product.discountPercentage > 0 ? product.discountPercentage + '%' : '-'}</td>
+                            <td>${product.stock}</td>
+                            <td class="${statusClass}"><span class="${statusBadgeClass}">${statusText}</span></td>
+                            <td>${getFeaturedText(product.featured)}</td>
+
+                            <td class="actions-cell">
+                                   <div class="button-group"> ${reviewButtonHtml}
+                                <a class="icon-btn edit-btn" title="Chỉnh sửa" href="/SellerProduct/EditProduct?id=${product.id}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="icon-btn delete-btn" title="Xóa"
+                                        onclick="deleteProduct('${product.id}', '${product.title}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                           </div> </td>
+                        </tr>
+                    `;
+            tbody.innerHTML += row;
+        });
+
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        const paginationContainer = document.getElementById('pagination');
+
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = ''; 
+            return;
+        }
+
+        let html = '<ul class="pagination justify-content-center">';
+
+        const prevDisabled = currentPage === 1 ? 'disabled' : '';
+        html += `
+                    <li class="page-item ${prevDisabled}">
+                        <a class="page-link" href="javascript:void(0)" onclick="renderTable(${currentPage - 1})">Trước</a>
+                    </li>
+                `;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const activeClass = i === currentPage ? 'active' : '';
+            html += `
+                        <li class="page-item ${activeClass}">
+                            <a class="page-link" href="javascript:void(0)" onclick="renderTable(${i})">${i}</a>
+                        </li>
+                    `;
+        }
+
+        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+        html += `
+                    <li class="page-item ${nextDisabled}">
+                        <a class="page-link" href="javascript:void(0)" onclick="renderTable(${currentPage + 1})">Tiếp theo</a>
+                    </li>
+                `;
+
+        html += '</ul>';
+        paginationContainer.innerHTML = html;
     }
 
     async function deleteProduct(productId, productTitle) {
@@ -176,17 +220,20 @@
 
             if (result.success) {
                 alert('Đã xóa sản phẩm thành công!');
-                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-                if (row) {
-                    row.remove();
+
+                allProducts = allProducts.filter(p => p.id !== productId);
+
+                const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+                if (currentPage > totalPages && currentPage > 1) {
+                    currentPage--;
                 }
 
-                const tbody = document.getElementById('productTableBody');
-                if (tbody.children.length === 0) {
-                    document.getElementById('productTable').style.display = 'none';
-                    document.getElementById('pagination').style.display = 'none';
-                    document.getElementById('emptyState').style.display = 'block';
+                if (allProducts.length === 0) {
+                    loadProducts(); 
+                } else {
+                    renderTable(currentPage);
                 }
+
             } else {
                 alert(result.message || 'Không thể xóa sản phẩm');
             }
