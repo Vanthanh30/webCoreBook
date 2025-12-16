@@ -235,6 +235,7 @@ namespace webCore.Controllers
             await _messageService.SaveSystemAsync(
                 conversationId: conversation.Id,
                 content: $"📦 Trao đổi về đơn hàng #{order.Id}",
+                messageType: "order",
                 orderId: order.Id.ToString()   
             );
 

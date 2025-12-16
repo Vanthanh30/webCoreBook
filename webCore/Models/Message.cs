@@ -22,7 +22,7 @@ namespace webCore.Models
         public string Content { get; set; } = string.Empty;
 
         // text | system | product | order
-        public string MessageType { get; set; } = "text";
+        public string MessageType { get; set; }
 
         // context (Shopee style)
         public string? ProductId { get; set; }

@@ -294,6 +294,7 @@ namespace webCore.Controllers
                 await _messageService.SaveSystemAsync(
                     conversation.Id,
                     $"📌 Trao đổi về sản phẩm: {product.Title}",
+                    messageType: "product",
                     productId: product.Id
                 );
             }

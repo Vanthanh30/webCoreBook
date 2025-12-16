@@ -9,7 +9,7 @@ using webCore.MongoHelper;
 
 namespace webCore.Controllers
 {
-    public class ChatController : Controller
+    public class ChatController : BaseController
     {
         // /Chat?mode=buyer OR /Chat?mode=seller
         public IActionResult Index(string mode = "buyer")

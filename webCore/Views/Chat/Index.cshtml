@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "_Layout";
+    Layout = "~/Views/Shared/_SellerLayout.cshtml";
     var mode = (string)ViewBag.Mode ?? "buyer";
     var userId = (string)ViewBag.UserId ?? "";
 }
@@ -90,7 +90,7 @@
 
     .system {
         width: 100%;
-        text-align: center;
+@*        text-align: center;*@
         color: #666;
         font-size: 12px;
     }
@@ -124,6 +124,23 @@
         border-radius: 999px;
         background: #eee;
     }
+    .order-card, .product-card {
+        display: flex;
+        gap: 10px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        max-width: 420px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+        .order-card img, .product-card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
 </style>
 
 <div class="chat-wrap">
@@ -212,25 +229,84 @@
     }
 
     function renderMessage(msg) {
-        // system message
+
+        if (msg.messageType === "order") {
+            return renderOrderMessage(msg);
+        }
+
+        if (msg.messageType === "product") {
+            return renderProductMessage(msg);
+        }
+
         if (msg.messageType === "system") {
-            return `<div class="system">📌 ${esc(msg.content)}</div>`;
+            return `<div class="system">${esc(msg.content)}</div>`;
         }
 
         const mine = msg.senderId === currentUserId;
         return `
-            <div class="msg-row ${mine ? "me" : "other"}">
-                <div class="bubble">${esc(msg.content)}</div>
+        <div class="msg-row ${mine ? "me" : "other"}">
+            <div class="bubble">${esc(msg.content)}</div>
+        </div>
+    `;
+    }
+    async function renderOrderMessage(msg) {
+        const res = await fetch(`/api/chat/order/summary/${msg.orderId}`);
+        if (!res.ok) return `<div class="system">📦 Đơn hàng</div>`;
+
+        const o = await res.json();
+        return `
+            <div class="system">
+                <div class="order-card">
+                    <img src="${o.image || o.Image}" />
+                    <div>
+                        <b>Đơn hàng #${o.id}</b><br/>
+                        ${o.productName}<br/>
+                        <span>${o.totalPrice} đ</span><br/>
+                        <a href="/Checkout/OrderDetails?orderId=${o.id}">Xem đơn hàng</a>
+                    </div>
+                </div>
             </div>
-        `;
+            `;
+    }
+    async function renderProductMessage(msg) {
+        const res = await fetch(`/api/chat/product/summary/${msg.productId}`);
+        if (!res.ok) return `<div class="system">📌 Sản phẩm</div>`;
+
+        const p = await res.json();
+        return `
+            <div class="system">
+                <div class="product-card">
+                    <img src="${p.image || p.Image}" />
+                    <div>
+                        <b>${p.title}</b><br/>
+                        ${p.price} đ<br/>
+                        <a href="/DetailProduct/DetailProduct/${p.id}">Xem sản phẩm</a>
+                    </div>
+                </div>
+            </div>
+            `;
     }
 
     async function loadMessages(conversationId) {
-        const res = await fetch(`/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=100`);
+        const res = await fetch(
+            `/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=100`
+        );
         if (!res.ok) return;
 
         const list = await res.json();
-        document.getElementById("chatBox").innerHTML = list.map(renderMessage).join("") || `<div class="system">Chưa có tin nhắn</div>`;
+        const box = document.getElementById("chatBox");
+        box.innerHTML = "";
+
+        if (list.length === 0) {
+            box.innerHTML = `<div class="system">Chưa có tin nhắn</div>`;
+            return;
+        }
+
+        for (const msg of list) {
+            const html = await renderMessage(msg);
+            box.insertAdjacentHTML("beforeend", html);
+        }
+
         scrollBottom();
     }
 
@@ -247,12 +323,13 @@
             .withAutomaticReconnect()
             .build();
 
-        connection.on("ReceiveMessage", msg => {
-            // chỉ append vào chat đang mở
+        connection.on("ReceiveMessage", async msg => {
             if (msg.conversationId !== activeConversationId) return;
 
             const box = document.getElementById("chatBox");
-            box.insertAdjacentHTML("beforeend", renderMessage(msg));
+            const html = await renderMessage(msg);
+
+            box.insertAdjacentHTML("beforeend", html);
             scrollBottom();
         });
 

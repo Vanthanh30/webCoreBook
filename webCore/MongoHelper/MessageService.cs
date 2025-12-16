@@ -13,7 +13,7 @@ namespace webCore.MongoHelper
         Task<Message> SaveTextAsync(string conversationId, string senderId, string content);
 
         // Shopee-style context (system card)
-        Task<Message> SaveSystemAsync(string conversationId, string content, string? productId = null, string? orderId = null);
+        Task<Message> SaveSystemAsync(string conversationId, string content, string messageType, string? productId = null, string? orderId = null);
 
         Task<bool> CanAccessAsync(string conversationId, string userId);
     }
@@ -73,14 +73,14 @@ namespace webCore.MongoHelper
             return msg;
         }
 
-        public async Task<Message> SaveSystemAsync(string conversationId, string content, string? productId = null, string? orderId = null)
+        public async Task<Message> SaveSystemAsync(string conversationId, string content, string messageType, string? productId = null, string? orderId = null)
         {
             var msg = new Message
             {
                 ConversationId = conversationId,
                 SenderId = "system",
                 Content = content,
-                MessageType = "system",
+                MessageType = messageType,
                 ProductId = productId,
                 OrderId = orderId,
                 CreatedAt = DateTime.UtcNow,
