@@ -965,3 +965,17 @@ footer {
         padding: 0 10px;
     }
 }
+
+html, body {
+    height: 100%;
+}
+
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#section-one {
+    flex: 1;
+}
