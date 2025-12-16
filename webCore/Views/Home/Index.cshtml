@@ -221,13 +221,16 @@
                             {
                                 "Nổi bật" => "NỔI BẬT",
                                 "Mới" => "MỚI NHẤT",
-                                _ => "BÁN CHẠY"
+                                "Gợi ý" => "GỢI Ý",
+                                "Bán chạy" => "BÁN CHẠY",
+                                _ => group.Key.ToUpper()
                             };
 
                             var sectionClass = group.Key switch
                             {
                                 "Nổi bật" => "featured",
                                 "Mới" => "new",
+                                "Gợi ý" => "bestseller",
                                 _ => "bestseller"
                             };
 

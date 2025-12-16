@@ -1,26 +1,30 @@
 ﻿@* Views/Home/_BookListPartial.cshtml *@
+@using System.Collections.Generic
+@using System.Linq
 @model List<KeyValuePair<string, List<webCore.Models.Product_admin>>>
 
 @if (Model != null && Model.Any())
 {
     foreach (var group in Model)
     {
-        // ✅ Mapping giống hệt Index.cshtml
+        // ✅ Mapping đầy đủ cho tất cả các nhóm
         var sectionTitle = group.Key switch
         {
             "Nổi bật" => "NỔI BẬT",
             "Mới" => "MỚI NHẤT",
-            "Bán chạy" => "BÁN CHẠY",
             "Gợi ý" => "GỢI Ý",
+            "Không nổi bật" => "KHÔNG NỔI BẬT",  // ✅ Thêm case mới
+            "Bán chạy" => "BÁN CHẠY",
             _ => group.Key.ToUpper()
         };
 
         var sectionClass = group.Key switch
         {
-            "Nổi bật" => "featured",
-            "Mới" => "new",
+            "Nổi bật" => "featured",        // Đỏ
+            "Mới" => "new",                 // Xanh lá
+            "Gợi ý" => "bestseller",        // Xanh dương
+            "Không nổi bật" => "bestseller", // Xanh dương (hoặc tạo class mới)
             "Bán chạy" => "bestseller",
-            "Gợi ý" => "bestseller",
             _ => "bestseller"
         };
 

@@ -57,6 +57,7 @@ namespace webCore.Controllers
             {
                 return BadRequest("Category ID is required.");
             }
+
             var allCategories = await _categoryService.GetCategoriesAsync();
             var childCategoryIds = allCategories
                 .Where(c => c.ParentId == categoryId)
@@ -79,16 +80,19 @@ namespace webCore.Controllers
             {
                 products = await _productService.GetProductsByCategoryIdAsync(categoryId);
             }
+
             products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
             var groupedProducts = new Dictionary<string, List<Product_admin>>();
 
+            // ✅ BAO GỒM CẢ Featured = 0 (Không nổi bật)
             var featuredGroups = products
                 .GroupBy(p => p.Featured switch
                 {
-                    1 => "Nổi bật",      
-                    2 => "Mới",         
-                    3 => "Gợi ý",       
-                    _ => "Gợi ý"       
+                    1 => "Nổi bật",
+                    2 => "Mới",
+                    3 => "Gợi ý",
+                    0 => "Không nổi bật",
+                    _ => "Không nổi bật"
                 })
                 .ToDictionary(g => g.Key, g => g.ToList());
 
@@ -102,6 +106,9 @@ namespace webCore.Controllers
             if (featuredGroups.ContainsKey("Gợi ý"))
                 groupedProducts.Add("Gợi ý", featuredGroups["Gợi ý"]);
 
+            if (featuredGroups.ContainsKey("Không nổi bật"))
+                groupedProducts.Add("Không nổi bật", featuredGroups["Không nổi bật"]);
+
             // Chuyển sang List với thứ tự đã định
             var orderedGroupedProducts = groupedProducts
                 .Select(kvp => new KeyValuePair<string, List<Product_admin>>(kvp.Key, kvp.Value))
@@ -113,7 +120,6 @@ namespace webCore.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string q)
         {
-            // Lấy tất cả dữ liệu như trang chủ
             var categories = await _categoryService.GetCategoriesAsync();
             ViewBag.Categories = categories;
 
@@ -123,18 +129,16 @@ namespace webCore.Controllers
             var featuredProducts = await _productService.GetFeaturedProductsAsync();
             ViewBag.FeaturedProducts = featuredProducts;
 
-            // ✅ Sửa: Dùng GetTopDiscountProductsAsync thay vì GetBestsellerProductsAsync
             var flashSaleProducts = await _productService.GetTopDiscountProductsAsync(3);
             ViewBag.FlashSaleProducts = flashSaleProducts;
 
-            // === PHẦN TÌM KIẾM ===
             ViewBag.SearchQuery = q?.Trim() ?? "";
 
             if (!string.IsNullOrWhiteSpace(q))
             {
                 var searchResults = await _productService.SearchProductsAsync(q);
 
-                // ✅ Nhóm theo Featured từ database thay vì theo DiscountPercentage
+                // ✅ BAO GỒM CẢ Featured = 0 (Không nổi bật)
                 var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
 
                 var featuredGroups = searchResults
@@ -143,11 +147,11 @@ namespace webCore.Controllers
                         1 => "Nổi bật",
                         2 => "Mới",
                         3 => "Gợi ý",
-                        _ => "Gợi ý"
+                        0 => "Không nổi bật",
+                        _ => "Không nổi bật"
                     })
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                // Thêm theo thứ tự: Nổi bật -> Mới -> Gợi ý
                 if (featuredGroups.ContainsKey("Nổi bật"))
                     grouped.Add(new KeyValuePair<string, List<Product_admin>>("Nổi bật", featuredGroups["Nổi bật"]));
 
@@ -156,6 +160,9 @@ namespace webCore.Controllers
 
                 if (featuredGroups.ContainsKey("Gợi ý"))
                     grouped.Add(new KeyValuePair<string, List<Product_admin>>("Gợi ý", featuredGroups["Gợi ý"]));
+
+                if (featuredGroups.ContainsKey("Không nổi bật"))
+                    grouped.Add(new KeyValuePair<string, List<Product_admin>>("Không nổi bật", featuredGroups["Không nổi bật"]));
 
                 ViewBag.SearchResults = grouped;
                 ViewBag.IsSearching = true;
@@ -166,7 +173,6 @@ namespace webCore.Controllers
                 ViewBag.IsSearching = false;
             }
 
-            // TRẢ VỀ LUÔN TRANG CHỦ (Index.cshtml)
             return View("Index");
         }
         [HttpPost]
@@ -231,22 +237,24 @@ namespace webCore.Controllers
             return Ok(breadcrumbs);
         }
         [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetProductsByPrice(decimal min, decimal max)
         {
             var products = await _productService.GetProductsByFinalPriceRangeAsync(min, max);
 
             var groupedProducts = new Dictionary<string, List<Product_admin>>();
+
             var featuredGroups = products
                 .GroupBy(p => p.Featured switch
                 {
                     1 => "Nổi bật",
                     2 => "Mới",
                     3 => "Gợi ý",
-                    _ => "Gợi ý"
+                    0 => "Không nổi bật",
+                    _ => "Không nổi bật"
                 })
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            // Thêm vào dictionary theo thứ tự ưu tiên
             if (featuredGroups.ContainsKey("Nổi bật"))
                 groupedProducts.Add("Nổi bật", featuredGroups["Nổi bật"]);
 
@@ -256,7 +264,15 @@ namespace webCore.Controllers
             if (featuredGroups.ContainsKey("Gợi ý"))
                 groupedProducts.Add("Gợi ý", featuredGroups["Gợi ý"]);
 
-            return PartialView("_BookListPartial", groupedProducts.ToList());
+            if (featuredGroups.ContainsKey("Không nổi bật"))
+                groupedProducts.Add("Không nổi bật", featuredGroups["Không nổi bật"]);
+
+            // ✅ QUAN TRỌNG: Chuyển sang List<KeyValuePair<>> giống các method khác
+            var orderedGroupedProducts = groupedProducts
+                .Select(kvp => new KeyValuePair<string, List<Product_admin>>(kvp.Key, kvp.Value))
+                .ToList();
+
+            return PartialView("_BookListPartial", orderedGroupedProducts);
         }
     }
 }
