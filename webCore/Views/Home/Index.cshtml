@@ -253,17 +253,23 @@
                                                     </div>
                                                     <div class="product-details mt-2">
                                                         <h3 class="product-name text-dark mb-1" style="font-size: 14px; height: 40px; overflow: hidden;">@product.Title</h3>
-                                                        @if (product.DiscountPercentage > 0)
-                                                        {
-                                                            <div class="product-price-old text-muted"><del>@string.Format("{0:N0} đ", product.Price)</del></div>
-                                                            <div class="product-price-new text-danger fw-bold">
-                                                                @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="product-price-single text-danger fw-bold">@string.Format("{0:N0} đ", product.Price)</div>
-                                                        }
+                                                        <div class="product-price-area">
+                                                            @if (product.DiscountPercentage > 0)
+                                                            {
+                                                                <div class="product-price-old">
+                                                                    <del>@string.Format("{0:N0} đ", product.Price)</del>
+                                                                </div>
+                                                                <div class="product-price-new">
+                                                                    @string.Format("{0:N0} đ", product.Price * (1m - (decimal)product.DiscountPercentage / 100m))
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="product-price-single">
+                                                                    @string.Format("{0:N0} đ", product.Price)
+                                                                </div>
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </a>
                                             </div>
