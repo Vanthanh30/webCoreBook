@@ -90,6 +90,14 @@
                     Mua ngay
                 </button>
                 <input type="hidden" id="quantityInput" value="1" />
+                <button class="btn btn-outline-primary chat-btn"
+                        data-product="@Model.Id"
+                        data-seller="@Model.SellerId"
+                        onclick="contactSeller(this)">
+                    Chat với shop
+                </button>
+
+
             </div>
 
             <!-- Mô tả sản phẩm -->
@@ -190,6 +198,7 @@
                         </div>
                         <a href="@Url.Action("DetailProduct", "DetailProduct", new { id = p.Id })"
                            class="btn btn-primary btn-sm mt-auto">Xem chi tiết</a>
+
                     </div>
                 </div>
             }
@@ -247,6 +256,7 @@
                 location.href = `/Cart/BuyNow?productId=${pid}&quantity=${qty}`;
             });
         });
+
         /* ....*/
         const productId = '@Model.Id';
 
@@ -476,6 +486,37 @@
         $(function () {
             loadReviews();
         });
+
+
     </script>
+    <script>
+        async function contactSeller(btn) {
+            const productId = btn.dataset.product;
+            const sellerId = btn.dataset.seller;
+            const currentUserId = "@ViewBag.UserId";
+
+            // 🚫 chặn chat với shop mình (frontend)
+            if (sellerId === currentUserId) {
+                alert("⚠️ Bạn không thể chat với sản phẩm của chính shop bạn");
+                return;
+            }
+
+            const res = await fetch(
+                `/DetailProduct/ContactSellerFromProduct?productId=${productId}`
+            );
+
+            const data = await res.json();
+
+            if (!data.success) {
+                alert(data.message);
+                return;
+            }
+
+            // ✅ mở chat
+            window.location.href = data.redirect;
+        }
+    </script>
+
+
 }
 }

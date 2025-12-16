@@ -13,14 +13,16 @@ namespace webCore.Controllers
     public class Admin_userController : Controller
     {
         private readonly User_adminService _useradminService;
+        private readonly RoleService _roleService;
         private const int PageSize = 5; // Số lượng người dùng trên mỗi trang
 
-        public Admin_userController(User_adminService useadminService)
+        public Admin_userController(User_adminService useadminService, RoleService roleService)
         {
             _useradminService = useadminService;
+            _roleService = roleService;
         }
 
-        // Hiển thị danh sách tất cả người dùng với phân trang
+        // Hiển thị danh sách tất cả người dùng với phân trang (không bao gồm Admin)
         public async Task<IActionResult> Index(int page = 1)
         {
             try
@@ -28,8 +30,11 @@ namespace webCore.Controllers
                 var adminName = HttpContext.Session.GetString("AdminName");
                 ViewBag.AdminName = adminName;
 
-                // Lấy tất cả người dùng từ service
-                var allUsers = await _useradminService.GetAllUsersAsync();
+                // Lấy danh sách RoleId của Admin để loại trừ
+                var adminRoleIds = await _roleService.GetAdminRoleIdsAsync();
+
+                // Lấy tất cả người dùng KHÔNG phải Admin từ service
+                var allUsers = await _useradminService.GetAllUsersAsync(adminRoleIds);
 
                 // Tính toán phân trang
                 var totalUsers = allUsers.Count;
@@ -62,7 +67,7 @@ namespace webCore.Controllers
             catch (Exception ex)
             {
                 // Xử lý khi có lỗi xảy ra
-                TempData["ErrorMessage"] = "Lỗi khi tải . " + ex.Message;
+                TempData["ErrorMessage"] = "Lỗi khi tải danh sách người dùng: " + ex.Message;
                 return RedirectToAction("Error");
             }
         }
@@ -79,18 +84,19 @@ namespace webCore.Controllers
             {
                 var adminName = HttpContext.Session.GetString("AdminName");
                 ViewBag.AdminName = adminName;
-                var user = await _useradminService.GetUserByIdAsync(id); // Gọi service để lấy thông tin đơn hàng
+                var user = await _useradminService.GetUserByIdAsync(id);
+
                 if (user == null)
                 {
-                    TempData["ErrorMessage"] = "Đơn hàng không tồn tại.";
-                    return RedirectToAction("Index"); // Quay lại trang danh sách nếu đơn hàng không tìm thấy
+                    TempData["ErrorMessage"] = "Người dùng không tồn tại.";
+                    return RedirectToAction("Index");
                 }
 
-                return View(user);  // Trả về View chi tiết đơn hàng
+                return View(user);
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Lỗi khi tải chi tiết đơn hàng: " + ex.Message;
+                TempData["ErrorMessage"] = "Lỗi khi tải chi tiết người dùng: " + ex.Message;
                 return RedirectToAction("Error");
             }
         }
@@ -104,7 +110,7 @@ namespace webCore.Controllers
                 if (string.IsNullOrEmpty(id))
                 {
                     TempData["ErrorMessage"] = "ID không hợp lệ.";
-                    return RedirectToAction("Index"); // Redirect đến trang Index
+                    return RedirectToAction("Index");
                 }
 
                 // Lấy người dùng theo ID
@@ -112,7 +118,7 @@ namespace webCore.Controllers
                 if (user == null)
                 {
                     TempData["ErrorMessage"] = "Người dùng không tồn tại.";
-                    return RedirectToAction("Index"); // Redirect đến trang Index
+                    return RedirectToAction("Index");
                 }
 
                 // Xác định trạng thái mới: nếu đang là 1 thì đổi thành 0
@@ -131,13 +137,14 @@ namespace webCore.Controllers
                 }
 
                 // Tải lại trang Index
-                return RedirectToAction("Index"); // Redirect đến trang Index để tải lại dữ liệu
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Đã xảy ra lỗi: " + ex.Message;
-                return RedirectToAction("Index"); // Redirect đến trang Index nếu có lỗi
+                return RedirectToAction("Index");
             }
         }
     }
 }
+

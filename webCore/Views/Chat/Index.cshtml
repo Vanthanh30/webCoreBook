@@ -294,18 +294,20 @@
     }
 
     // init
-    loadConversations();
-    const urlParams = new URLSearchParams(window.location.search);
-    const convoFromUrl = urlParams.get("conversationId");
-    //đợi load danh sách chat
-    if (convoFromUrl) {
-        setTimeout(() => {
+    (async function initChat() {
+        await loadConversations();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const convoFromUrl = urlParams.get("conversationId");
+
+        if (convoFromUrl) {
             const el = document.querySelector(
                 `.chat-list-item[data-id="${convoFromUrl}"]`
             );
             if (el) {
                 openConversation(convoFromUrl, el);
             }
-        }, 200);
-    }
+        }
+    })();
+
 </script>
