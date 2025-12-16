@@ -80,9 +80,13 @@
                                 foreach (var parent in parentCategories)
                                 {
                                     var subCategories = categories.Where(c => c.ParentId == parent._id).ToList();
+
                                     <div class="filter-item">
-                                        <input type="checkbox" id="cat_@parent._id" class="filter-checkbox parent-checkbox"
-                                               onchange="toggleSubCategories('@parent._id')" onclick="loadProductsByCategoryId('@parent._id')">
+                                        <input type="checkbox"
+                                               id="cat_@parent._id"
+                                               class="filter-checkbox parent-checkbox"
+                                               data-id="@parent._id"
+                                               onchange="toggleSubCategories('@parent._id'); filterByCategory();"/>
                                         <label for="cat_@parent._id">@parent.Title</label>
                                     </div>
 
@@ -92,8 +96,12 @@
                                             @foreach (var sub in subCategories)
                                             {
                                                 <div class="filter-item sub-item">
-                                                    <input type="checkbox" id="subcat_@sub._id" class="filter-checkbox"
-                                                           onclick="loadProductsByCategoryId('@sub._id')">
+                                                    <input type="checkbox"
+                                                           id="subcat_@sub._id"
+                                                           class="filter-checkbox child-checkbox"
+                                                           data-id="@sub._id"
+                                                           data-parent="@parent._id"
+                                                           onchange="filterByCategory()" />
                                                     <label for="subcat_@sub._id">@sub.Title</label>
                                                 </div>
                                             }
@@ -296,8 +304,16 @@
     function toggleSubCategories(parentId) {
         const sub = document.getElementById('sub_' + parentId);
         const checkbox = document.getElementById('cat_' + parentId);
-        if (sub && checkbox) {
-            sub.classList.toggle('show', checkbox.checked);
+
+        if (!sub || !checkbox) return;
+
+        if (checkbox.checked) {
+            sub.classList.add('show');
+        } else {
+            sub.classList.remove('show');
+
+            // Bỏ chọn toàn bộ checkbox con khi bỏ chọn cha
+            sub.querySelectorAll('.child-checkbox').forEach(cb => cb.checked = false);
         }
     }
 
@@ -334,6 +350,46 @@
         const slider = btn.parentElement.querySelector('.products-slider');
         slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
     }
+//Chức năng lọc
+    function filterByCategory() {
+        const parentCheckboxes = document.querySelectorAll('.parent-checkbox');
+        const childCheckboxes = document.querySelectorAll('.child-checkbox');
+
+        let categoryIds = [];
+
+        parentCheckboxes.forEach(parent => {
+            const parentId = parent.dataset.id;
+            const children = document.querySelectorAll(
+                `.child-checkbox[data-parent='${parentId}']`
+            );
+
+            const checkedChildren = Array.from(children).filter(cb => cb.checked);
+
+            if (checkedChildren.length > 0) {
+                // Có chọn con → dùng con
+                categoryIds.push(
+                    ...checkedChildren.map(cb => cb.dataset.id)
+                );
+            } else if (parent.checked) {
+                // Chỉ chọn cha → dùng cha (server sẽ expand ra con)
+                categoryIds.push(parentId);
+            }
+        });
+
+        if (categoryIds.length === 0) {
+            location.reload();
+            return;
+        }
+
+        $.ajax({
+            url: '/Home/GetProductsByCategoryId',
+            type: 'GET',
+            traditional: true,
+            data: { categoryId: categoryIds },
+            success: function (html) {
+                $('.product-list').html(html);
+            }
+        });
+    }
 </script>
-} 
-}
+

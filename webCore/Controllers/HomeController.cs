@@ -53,44 +53,59 @@ namespace webCore.Controllers
         }
 
         // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
-        public async Task<IActionResult> GetProductsByCategoryId(string categoryId)
+        public async Task<IActionResult> GetProductsByCategoryId(List<string> categoryId)
         {
-            if (string.IsNullOrEmpty(categoryId))
+            if (categoryId == null || !categoryId.Any())
             {
-                return BadRequest("Category ID is required.");
+                var homeGroupedProducts = await _productService.GetProductsGroupedByFeaturedAsync();
+
+                var orderedHomeProducts = homeGroupedProducts
+                    .Where(g => g.Key == "Nổi bật" || g.Key == "Mới" || g.Key == "Gợi ý" || g.Key == "Bán chạy")
+                    .OrderBy(g =>
+                        g.Key == "Nổi bật" ? 0 :
+                        g.Key == "Mới" ? 1 :
+                        g.Key == "Gợi ý" ? 2 : 3)
+                    .ToList();
+
+                return PartialView("_BookListPartial", orderedHomeProducts);
             }
 
-            // --- BẮT ĐẦU SỬA ĐỔI ---
-
-            // 1. Lấy tất cả danh mục để kiểm tra quan hệ cha-con
+            // ===== 1. LẤY TOÀN BỘ DANH MỤC =====
             var allCategories = await _categoryService.GetCategoriesAsync();
 
-            // 2. Tìm danh sách các ID danh mục con của categoryId hiện tại
-            var childCategoryIds = allCategories
-                .Where(c => c.ParentId == categoryId)
-                .Select(c => c._id)
-                .ToList();
+            // ===== 2. XÁC ĐỊNH DANH MỤC CUỐI CÙNG CẦN LỌC =====
+            var finalCategoryIds = new HashSet<string>();
 
-            List<Product_admin> products = new List<Product_admin>();
-
-            // 3. Logic: Nếu có con (là Cha) thì lấy cả cha lẫn con. Nếu không (là Con) thì chỉ lấy nó.
-            if (childCategoryIds.Any())
+            foreach (var id in categoryId)
             {
-                // A. Trường hợp chọn Danh mục Cha:
+                // Lấy danh mục con nếu id là danh mục cha
+                var childIds = allCategories
+                    .Where(c => c.ParentId == id)
+                    .Select(c => c._id)
+                    .ToList();
 
-                var parentProducts = await _productService.GetProductsByCategoryIdAsync(categoryId);
-                products.AddRange(parentProducts);
-
-                foreach (var childId in childCategoryIds)
+                if (childIds.Any())
                 {
-                    var childProducts = await _productService.GetProductsByCategoryIdAsync(childId);
-                    products.AddRange(childProducts);
+                    // Click danh mục cha → chỉ lấy sản phẩm của danh mục con
+                    foreach (var childId in childIds)
+                    {
+                        finalCategoryIds.Add(childId);
+                    }
+                }
+                else
+                {
+                    // Click danh mục con → lấy trực tiếp
+                    finalCategoryIds.Add(id);
                 }
             }
-            else
-            {
 
-                products = await _productService.GetProductsByCategoryIdAsync(categoryId);
+            // ===== 3. LẤY SẢN PHẨM THEO DANH MỤC =====
+            var products = new List<Product_admin>();
+
+            foreach (var catId in finalCategoryIds)
+            {
+                var catProducts = await _productService.GetProductsByCategoryIdAsync(catId);
+                products.AddRange(catProducts);
             }
 
             products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
