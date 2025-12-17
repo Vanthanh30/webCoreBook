@@ -173,3 +173,7 @@
     background-color: #E53935 !important;
     color: #fff;
 }
+.badge-dark {
+    color: #fff;
+    background-color: #343a40 !important;
+}

@@ -12,7 +12,7 @@ using webCore.Services;
 
 namespace webCore.Controllers
 {
-    public class CheckoutController : Controller
+    public class CheckoutController : BaseController
     {
         private readonly CartService _cartService;
         private readonly OrderService _orderService;

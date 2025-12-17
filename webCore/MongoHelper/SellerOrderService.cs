@@ -78,7 +78,8 @@ namespace webCore.MongoHelper
                 { "Packing", allOrders.Count(x => x.Status == "Chờ lấy hàng") },
                 { "Shipping", allOrders.Count(x => x.Status == "Đang giao") },
                 { "Completed", allOrders.Count(x => x.Status == "Đã giao") },
-                { "Return", allOrders.Count(x => x.Status == "Đã hủy" || x.Status == "Trả hàng") }
+                { "Cancel", allOrders.Count(x => x.Status == "Đã hủy") },
+                { "ReturnRequest", allOrders.Count(x => x.Status == "Trả hàng/Hoàn tiền") }
             };
         }
 
@@ -174,8 +175,9 @@ namespace webCore.MongoHelper
         { "Chờ lấy hàng", orders.Count(o => o.Status == "Chờ lấy hàng" || o.Status == "Processing") },
         { "Đang giao", orders.Count(o => o.Status == "Đang giao" || o.Status == "Shipping") },
         { "Đã giao", orders.Count(o => o.Status == "Đã giao" || o.Status == "Completed" || o.Status == "Delivered") },
-        { "Đã hủy", orders.Count(o => o.Status == "Đã hủy" || o.Status == "Cancelled") }
-    };
+        { "Đã hủy", orders.Count(o => o.Status == "Đã hủy" || o.Status == "Cancelled") },
+                { "Trả hàng/Hoàn tiền", orders.Count(o => o.Status == "Trả hàng/Hoàn tiền") }
+        };
         }
         public async Task<decimal> GetSellerRevenueAsync(List<string> productIds)
         {

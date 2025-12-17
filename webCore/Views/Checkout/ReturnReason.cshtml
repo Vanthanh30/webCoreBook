@@ -7,18 +7,77 @@
 
 @section Styles {
     <style>
-        /* Thêm style cho preview ảnh giống trang Review */
+        .detail-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .product-mini {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+            .product-mini:last-child {
+                border-bottom: none;
+            }
+
+        /* Upload Area Styling */
+        .media-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .media-upload-area:hover {
+                border-color: #007bff;
+                background: #f0f7ff;
+            }
+
+            .media-upload-area i {
+                font-size: 24px;
+                color: #6c757d;
+                margin-bottom: 8px;
+            }
+
+            .media-upload-area:hover i, .media-upload-area:hover div {
+                color: #007bff;
+            }
+
+        /* Preview Images */
         .preview-container {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 15px;
-            justify-content: center;
         }
 
         .preview-item {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             object-fit: cover;
             border-radius: 6px;
             border: 1px solid #ddd;
@@ -27,49 +86,59 @@
 }
 
 <div class="container">
-    <div class="return-container">
-        <div class="text-center mb-4">
-            <h3 style="font-weight: 700; color: #333;">YÊU CẦU TRẢ HÀNG</h3>
-        </div>
+    <div class="detail-container">
 
-        <div class="header-info">
-            <strong>Mã đơn hàng:</strong> <span class="text-primary">#@Model.Id</span>
-            <br>
-            <small class="text-muted">Ngày đặt: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-        </div>
+        <h4 class="text-danger mb-4 border-bottom pb-3 text-center" style="font-weight: 700;">
+            <i class="fas fa-file-invoice-dollar mr-2"></i> YÊU CẦU TRẢ HÀNG / HOÀN TIỀN
+        </h4>
 
         <form asp-action="SubmitReturnRequest" asp-controller="Checkout" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmit()">
 
             <input type="hidden" name="orderId" value="@Model.Id" />
 
-            @if (Model.Items != null)
-            {
-                foreach (var item in Model.Items)
-                {
-                    <div class="product-box d-flex p-3 mb-3">
-                        <img src="@item.Image" style="width:70px; height:70px; border-radius:8px; margin-right:15px; object-fit: cover;" />
-                        <div>
-                            <strong>@item.Title</strong><br>
-                            <small>@item.Price.ToString("N0")đ x @item.Quantity</small>
-                        </div>
+            <div class="mb-4">
+                <label class="info-label">Đơn hàng liên quan: <span class="text-primary">#@Model.Id</span></label>
+                <div class="info-box">
+                    <div class="d-flex justify-content-between mb-2">
+                        <small class="text-muted">Ngày đặt: @Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</small>
                     </div>
-                }
-            }
 
-            <hr />
+                    <div class="bg-white border rounded p-2">
+                        @if (Model.Items != null)
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <div class="product-mini">
+                                    <img src="@item.Image" style="width: 60px; height: 60px; border-radius: 6px; object-fit: cover; margin-right: 15px; border: 1px solid #f0f0f0;" />
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 15px;">@item.Title</div>
+                                        <small class="text-muted">@item.Price.ToString("N0")đ x @item.Quantity</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
 
-            <div class="form-group">
-                <label><strong>Lý do trả hàng & Mô tả</strong> <span class="text-danger">*</span></label>
-                <textarea name="reason" class="form-control" rows="4" required placeholder="Mô tả chi tiết lý do..."></textarea>
+                    <div class="text-right mt-3">
+                        <span class="text-muted">Số tiền hoàn dự kiến:</span>
+                        <span class="text-danger font-weight-bold ml-2" style="font-size: 18px;">@Model.FinalAmount.ToString("N0")đ</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label><strong>Hình ảnh / Video minh chứng</strong></label>
-                <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()" style="cursor: pointer;">
-                    <div class="media-upload">
-                        <i class="fa fa-cloud-upload-alt"></i>
-                        <div style="font-size: 13px;">Tải lên Ảnh/Video</div>
-                    </div>
+            <div class="form-group mb-4">
+                <label class="info-label">Lý do trả hàng & Mô tả chi tiết <span class="text-danger">*</span></label>
+                <textarea name="reason" class="form-control" rows="4" required
+                          style="border-radius: 8px; padding: 12px;"
+                          placeholder="Vui lòng mô tả chi tiết lý do (Ví dụ: Hàng bị vỡ, sai màu, thiếu phụ kiện...)..."></textarea>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="info-label">Hình ảnh / Video minh chứng</label>
+                <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <div style="font-size: 14px; font-weight: 500;">Nhấn để tải lên Ảnh hoặc Video</div>
+                    <small class="text-muted">(Cung cấp bằng chứng rõ nét giúp yêu cầu được xử lý nhanh hơn)</small>
                 </div>
 
                 <input type="file" id="mediaInput" name="mediaFiles" multiple accept="image/*,video/*" style="display:none;" onchange="previewMedia(this)" />
@@ -77,13 +146,15 @@
                 <div id="previewContainer" class="preview-container"></div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block btn-submit text-white mt-4">
-                <i class="fas fa-paper-plane mr-2"></i> Gửi yêu cầu
-            </button>
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-primary py-2 px-5" style="font-weight: 600; font-size: 16px; border-radius: 8px;">
+                    <i class="fas fa-paper-plane mr-2"></i> Gửi yêu cầu hoàn tiền
+                </button>
+            </div>
         </form>
 
-        <div class="text-center mt-3">
-            <a href="@Url.Action("PaymentHistory", "Checkout")" class="text-secondary small">
+        <div class="text-center mt-4 border-top pt-3">
+            <a href="@Url.Action("PaymentHistory", "Checkout")" class="text-secondary small" style="text-decoration: none;">
                 <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
             </a>
         </div>
@@ -92,7 +163,7 @@
 
 @section Scripts {
     <script>
-        // Hàm xem trước ảnh/video (Copy từ trang Review của bạn)
+        // Hàm xem trước ảnh/video
         function previewMedia(input) {
             var container = document.getElementById('previewContainer');
             container.innerHTML = '';
@@ -105,7 +176,7 @@
                             media = document.createElement('video');
                             media.src = e.target.result;
                             media.className = 'preview-item';
-                            media.controls = false; // Tắt control cho gọn
+                            media.controls = false;
                         } else {
                             media = document.createElement('img');
                             media.src = e.target.result;
