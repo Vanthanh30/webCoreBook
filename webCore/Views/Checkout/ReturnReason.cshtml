@@ -1,148 +1,126 @@
-﻿@{
-    Layout = "_Layout";
+﻿@model webCore.Models.Order
 
-    var orderId = "234567oiuthgfdzxf";
-    var productImage = "https://via.placeholder.com/80";
-    var productTitle = "Take note";
-    var price = 200000;
-    var quantity = 2;
-    var total = price * quantity;
+@{
+    ViewData["Title"] = "Yêu cầu Trả hàng";
+    Layout = "_Layout";
 }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="~/css/checkout.css" />
-<style>
-    .return-container {
-        max-width: 550px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin-top: 25px;
-    }
-
-    .product-box {
-        border-radius: 12px;
-        border: 1px solid #e0e0e0;
-        background: #fff;
-    }
-
-    .media-upload {
-        width: 120px;
-        height: 110px;
-        border: 1px dashed #bbb;
-        border-radius: 10px;
-        padding: 18px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-        .media-upload:hover {
-            border-color: #007bff;
-            background: #f8f9ff;
+@section Styles {
+    <style>
+        /* Thêm style cho preview ảnh giống trang Review */
+        .preview-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            justify-content: center;
         }
 
-        .media-upload i {
-            color: #555;
+        .preview-item {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
         }
+    </style>
+}
 
-    textarea {
-        border-radius: 10px !important;
-        border: 1px solid #ccc !important;
-    }
-
-    .btn-primary {
-        background: #007bff;
-        border-radius: 10px;
-        padding: 10px 22px;
-    }
-</style>
-<div class="container ">
-    <div class="row">
-        <div class="col">
-            <div class="cart-title">
-                <h2 class="title">TRẢ HÀNG/HOÀN TIỀN</h2>
-            </div>
-        </div>
-    </div>
+<div class="container">
     <div class="return-container">
+        <div class="text-center mb-4">
+            <h3 style="font-weight: 700; color: #333;">YÊU CẦU TRẢ HÀNG</h3>
+        </div>
 
-        <h5 class="text-madonhang">
-            <strong>Mã đơn hàng:</strong> @orderId
-        </h5>
+        <div class="header-info">
+            <strong>Mã đơn hàng:</strong> <span class="text-primary">#@Model.Id</span>
+            <br>
+            <small class="text-muted">Ngày đặt: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+        </div>
 
-        <!-- Sản phẩm -->
-        <div class="product-box d-flex p-3 mb-4 shadow-sm">
-            <img src="@productImage"
-                 style="width:80px;height:80px;border-radius:12px;margin-right:15px;" />
+        <form asp-action="SubmitReturnRequest" asp-controller="Checkout" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmit()">
 
-            <div class="flex-grow-1">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <strong>@productTitle</strong>
-                        <div class="text-danger mt-1" style="font-size:15px;">
-                            @price.ToString("N0")đ
+            <input type="hidden" name="orderId" value="@Model.Id" />
+
+            @if (Model.Items != null)
+            {
+                foreach (var item in Model.Items)
+                {
+                    <div class="product-box d-flex p-3 mb-3">
+                        <img src="@item.Image" style="width:70px; height:70px; border-radius:8px; margin-right:15px; object-fit: cover;" />
+                        <div>
+                            <strong>@item.Title</strong><br>
+                            <small>@item.Price.ToString("N0")đ x @item.Quantity</small>
                         </div>
                     </div>
+                }
+            }
 
-                    <div style="font-weight:bold;">
-                        X@quantity
+            <hr />
+
+            <div class="form-group">
+                <label><strong>Lý do trả hàng & Mô tả</strong> <span class="text-danger">*</span></label>
+                <textarea name="reason" class="form-control" rows="4" required placeholder="Mô tả chi tiết lý do..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label><strong>Hình ảnh / Video minh chứng</strong></label>
+                <div class="media-upload-area" onclick="document.getElementById('mediaInput').click()" style="cursor: pointer;">
+                    <div class="media-upload">
+                        <i class="fa fa-cloud-upload-alt"></i>
+                        <div style="font-size: 13px;">Tải lên Ảnh/Video</div>
                     </div>
                 </div>
 
-                <div class="text-right mt-2" style="font-size:16px;font-weight:bold;color:#d9534f;">
-                    Tổng tiền: @total.ToString("N0")đ
-                </div>
-            </div>
-        </div>
+                <input type="file" id="mediaInput" name="mediaFiles" multiple accept="image/*,video/*" style="display:none;" onchange="previewMedia(this)" />
 
-        <!-- Mô tả -->
-        <label><strong>Nhập mô tả</strong></label>
-        <textarea class="form-control mb-3"
-                  id="returnDescription"
-                  rows="4"
-                  placeholder="Vui lòng mô tả lý do trả hàng..."></textarea>
-
-        <!-- Upload -->
-        <div class="d-flex justify-content-around text-center mt-4 mb-3">
-            <div class="media-upload" id="addImage">
-                <i class="fa fa-camera" style="font-size:32px;"></i>
-                <div>Thêm ảnh</div>
+                <div id="previewContainer" class="preview-container"></div>
             </div>
 
-            <div class="media-upload" id="addVideo">
-                <i class="fa fa-video" style="font-size:32px;"></i>
-                <div>Thêm video</div>
-            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-submit text-white mt-4">
+                <i class="fas fa-paper-plane mr-2"></i> Gửi yêu cầu
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="@Url.Action("PaymentHistory", "Checkout")" class="text-secondary small">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
+            </a>
         </div>
-
-        <input type="file" id="mediaInput" style="display:none;" multiple />
-
-        <!-- Nút gửi -->
-        <div class="text-center mt-4">
-            <button id="btnSubmitReturn" class="btn btn-primary">Gửi yêu cầu</button>
-        </div>
-
     </div>
-    </div>
+</div>
+
+@section Scripts {
     <script>
-        $("#addImage").on("click", function () {
-            $("#mediaInput").attr("accept", "image/*").click();
-        });
-
-        $("#addVideo").on("click", function () {
-            $("#mediaInput").attr("accept", "video/*").click();
-        });
-
-        $("#btnSubmitReturn").on("click", function () {
-            let desc = $("#returnDescription").val().trim();
-
-            if (desc === "") {
-                alert("Vui lòng nhập lý do trả hàng!");
-                return;
+        // Hàm xem trước ảnh/video (Copy từ trang Review của bạn)
+        function previewMedia(input) {
+            var container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var media;
+                        if (file.type.startsWith('video')) {
+                            media = document.createElement('video');
+                            media.src = e.target.result;
+                            media.className = 'preview-item';
+                            media.controls = false; // Tắt control cho gọn
+                        } else {
+                            media = document.createElement('img');
+                            media.src = e.target.result;
+                            media.className = 'preview-item';
+                        }
+                        container.appendChild(media);
+                    }
+                    reader.readAsDataURL(file);
+                });
             }
+        }
 
-            alert("Đã gửi yêu cầu trả hàng!");
-        });
+        // Xác nhận trước khi gửi
+        function confirmSubmit() {
+            return confirm("Bạn có chắc chắn muốn gửi yêu cầu trả hàng? Đơn hàng sẽ được hủy ngay sau khi gửi.");
+        }
     </script>
+}

@@ -1,0 +1,140 @@
+﻿@model webCore.Models.ReturnRequest
+
+@{
+    ViewData["Title"] = "Chi tiết Yêu cầu Trả hàng";
+    Layout = "_Layout";
+    var order = ViewBag.OrderInfo as webCore.Models.Order;
+}
+
+<style>
+    .detail-container {
+        max-width: 700px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .info-group {
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-content {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        color: #333;
+    }
+
+    .media-grid {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    .media-item {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .media-item:hover {
+        transform: scale(1.05);
+        border-color: #007bff;
+    }
+
+    .product-mini-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .product-mini-item:last-child { border-bottom: none; }
+</style>
+
+<div class="container">
+    <div class="detail-container">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <h4 class="mb-0 text-danger"><i class="fas fa-undo-alt"></i> CHI TIẾT TRẢ HÀNG</h4>
+            <span class="badge badge-secondary">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+
+        @if (order != null)
+        {
+            <div class="info-group">
+                <label class="info-label">Đơn hàng #@order.Id</label>
+                <div class="border rounded">
+                    @foreach (var item in order.Items)
+                    {
+                        <div class="product-mini-item">
+                            <img src="@item.Image" style="width: 50px; height: 50px; border-radius: 5px; object-fit: cover; margin-right: 10px;">
+                            <div>
+                                <div style="font-weight: 500; font-size: 14px;">@item.Title</div>
+                                <small class="text-muted">x @item.Quantity</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="info-group">
+            <label class="info-label">Lý do & Mô tả lỗi:</label>
+            <div class="info-content">
+                @Model.Reason
+            </div>
+        </div>
+
+        <div class="info-group">
+            <label class="info-label">Hình ảnh/Video minh chứng:</label>
+            @if (Model.MediaUrls != null && Model.MediaUrls.Any())
+            {
+                <div class="media-grid">
+                    @foreach (var url in Model.MediaUrls)
+                    {
+                        // Kiểm tra đuôi file để phân biệt ảnh hay video
+                        var isVideo = url.Contains(".mp4") || url.Contains(".webm") || url.Contains(".mov");
+
+                        if (isVideo)
+                        {
+                            <video src="@url" class="media-item" controls></video>
+                        }
+                        else
+                        {
+                            <a href="@url" target="_blank">
+                                <img src="@url" class="media-item" alt="Minh chứng" />
+                            </a>
+                        }
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small"><i>(Không có hình ảnh/video nào được tải lên)</i></p>
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="@Url.Action("PaymentHistory", "Checkout")" class="btn btn-outline-secondary px-4">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a href="@Url.Action("ContactSeller", "Checkout", new { orderId = Model.OrderId })" class="btn btn-primary px-4 ml-2">
+                <i class="fas fa-comments"></i> Chat với Shop
+            </a>
+        </div>
+    </div>
+</div>

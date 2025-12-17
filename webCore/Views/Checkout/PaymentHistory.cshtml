@@ -227,7 +227,9 @@
                                 </a>
                             }
                             <a class="btn btn-sm btn-outline-danger action-btn"
-                               href="@Url.Action("ReturnReason", "Checkout")">Yêu cầu trả hàng</a>
+                               href="@Url.Action("ReturnReason", "Checkout", new { orderId = order.Id })">
+                                Yêu cầu trả hàng
+                            </a>
                         }
                         else if (order.Status == "Trả hàng/Hoàn tiền")
                         {
