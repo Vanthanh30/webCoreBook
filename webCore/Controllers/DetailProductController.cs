@@ -287,17 +287,12 @@ namespace webCore.Controllers
                 shopId: shop.Id
             );
 
-            // 5️⃣ TẠO SYSTEM MESSAGE (CHỈ 1 LẦN)
-            var messages = await _messageService.GetMessagesAsync(conversation.Id, 1);
-            if (messages.Count == 0)
-            {
                 await _messageService.SaveSystemAsync(
                     conversation.Id,
                     $"📌 Trao đổi về sản phẩm: {product.Title}",
                     messageType: "product",
                     productId: product.Id
                 );
-            }
 
             // 6️⃣ REDIRECT VÀO CHAT + AUTO OPEN
             return Json(new

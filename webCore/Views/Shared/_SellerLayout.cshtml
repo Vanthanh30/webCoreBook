@@ -97,41 +97,6 @@
                 <div class="col-auto">
                     <div class="items-icon">
                        
-                        <!-- User Icon -->
-                        <div class="inner-user" id="userIcon" style="cursor: pointer;">
-                            <div>
-                                <i class="fa-regular fa-user"></i>
-                            </div>
-                            <div class="user-name">
-                                @{
-                                    var userName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
-                                    if (!string.IsNullOrEmpty(userName))
-                                    {
-                                        <span class="username">@userName</span>
-                                    }
-                                    else
-                                    {
-                                        <p class="login-text">Đăng nhập</p>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dropdown Menu -->
-                    <div id="userDropdownMenu" class="user-dropdown hidden">
-                        <a id="profileLink" href="@Url.Action("Index", "DetailUser")" style="display: none;">Thông tin cá nhân</a>
-                        <div id="sellerChannelContainer" class="dropdown-item-container" style="display: none;">
-                            <a href="#" id="sellerChannelLink" class="dropdown-item-with-arrow">
-                                Kênh người bán
-                            </a>
-                        </div>
-                        <a id="orderLink" href="@Url.Action("PaymentHistory", "Checkout")" style="display: none;">Đơn mua</a>
-                        <form id="logoutForm" onsubmit="return handleLogout(event)" style="display: none;">
-                            <button type="submit" id="logoutButton">Đăng xuất</button>
-                        </form>
-                        <a id="loginLink" href="@Url.Action("Sign_in", "User")" style="display: none;">Đăng nhập</a>
-                        <a id="registerLink" href="@Url.Action("Sign_up", "User")" style="display: none;">Đăng ký</a>
                     </div>
                 </div>
             </div>
