@@ -1,6 +1,8 @@
 ﻿@{
-    Layout = "~/Views/Shared/_SellerLayout.cshtml";
     var mode = (string)ViewBag.Mode ?? "buyer";
+    Layout = mode == "seller"
+    ? "~/Views/Shared/_SellerLayout.cshtml"
+    : "~/Views/Shared/_Layout.cshtml";
     var userId = (string)ViewBag.UserId ?? "";
 }
 
