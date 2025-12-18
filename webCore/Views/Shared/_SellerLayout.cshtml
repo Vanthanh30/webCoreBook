@@ -71,6 +71,14 @@
         header .col-auto {
             position: relative !important;
         }
+
+        header .row {
+            justify-content: space-between;
+        }
+
+        header .col-auto:last-child {
+            margin-left: auto;
+        }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -86,34 +94,9 @@
                         </a>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="inner-search">
-                        <form class="d-flex" role="search" action="/api/products/search" method="get">
-                            <input class="form-control" type="search" placeholder="Tìm kiếm..." aria-label="Search" name="name" />
-                            <button class="btn" type="submit">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
                 <div class="col-auto">
                     <div class="items-icon">
-                        <!-- Chat Icon -->
-                        <div class="inner-chat">
-                            <a href="#">
-                                <i class="fa-solid fa-comment-dots"></i>
-                                
-                            </a>
-                        </div>
-
-                        <!-- Cart Icon -->
-                        <div class="inner-cart">
-                            <a href="@Url.Action("Cart", "Cart")">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                                <span class="cart-item-1" id="cart-item-1">0</span>
-                            </a>
-                        </div>
-
+                       
                         <!-- User Icon -->
                         <div class="inner-user" id="userIcon" style="cursor: pointer;">
                             <div>

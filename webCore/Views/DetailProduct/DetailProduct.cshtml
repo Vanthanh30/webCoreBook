@@ -325,8 +325,9 @@
         }
 
         /* REVIEW HTML */
-        function generateReviewHTML(review) {
+            function generateReviewHTML(review) {
             const q = Number(review.qualityRating) || 0;
+            const s = Number(review.serviceRating) || 0;
             const stars = generateStars(q);
             const date = formatDate(review.createdAt);
 
@@ -358,7 +359,8 @@
                             </div>
 
                             <div class="rating-labels">
-                            <div>Chất lượng: ${q}/5</div>
+                                <div>Chất lượng: ${q}/5</div>
+                                <div>Dịch vụ: ${s}/5</div>
                             </div>
 
                             <div class="review-comment">
