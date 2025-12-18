@@ -178,3 +178,15 @@ function updateCartCount() {
         });
 
 }
+$(document).on('cartUpdated', function (e, itemCount) {
+    const cartCountElement = document.getElementById('cart-item-1');
+    if (!cartCountElement) return;
+
+    // Update UI immediately
+    if (typeof itemCount === 'number') {
+        cartCountElement.textContent = itemCount;
+    } else {
+        // fallback (rare case)
+        updateCartCount();
+    }
+});
