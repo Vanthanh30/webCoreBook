@@ -68,9 +68,20 @@
             <a class="nav-link @(currentStatus == "Đã hủy" ? "active" : "")"
                href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Đã hủy" })">
                 Đã hủy
-                @if (statusCount != null && statusCount.ContainsKey("Return"))
+                @if (statusCount != null && statusCount.ContainsKey("Cancel"))
                 {
-                    <span class="badge badge-danger ml-1">@statusCount["Return"]</span>
+                    <span class="badge badge-danger ml-1">@statusCount["Cancel"]</span>
+                }
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(currentStatus == "Trả hàng/Hoàn tiền" ? "active" : "")"
+               href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Trả hàng/Hoàn tiền" })">
+                Trả hàng/Hoàn tiền
+                @if (statusCount != null && statusCount.ContainsKey("ReturnRequest"))
+                {
+                    <span class="badge badge-danger ml-1">@statusCount["ReturnRequest"]</span>
                 }
             </a>
         </li>
@@ -204,6 +215,20 @@
                                     <i class="fas fa-comment-dots"></i> Liên hệ
                                 </button>
                             }
+                            else if (order.Status == "Trả hàng/Hoàn tiền")
+                            {
+                                <a href="@Url.Action("OrderDetail", "SellerOrder", new { id = orderId })" class="btn btn-outline-info btn-sm mr-2">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+
+                                <a href="@Url.Action("ReturnRequestDetail", "SellerOrder", new { orderId = order.Id })" class="btn btn-warning btn-sm mr-2">
+                                    <i class="fas fa-exclamation-circle"></i> Xem lý do trả
+                                </a>
+
+                                <button class="btn btn-outline-secondary btn-sm" onclick="contactBuyer('@order.UserId')">
+                                    <i class="fas fa-comment-dots"></i> Liên hệ
+                                </button>
+                            }
                         </div>
                     </div>
                 </div>
@@ -222,6 +247,7 @@
             "Đang giao" => "badge-primary",
             "Đã giao" => "badge-success",
             "Đã hủy" => "badge-danger",
+            "Trả hàng/Hoàn tiền" => "badge-dark",
             _ => "badge-secondary"
         };
     }

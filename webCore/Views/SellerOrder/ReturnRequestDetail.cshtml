@@ -1,0 +1,100 @@
+﻿@model webCore.Models.ReturnRequest
+
+@{
+    ViewData["Title"] = "Chi tiết Yêu cầu Trả hàng";
+    Layout = "~/Views/Shared/_SellerLayout.cshtml"; // Layout của người bán
+    var order = ViewBag.OrderInfo as webCore.Models.Order;
+}
+
+<style>
+    .detail-container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .info-label { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
+    .info-box { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef; }
+    .media-item { width: 120px; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; margin-right: 10px; margin-bottom: 10px; }
+    .product-mini { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .product-mini:last-child { border-bottom: none; }
+</style>
+
+<div class="container-fluid">
+    <div class="detail-container">
+        <h4 class="text-danger mb-4 border-bottom pb-3">
+            <i class="fas fa-exclamation-circle"></i> CHI TIẾT YÊU CẦU TRẢ HÀNG
+        </h4>
+
+        @if (order != null)
+        {
+            <div class="mb-4">
+                <label class="info-label">Đơn hàng liên quan: #@order.Id</label>
+                <div class="info-box">
+                    <div><strong>Ngày đặt:</strong> @order.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</div>
+                    <div class="mt-2">
+                        @foreach (var item in order.Items)
+                        {
+                            <div class="product-mini">
+                                <img src="@item.Image" style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover; margin-right: 15px;">
+                                <div>
+                                    <div style="font-weight: 500;">@item.Title</div>
+                                    <small class="text-muted">Đơn giá: @item.Price.ToString("N0")đ x @item.Quantity</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-right mt-2 text-danger font-weight-bold">
+                        Tổng hoàn tiền: @order.FinalAmount.ToString("N0")đ
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="mb-4">
+            <label class="info-label">Lý do trả hàng & Mô tả:</label>
+            <div class="info-box text-dark">
+                @Model.Reason
+            </div>
+            <div class="text-right mt-1">
+                <small class="text-muted">Ngày gửi yêu cầu: @Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm")</small>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="info-label">Bằng chứng (Ảnh/Video):</label>
+            <div class="d-flex flex-wrap">
+                @if (Model.MediaUrls != null && Model.MediaUrls.Any())
+                {
+                    foreach (var url in Model.MediaUrls)
+                    {
+                        var isVideo = url.Contains(".mp4") || url.Contains(".webm");
+                        if (isVideo)
+                        {
+                            <video src="@url" controls class="media-item"></video>
+                        }
+                        else
+                        {
+                            <a href="@url" target="_blank">
+                                <img src="@url" class="media-item" title="Nhấn để xem ảnh lớn" />
+                            </a>
+                        }
+                    }
+                }
+                else
+                {
+                    <span class="text-muted font-italic">Khách hàng không tải lên tệp đính kèm nào.</span>
+                }
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="@Url.Action("OrderManagement", "SellerOrder", new { status = "Trả hàng/Hoàn tiền" })" class="btn btn-secondary px-4 mr-2">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+
+        </div>
+    </div>
+</div>
