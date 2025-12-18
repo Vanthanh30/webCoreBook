@@ -11,7 +11,7 @@ namespace webCore.Models
         public string Id { get; set; }
 
         [BsonElement("UserId")]
-        public string UserId { get; set; } 
+        public string UserId { get; set; }
 
         [BsonElement("Items")]
         public List<CartItem> Items { get; set; } = new List<CartItem>();
