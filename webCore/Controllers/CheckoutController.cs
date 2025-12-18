@@ -12,7 +12,7 @@ using webCore.Services;
 
 namespace webCore.Controllers
 {
-    public class CheckoutController : Controller
+    public class CheckoutController : BaseController
     {
         private readonly CartService _cartService;
         private readonly OrderService _orderService;
@@ -25,11 +25,12 @@ namespace webCore.Controllers
         private readonly ShopService _shopService;
         private readonly IConversationService _conversationService;
         private readonly IMessageService _messageService;
+        private readonly ReturnRequestService _returnRequestService;
 
         public CheckoutController(CartService cartService, OrderService orderService,
     VoucherClientService voucherClientService, CategoryProduct_adminService categoryProduct_AdminService,
     ReviewService reviewService, UserService userService, CloudinaryService cloudinaryService,
-    ILogger<CheckoutController> logger, ShopService shopService, IConversationService conversationService, IMessageService messageService)
+    ILogger<CheckoutController> logger, ShopService shopService, IConversationService conversationService, IMessageService messageService, ReturnRequestService returnRequestService)
         {
             _cartService = cartService;
             _orderService = orderService;
@@ -42,6 +43,7 @@ namespace webCore.Controllers
             _shopService = shopService;
             _conversationService = conversationService;
             _messageService = messageService;
+            _returnRequestService = returnRequestService;
         }
 
 
@@ -248,9 +250,117 @@ namespace webCore.Controllers
 
 
 
-        public IActionResult ReturnReason()
+        [HttpGet]
+        public async Task<IActionResult> ReturnReason(string orderId)
         {
-            return View(); 
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Sign_in", "User");
+            }
+
+            if (string.IsNullOrEmpty(orderId))
+            {
+                return RedirectToAction("PaymentHistory");
+            }
+
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+
+            if (order == null || order.UserId != userId)
+            {
+                return NotFound("Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.");
+            }
+
+            var existingRequest = await _returnRequestService.GetByOrderIdAsync(orderId);
+
+            if (existingRequest != null)
+            {
+                ViewBag.OrderInfo = order;
+
+                return View("ReturnDetails", existingRequest);
+            }
+
+            if (order.Status != "Đã giao")
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể yêu cầu trả hàng cho đơn đã giao thành công.";
+                return RedirectToAction("PaymentHistory");
+            }
+
+            return View(order);
+        }
+        [HttpPost]
+        [RequestSizeLimit(104857600)] // 100MB
+        [RequestFormLimits(MultipartBodyLengthLimit = 104857600)] 
+        public async Task<IActionResult> SubmitReturnRequest(string orderId, string reason, List<IFormFile> mediaFiles)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Sign_in", "User");
+
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+                if (order == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                    return RedirectToAction("PaymentHistory");
+                }
+
+                var exists = await _returnRequestService.HasReturnRequestAsync(orderId);
+                if (exists)
+                {
+                    TempData["ErrorMessage"] = "Bạn đã gửi yêu cầu cho đơn này rồi.";
+                    return RedirectToAction("PaymentHistory");
+                }
+
+                List<string> uploadedUrls = new List<string>();
+                if (mediaFiles != null && mediaFiles.Count > 0)
+                {
+                    foreach (var file in mediaFiles)
+                    {
+                        if (file.Length > 0)
+                        {
+                            var url = await _cloudinaryService.UploadMediaAsync(file);
+                            if (!string.IsNullOrEmpty(url)) uploadedUrls.Add(url);
+                        }
+                    }
+                }
+
+                var returnRequest = new ReturnRequest
+                {
+                    OrderId = orderId,
+                    UserId = userId,
+                    Reason = reason,
+                    MediaUrls = uploadedUrls,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _returnRequestService.CreateAsync(returnRequest);
+
+                order.Status = "Trả hàng/Hoàn tiền";
+                await _orderService.SaveOrderAsync(order);
+
+                if (order.Items != null)
+                {
+                    foreach (var item in order.Items)
+                    {
+                        var product = await _categoryProductAdminService.GetProductByIdAsync(item.ProductId);
+                        if (product != null)
+                        {
+                            product.Stock += item.Quantity;
+                            await _categoryProductAdminService.UpdateProductAsync(product);
+                        }
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Gửi yêu cầu trả hàng thành công!";
+                return RedirectToAction("PaymentHistory");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
+                return RedirectToAction("PaymentHistory");
+            }
         }
 
         [HttpGet]

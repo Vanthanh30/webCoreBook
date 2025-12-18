@@ -13,10 +13,12 @@ namespace webCore.Controllers
     public class SellerOrderController : BaseController
     {
         private readonly SellerOrderService _orderService;
+        private readonly ReturnRequestService _returnRequestService;
 
-        public SellerOrderController(SellerOrderService orderService)
+        public SellerOrderController(SellerOrderService orderService, ReturnRequestService returnRequestService)
         {
             _orderService = orderService;
+            _returnRequestService = returnRequestService;
         }
         private string GetCurrentSellerId()
         {
@@ -255,6 +257,26 @@ namespace webCore.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> ReturnRequestDetail(string orderId)
+        {
+            var sellerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sellerId))
+            {
+                return RedirectToAction("Sign_in", "User");
+            }
+
+            var request = await _returnRequestService.GetByOrderIdAsync(orderId);
+            if (request == null)
+            {
+                return NotFound("Không tìm thấy yêu cầu trả hàng cho đơn này.");
+            }
+
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            ViewBag.OrderInfo = order;
+
+            return View(request);
         }
 
     }
