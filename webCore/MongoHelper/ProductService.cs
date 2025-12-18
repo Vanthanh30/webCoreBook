@@ -91,22 +91,16 @@ namespace webCore.MongoHelper
             return await _productCollection.Find(filter).ToListAsync();
         }
 
-        // Lấy danh sách sản phẩm bán chạy: Status = "Hoạt động", Featured thuộc 1,2,3
-        // Sắp xếp theo ngày tạo mới nhất
-        public async Task<List<Product_admin>> GetBestsellerProductsAsync()
+        public async Task<List<Product_admin>> GetTopDiscountProductsAsync(int count = 3)
         {
             var filter = Builders<Product_admin>.Filter.Eq(p => p.Deleted, false) &
                          Builders<Product_admin>.Filter.Eq(p => p.Status, "Hoạt động") &
-                         Builders<Product_admin>.Filter.In(p => p.Featured, new[]
-                         {
-                             (int)FeaturedStatus.Highlighted,  // 1
-                             (int)FeaturedStatus.New,          // 2
-                             (int)FeaturedStatus.Suggested     // 3
-                         });
+                         Builders<Product_admin>.Filter.Gt(p => p.DiscountPercentage, 0);
 
-            var sort = Builders<Product_admin>.Sort.Descending(p => p.CreatedAt);
+            // Sắp xếp theo DiscountPercentage giảm dần (cao nhất trước)
+            var sort = Builders<Product_admin>.Sort.Descending(p => p.DiscountPercentage);
 
-            return await _productCollection.Find(filter).Sort(sort).Limit(10).ToListAsync();
+            return await _productCollection.Find(filter).Sort(sort).Limit(count).ToListAsync();
         }
 
         public async Task<List<Product_admin>> GetProductsByCategoryIdAsync(string categoryId)

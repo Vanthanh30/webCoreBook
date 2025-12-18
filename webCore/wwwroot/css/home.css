@@ -683,12 +683,15 @@ header {
 /* ===== PRODUCT BOX ===== */
 .product-box {
     flex: 0 0 180px;
+    height: 380px; /* CỐ ĐỊNH CHIỀU CAO */
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 5px;
     overflow: hidden;
     transition: all 0.3s;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
     .product-box:hover {
@@ -699,8 +702,11 @@ header {
     .product-box a {
         text-decoration: none;
         color: inherit;
+        display: block;
+        height: 100%;
     }
 
+/* ===== DISCOUNT BADGE ===== */
 .product-discount-badge {
     position: absolute;
     top: 10px;
@@ -714,6 +720,7 @@ header {
     z-index: 1;
 }
 
+/* ===== IMAGE ===== */
 .product-img-wrapper {
     width: 100%;
     height: 220px;
@@ -730,10 +737,16 @@ header {
         object-fit: contain;
     }
 
+/* ===== DETAILS ===== */
 .product-details {
     padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
+/* ===== PRODUCT NAME ===== */
 .product-name {
     font-size: 14px;
     line-height: 1.4;
@@ -746,25 +759,37 @@ header {
     color: #333;
 }
 
+/* ===== PRICE AREA (FIX GIÁ NHẢY) ===== */
+.product-price-area {
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* ===== PRICE ===== */
 .product-price-old {
     text-decoration: line-through;
-    color: #999;
+    color: #333;
     font-size: 13px;
     margin-bottom: 3px;
 }
 
+/* GIÁ SAU GIẢM → MÀU ĐỎ */
 .product-price-new {
-    color: #ff6b6b;
+    color: #ff4757;
     font-weight: bold;
     font-size: 16px;
 }
 
+/* KHÔNG GIẢM GIÁ → MẶC ĐỊNH MÀU ĐỎ */
 .product-price-single {
-    color: #333;
+    color: #ff4757;
     font-weight: bold;
     font-size: 16px;
 }
 
+/* ===== STOCK ===== */
 .product-stock {
     margin-top: 5px;
     font-size: 12px;
