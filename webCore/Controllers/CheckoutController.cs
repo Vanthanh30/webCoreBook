@@ -531,5 +531,30 @@ namespace webCore.Controllers
 
             return RedirectToAction("PaymentHistory");
         }
+        [HttpGet]
+        public async Task<IActionResult> ConfirmDelivery(string orderId)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Sign_in", "User");
+            }
+
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+
+            if (order != null && order.UserId == userId && order.Status == "Đang giao")
+            {
+                order.Status = "Đã giao";
+                await _orderService.SaveOrderAsync(order);
+
+                TempData["SuccessMessage"] = "Xác nhận đã nhận hàng";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không nhận đơn hàng này (Đã được xử lý hoặc không tồn tại).";
+            }
+
+            return RedirectToAction("PaymentHistory");
+        }
     }
 }

@@ -6,387 +6,289 @@
     var userId = (string)ViewBag.UserId ?? "";
 }
 
-<style>
-    .chat-wrap {
-        display: flex;
-        gap: 16px;
-        height: calc(100vh - 140px);
-    }
-
-    .chat-left {
-        width: 320px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        overflow: auto;
-    }
-
-    .chat-right {
-        flex: 1;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .chat-header {
-        padding: 12px 14px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .chat-list-item {
-        padding: 12px 14px;
-        border-bottom: 1px solid #f0f0f0;
-        cursor: pointer;
-    }
-
-        .chat-list-item:hover {
-            background: #fafafa;
-        }
-
-        .chat-list-item.active {
-            background: #f3f6ff;
-        }
-
-    .chat-title {
-        font-weight: 600;
-    }
-
-    .chat-sub {
-        color: #666;
-        font-size: 12px;
-        margin-top: 4px;
-    }
-
-    .chat-box {
-        flex: 1;
-        padding: 14px;
-        overflow: auto;
-        background: #fafafa;
-    }
-
-    .msg-row {
-        margin: 8px 0;
-        display: flex;
-    }
-
-        .msg-row.me {
-            justify-content: flex-end;
-        }
-
-    .bubble {
-        max-width: 70%;
-        padding: 10px 12px;
-        border-radius: 14px;
-        background: #fff;
-        border: 1px solid #eee;
-    }
-
-    .msg-row.me .bubble {
-        background: #e8f0ff;
-        border-color: #d7e3ff;
-    }
-
-    .system {
-        width: 100%;
-@*        text-align: center;*@
-        color: #666;
-        font-size: 12px;
-    }
-
-    .chat-input {
-        display: flex;
-        gap: 10px;
-        padding: 12px;
-        border-top: 1px solid #eee;
-        background: #fff;
-    }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-
-        .chat-input button {
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: none;
-            background: #2563eb;
-            color: #fff;
-        }
-
-    .badge {
-        font-size: 12px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: #eee;
-    }
-    .order-card, .product-card {
-        display: flex;
-        gap: 10px;
-        background: #fff;
-        border-radius: 10px;
-        padding: 10px;
-        max-width: 420px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.08);
-    }
-
-        .order-card img, .product-card img {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-</style>
-
-<div class="chat-wrap">
-    <div class="chat-left">
-        <div class="chat-header">
-            <div class="chat-title">
-                @(mode == "seller" ? "💬 Kênh người bán" : "💬 Chat của tôi")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+          crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="chat-wrap">
+        <div class="chat-left">
+            <div class="chat-header">
+                <div class="chat-title">
+                    @(mode == "seller" ? "💬 Kênh người bán" : "💬 Chat của tôi")
+                </div>
+                @*            <div class="badge">Mode: @mode</div>*@
             </div>
-@*            <div class="badge">Mode: @mode</div>*@
+
+            <div id="conversationList"></div>
         </div>
 
-        <div id="conversationList"></div>
-    </div>
-
-    <div class="chat-right">
-        <div class="chat-header">
-            <div>
-                <div class="chat-title" id="chatWith">Chọn cuộc hội thoại</div>
-                <div class="chat-sub" id="chatMeta"></div>
-            </div>
-        </div>
-
-        <div class="chat-box" id="chatBox">
-            <div class="system">Chọn một cuộc hội thoại bên trái để xem tin nhắn</div>
-        </div>
-
-        <div class="chat-input">
-            <input id="messageInput" placeholder="Nhập tin nhắn..." disabled />
-            <button id="sendBtn" onclick="send()" disabled>Gửi</button>
-        </div>
-    </div>
-</div>
-
-<input type="hidden" id="mode" value="@mode" />
-<input type="hidden" id="currentUserId" value="@userId" />
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
-
-<script>
-    const mode = document.getElementById("mode").value;
-    const currentUserId = document.getElementById("currentUserId").value;
-
-    let activeConversationId = null;
-    let connection = null;
-
-    function esc(s) {
-        return (s || "").replace(/[&<>"']/g, m => ({
-            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-        }[m]));
-    }
-
-    function renderConversationItem(c) {
-        const displayName = (mode === "seller")
-            ? `Khách: ${c.buyerName}`
-            : `Shop: ${c.shopName}`;
-
-        const last = c.lastMessage || "(chưa có tin nhắn)";
-        const time = c.updatedAt
-            ? new Date(c.updatedAt).toLocaleString()
-            : "";
-
-        return `
-        <div class="chat-list-item" data-id="${c.id}" data-name="${esc(displayName)}"
-             onclick="openConversation('${c.id}', this)">
-            <div class="chat-title">${esc(displayName)}</div>
-            <div class="chat-sub">${esc(last)}</div>
-            <div class="chat-sub">${esc(time)}</div>
-        </div>
-    `;
-    }
-
-
-    function setActiveListItem(conversationId) {
-        document.querySelectorAll(".chat-list-item").forEach(el => {
-            el.classList.toggle("active", el.getAttribute("data-id") === conversationId);
-        });
-    }
-
-    async function loadConversations() {
-        const res = await fetch(`/api/chat/conversations?mode=${encodeURIComponent(mode)}`);
-        if (!res.ok) return;
-
-        const list = await res.json();
-        const html = list.map(renderConversationItem).join("");
-        document.getElementById("conversationList").innerHTML = html || `<div class="system" style="padding:12px;">Chưa có cuộc hội thoại</div>`;
-    }
-
-    function renderMessage(msg) {
-
-        if (msg.messageType === "order") {
-            return renderOrderMessage(msg);
-        }
-
-        if (msg.messageType === "product") {
-            return renderProductMessage(msg);
-        }
-
-        if (msg.messageType === "system") {
-            return `<div class="system">${esc(msg.content)}</div>`;
-        }
-
-        const mine = msg.senderId === currentUserId;
-        return `
-        <div class="msg-row ${mine ? "me" : "other"}">
-            <div class="bubble">${esc(msg.content)}</div>
-        </div>
-    `;
-    }
-    async function renderOrderMessage(msg) {
-        const res = await fetch(`/api/chat/order/summary/${msg.orderId}`);
-        if (!res.ok) return `<div class="system">📦 Đơn hàng</div>`;
-
-        const o = await res.json();
-        return `
-            <div class="system">
-                <div class="order-card">
-                    <img src="${o.image || o.Image}" />
-                    <div>
-                        <b>Đơn hàng #${o.id}</b><br/>
-                        ${o.productName}<br/>
-                        <span>${o.totalPrice} đ</span><br/>
-                        <a href="/Checkout/OrderDetails?orderId=${o.id}">Xem đơn hàng</a>
-                    </div>
+        <div class="chat-right">
+            <div class="chat-header">
+                <div>
+                    <div class="chat-title" id="chatWith">Chọn cuộc hội thoại</div>
+                    <div class="chat-sub" id="chatMeta"></div>
                 </div>
             </div>
-            `;
-    }
-    async function renderProductMessage(msg) {
-        const res = await fetch(`/api/chat/product/summary/${msg.productId}`);
-        if (!res.ok) return `<div class="system">📌 Sản phẩm</div>`;
 
-        const p = await res.json();
-        return `
-            <div class="system">
-                <div class="product-card">
-                    <img src="${p.image || p.Image}" />
-                    <div>
-                        <b>${p.title}</b><br/>
-                        ${p.price} đ<br/>
-                        <a href="/DetailProduct/DetailProduct/${p.id}">Xem sản phẩm</a>
-                    </div>
-                </div>
+            <div class="chat-box" id="chatBox">
+                <div class="system">Chọn một cuộc hội thoại bên trái để xem tin nhắn</div>
             </div>
+
+            <div class="chat-input">
+                <input id="messageInput" placeholder="Nhập tin nhắn..." disabled />
+                <button id="sendBtn" onclick="send()" disabled>Gửi</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="mode" value="@mode" />
+    <input type="hidden" id="currentUserId" value="@userId" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+    <script>
+        const mode = document.getElementById("mode").value;
+        const currentUserId = document.getElementById("currentUserId").value;
+
+        let activeConversationId = null;
+        let connection = null;
+
+        function esc(s) {
+            return (s || "").replace(/[&<>"']/g, m => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+            }[m]));
+        }
+
+        function renderConversationItem(c) {
+            const displayName = (mode === "seller")
+                ? `Khách: ${c.buyerName}`
+                : `Shop: ${c.shopName}`;
+
+            const last = c.lastMessage || "(chưa có tin nhắn)";
+            const time = c.updatedAt
+                ? new Date(c.updatedAt).toLocaleString()
+                : "";
+
+            return `
+                <div class="chat-list-item" data-id="${c.id}" data-name="${esc(displayName)}"
+                     onclick="openConversation('${c.id}', this)">
+                    <div class="chat-title">${esc(displayName)}</div>
+                    <div class="chat-sub">${esc(last)}</div>
+                    <div class="chat-sub">${esc(time)}</div>
+                </div>
             `;
-    }
-
-    async function loadMessages(conversationId) {
-        const res = await fetch(
-            `/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=100`
-        );
-        if (!res.ok) return;
-
-        const list = await res.json();
-        const box = document.getElementById("chatBox");
-        box.innerHTML = "";
-
-        if (list.length === 0) {
-            box.innerHTML = `<div class="system">Chưa có tin nhắn</div>`;
-            return;
         }
 
-        for (const msg of list) {
-            const html = await renderMessage(msg);
-            box.insertAdjacentHTML("beforeend", html);
+
+        function setActiveListItem(conversationId) {
+            document.querySelectorAll(".chat-list-item").forEach(el => {
+                el.classList.toggle("active", el.getAttribute("data-id") === conversationId);
+            });
         }
 
-        scrollBottom();
-    }
+        async function loadConversations() {
+            const res = await fetch(`/api/chat/conversations?mode=${encodeURIComponent(mode)}`);
+            if (!res.ok) return;
 
-    function scrollBottom() {
-        const box = document.getElementById("chatBox");
-        box.scrollTop = box.scrollHeight;
-    }
+            const list = await res.json();
+            const html = list.map(renderConversationItem).join("");
+            document.getElementById("conversationList").innerHTML = html || `<div class="system" style="padding:12px;">Chưa có cuộc hội thoại</div>`;
+        }
 
-    async function ensureSignalR() {
-        if (connection) return;
+        function renderMessage(msg) {
 
-        connection = new signalR.HubConnectionBuilder()
-            .withUrl("/chatHub")
-            .withAutomaticReconnect()
-            .build();
-
-        connection.on("ReceiveMessage", async msg => {
-            if (msg.conversationId !== activeConversationId) return;
-
-            const box = document.getElementById("chatBox");
-            const html = await renderMessage(msg);
-
-            box.insertAdjacentHTML("beforeend", html);
-            scrollBottom();
-        });
-
-        await connection.start();
-    }
-
-    async function openConversation(conversationId, el) {
-        activeConversationId = conversationId;
-        setActiveListItem(conversationId);
-
-        document.getElementById("messageInput").disabled = false;
-        document.getElementById("sendBtn").disabled = false;
-
-        const name = el?.getAttribute("data-name");
-        document.getElementById("chatWith").innerText = name;
-        document.getElementById("chatMeta").innerText = `ConversationId: ${conversationId}`;
-
-        await ensureSignalR();
-
-        // join group (validate quyền trong Hub)
-        await connection.invoke("JoinConversation", conversationId);
-
-        await loadMessages(conversationId);
-    }
-
-    async function send() {
-        if (!activeConversationId) return;
-
-        const input = document.getElementById("messageInput");
-        const text = (input.value || "").trim();
-        if (!text) return;
-
-        await connection.invoke("SendMessage", activeConversationId, text);
-        input.value = "";
-        input.focus();
-
-        // refresh sidebar preview (đơn giản)
-        loadConversations();
-    }
-
-    // init
-    (async function initChat() {
-        await loadConversations();
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const convoFromUrl = urlParams.get("conversationId");
-
-        if (convoFromUrl) {
-            const el = document.querySelector(
-                `.chat-list-item[data-id="${convoFromUrl}"]`
-            );
-            if (el) {
-                openConversation(convoFromUrl, el);
+            if (msg.messageType === "order") {
+                return renderOrderMessage(msg);
             }
-        }
-    })();
 
-</script>
+            if (msg.messageType === "product") {
+                return renderProductMessage(msg);
+            }
+
+            if (msg.messageType === "system") {
+                return `<div class="system">
+                            ${esc(msg.content)}
+                            <div class="msg-time">${formatTime(msg.createdAt)}</div>
+                        </div>`;
+            }
+
+            const mine = msg.senderId === currentUserId;
+            return `
+                <div class="msg-row ${mine ? "me" : "other"}">
+                    <div class="bubble">${esc(msg.content)}</div>
+                    <div class="msg-time">${formatTime(msg.createdAt)}</div>
+                </div>
+            `;
+        }
+        async function renderOrderMessage(msg) {
+            const res = await fetch(`/api/chat/order/summary/${msg.orderId}`);
+            if (!res.ok) return `<div class="system">📦 Đơn hàng</div>`;
+
+            const o = await res.json();
+            return `
+                    <div class="system">
+                        <div class="order-card">
+                            <img src="${o.image || o.Image}" />
+                            <div>
+                                <b>Đơn hàng #${o.id}</b><br/>
+                                ${o.productName}<br/>
+                                <span>${o.totalPrice} đ</span><br/>
+                                <a href="/Checkout/OrderDetails?orderId=${o.id}">Xem đơn hàng</a>
+                         
+                            </div>
+                        </div>
+                        <div class="msg-time">${formatTime(msg.createdAt)}</div>
+                    </div>
+                    `;
+        }
+        async function renderProductMessage(msg) {
+            const res = await fetch(`/api/chat/product/summary/${msg.productId}`);
+            if (!res.ok) return `<div class="system">📌 Sản phẩm</div>`;
+
+            const p = await res.json();
+            return `
+                    <div class="system">
+                        <div class="product-card">
+                            <img src="${p.image || p.Image}" />
+                            <div>
+                                <b>${p.title}</b><br/>
+                                ${p.price} đ<br/>
+                                <a href="/DetailProduct/DetailProduct/${p.id}">Xem sản phẩm</a>
+                                
+                            </div>
+                        </div>
+                        <div class="msg-time">${formatTime(msg.createdAt)}</div>
+                    </div>
+                    `;
+        }
+
+        async function loadMessages(conversationId) {
+            const res = await fetch(
+                `/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=100`
+            );
+            if (!res.ok) return;
+
+            const list = await res.json();
+            const box = document.getElementById("chatBox");
+            box.innerHTML = "";
+
+            if (list.length === 0) {
+                box.innerHTML = `<div class="system">Chưa có tin nhắn</div>`;
+                return;
+            }
+
+            for (const msg of list) {
+                const html = await renderMessage(msg);
+                box.insertAdjacentHTML("beforeend", html);
+            }
+
+            scrollBottom();
+        }
+
+        function scrollBottom() {
+            const box = document.getElementById("chatBox");
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function ensureSignalR() {
+            if (connection) return;
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("ReceiveMessage", async msg => {
+                if (msg.conversationId !== activeConversationId) return;
+
+                const box = document.getElementById("chatBox");
+                const html = await renderMessage(msg);
+
+                box.insertAdjacentHTML("beforeend", html);
+                scrollBottom();
+            });
+
+            await connection.start();
+        }
+
+        async function openConversation(conversationId, el) {
+            activeConversationId = conversationId;
+            setActiveListItem(conversationId);
+
+            document.getElementById("messageInput").disabled = false;
+            document.getElementById("sendBtn").disabled = false;
+
+            const name = el?.getAttribute("data-name");
+            document.getElementById("chatWith").innerText = name;
+            document.getElementById("chatMeta").innerText = `ConversationId: ${conversationId}`;
+
+            await ensureSignalR();
+
+            // join group (validate quyền trong Hub)
+            await connection.invoke("JoinConversation", conversationId);
+
+            await loadMessages(conversationId);
+        }
+
+        async function send() {
+            if (!activeConversationId) return;
+
+            const input = document.getElementById("messageInput");
+            const text = (input.value || "").trim();
+            if (!text) return;
+
+            await connection.invoke("SendMessage", activeConversationId, text);
+            input.value = "";
+            input.focus();
+
+            // refresh sidebar preview (đơn giản)
+            loadConversations();
+        }
+
+        // init
+        (async function initChat() {
+            await loadConversations();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const convoFromUrl = urlParams.get("conversationId");
+
+            if (convoFromUrl) {
+                const el = document.querySelector(
+                    `.chat-list-item[data-id="${convoFromUrl}"]`
+                );
+                if (el) {
+                    openConversation(convoFromUrl, el);
+                }
+            }
+        })();
+        function formatTime(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr);
+            return d.toLocaleString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            });
+        }
+
+    </script>
+</body>
+</html>
