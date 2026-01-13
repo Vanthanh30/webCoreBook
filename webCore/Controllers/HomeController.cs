@@ -92,7 +92,7 @@ namespace webCore.Controllers
             var groupedProducts = ClassifyProductsByFeatured(products);
 
             var orderedGroupedProducts = groupedProducts
-                .OrderBy(group => group.Key == "Nổi bật" ? 0 : group.Key == "Mới" ? 1 : group.Key == "Gợi ý" ? 2 : int.MaxValue)
+                .OrderBy(group => group.Key == "Nổi bật" ? 0 : group.Key == "Mới" ? 1 : group.Key == "Bán chạy" ? 2 : int.MaxValue)
                 .ToList();
 
             return PartialView("_BookListPartial", orderedGroupedProducts);
@@ -245,7 +245,7 @@ namespace webCore.Controllers
                 grouped.Add(new KeyValuePair<string, List<Product_admin>>("Mới", newProducts));
 
             if (suggestedProducts.Any())
-                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Gợi ý", suggestedProducts));
+                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Bán chạy", suggestedProducts));
 
             if (bestsellerProducts.Any())
                 grouped.Add(new KeyValuePair<string, List<Product_admin>>("Bán chạy", bestsellerProducts));

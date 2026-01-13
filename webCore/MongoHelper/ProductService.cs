@@ -39,7 +39,7 @@ namespace webCore.MongoHelper
             {
                 case FeaturedStatus.Highlighted: return "Nổi bật";
                 case FeaturedStatus.New: return "Mới";
-                case FeaturedStatus.Suggested: return "Gợi ý";
+                case FeaturedStatus.Suggested: return "Bán chạy";
                 case FeaturedStatus.None: return "Không nổi bật";
                 default: return "Không nổi bật";
             }

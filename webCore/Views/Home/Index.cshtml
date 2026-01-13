@@ -207,12 +207,7 @@
                     {
                         foreach (var group in displayGroups)
                         {
-                            var sectionTitle = group.Key switch
-                            {
-                                "Nổi bật" => "NỔI BẬT",
-                                "Mới" => "MỚI NHẤT",
-                                _ => "BÁN CHẠY"
-                            };
+                            var sectionTitle = group.Key.ToUpper();
 
                             var sectionClass = group.Key switch
                             {
