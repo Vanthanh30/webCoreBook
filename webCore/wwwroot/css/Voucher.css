@@ -1,5 +1,4 @@
-﻿/* General Layout */
-.container {
+﻿.container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px;
@@ -14,7 +13,6 @@
     text-align: center;
     margin-bottom: 20px;
 }
-/* Button Container */
 .button-container {
     text-align: right;
     margin-bottom: 20px;
@@ -39,7 +37,6 @@
     margin-right: 8px;
 }
 
-/* Table */
 .voucher-table {
     width: 100%;
     border-collapse: collapse;
@@ -75,16 +72,14 @@
         background-color: #f1f8ff;
     }
 
-/* Status Styles */
     .voucher-table td.status-active {
-        color: #4caf50; /* Green for active status */
+        color: #4caf50; 
         font-weight: bold;
         padding: 5px 10px;
         border-radius: 5px;
     }
 
 
-/* Action Buttons */
 .actions-cell {
     display: flex;
     justify-content: center;
@@ -105,7 +100,7 @@
     }
 
 .edit-btn {
-    color: #ffc107; /* Yellow for edit button */
+    color: #ffc107;
 }
 
     .edit-btn:hover {
@@ -113,14 +108,13 @@
     }
 
 .delete-btn {
-    color: #dc3545; /* Red for delete button */
+    color: #dc3545; 
 }
 
     .delete-btn:hover {
         color: #d9534f;
     }
 
-/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
