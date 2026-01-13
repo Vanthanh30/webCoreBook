@@ -29,56 +29,44 @@ namespace webCore.Controllers
         [ServiceFilter(typeof(SetLoginStatusFilter))]
         public async Task<IActionResult> Index()
         {
-            // Kiểm tra trạng thái đăng nhập
             var isLoggedIn = HttpContext.Session.GetString("UserToken") != null;
             ViewBag.IsLoggedIn = isLoggedIn;
 
-            // Lấy danh mục hoạt động từ MongoDB
             var categories = await _categoryService.GetCategoriesAsync();
             ViewBag.Categories = categories;
 
-            // Lấy danh sách sản phẩm nhóm theo trạng thái Featured
             var groupedProducts = await _productService.GetProductsGroupedByFeaturedAsync();
             ViewBag.GroupedProducts = groupedProducts;
 
-            // Lấy danh sách sản phẩm nổi bật
             var featuredProducts = await _productService.GetFeaturedProductsAsync();
             ViewBag.FeaturedProducts = featuredProducts;
 
-            // Lấy danh sách sản phẩm bán chạy
             var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
             ViewBag.BestsellerProducts = bestsellerProducts;
 
-            return View(); // Trả về View Index.cshtml
+            return View();
         }
 
-        // Lấy danh sách sản phẩm theo danh mục (AJAX) - ĐÃ SỬA
+        // Lấy danh sách sản phẩm theo danh mục (AJAX)
         public async Task<IActionResult> GetProductsByCategoryId(List<string> categoryId)
         {
             if (categoryId == null || !categoryId.Any())
             {
                 var homeGroupedProducts = await _productService.GetProductsGroupedByFeaturedAsync();
-
                 var orderedHomeProducts = homeGroupedProducts
                     .Where(g => g.Key == "Nổi bật" || g.Key == "Mới" || g.Key == "Gợi ý" || g.Key == "Bán chạy")
-                    .OrderBy(g =>
-                        g.Key == "Nổi bật" ? 0 :
-                        g.Key == "Mới" ? 1 :
-                        g.Key == "Gợi ý" ? 2 : 3)
+                    .OrderBy(g => g.Key == "Nổi bật" ? 0 : g.Key == "Mới" ? 1 : g.Key == "Gợi ý" ? 2 : 3)
                     .ToList();
-
                 return PartialView("_BookListPartial", orderedHomeProducts);
             }
 
-            // ===== 1. LẤY TOÀN BỘ DANH MỤC =====
+            // Lấy toàn bộ danh mục
             var allCategories = await _categoryService.GetCategoriesAsync();
 
-            // ===== 2. XÁC ĐỊNH DANH MỤC CUỐI CÙNG CẦN LỌC =====
+            // Xác định danh mục cuối cùng cần lọc
             var finalCategoryIds = new HashSet<string>();
-
             foreach (var id in categoryId)
             {
-                // Lấy danh mục con nếu id là danh mục cha
                 var childIds = allCategories
                     .Where(c => c.ParentId == id)
                     .Select(c => c._id)
@@ -86,7 +74,6 @@ namespace webCore.Controllers
 
                 if (childIds.Any())
                 {
-                    // Click danh mục cha → chỉ lấy sản phẩm của danh mục con
                     foreach (var childId in childIds)
                     {
                         finalCategoryIds.Add(childId);
@@ -94,14 +81,12 @@ namespace webCore.Controllers
                 }
                 else
                 {
-                    // Click danh mục con → lấy trực tiếp
                     finalCategoryIds.Add(id);
                 }
             }
 
-            // ===== 3. LẤY SẢN PHẨM THEO DANH MỤC =====
+            // Lấy sản phẩm theo danh mục
             var products = new List<Product_admin>();
-
             foreach (var catId in finalCategoryIds)
             {
                 var catProducts = await _productService.GetProductsByCategoryIdAsync(catId);
@@ -110,21 +95,11 @@ namespace webCore.Controllers
 
             products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
 
-            var groupedProducts = new Dictionary<string, List<Product_admin>>();
-
-            var featuredProducts = products.Where(p => p.DiscountPercentage > 0).ToList();
-            var newProducts = products.Where(p => p.DiscountPercentage == 0 && p.Price > 0).Take(10).ToList();
-            var suggestedProducts = products.Except(featuredProducts).Except(newProducts).ToList();
-
-            if (featuredProducts.Any()) groupedProducts.Add("Nổi bật", featuredProducts);
-            if (newProducts.Any()) groupedProducts.Add("Mới", newProducts);
-            if (suggestedProducts.Any()) groupedProducts.Add("Gợi ý", suggestedProducts);
+            // Phân loại sản phẩm theo Featured enum
+            var groupedProducts = ClassifyProductsByFeatured(products);
 
             var orderedGroupedProducts = groupedProducts
-                .OrderBy(group =>
-                    group.Key == "Nổi bật" ? 0 :
-                    group.Key == "Mới" ? 1 :
-                    group.Key == "Gợi ý" ? 2 : int.MaxValue)
+                .OrderBy(group => group.Key == "Nổi bật" ? 0 : group.Key == "Mới" ? 1 : group.Key == "Gợi ý" ? 2 : int.MaxValue)
                 .ToList();
 
             return PartialView("_BookListPartial", orderedGroupedProducts);
@@ -146,25 +121,17 @@ namespace webCore.Controllers
             var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
             ViewBag.BestsellerProducts = bestsellerProducts;
 
-            // === PHẦN TÌM KIẾM ===
+            // Xử lý tìm kiếm
             ViewBag.SearchQuery = q?.Trim() ?? "";
 
             if (!string.IsNullOrWhiteSpace(q))
             {
                 var searchResults = await _productService.SearchProductsAsync(q);
 
-                // Tạo nhóm giống hệt trang chủ
-                var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
+                // ✅ SỬA: Phân loại theo Featured enum (giống trang chủ)
+                var grouped = ClassifyProductsByFeatured(searchResults);
 
-                var flash = searchResults.Where(p => p.DiscountPercentage > 0).Take(20).ToList();
-                var newest = searchResults.Where(p => p.DiscountPercentage == 0).Take(20).ToList();
-                var suggest = searchResults.Except(flash).Except(newest).Take(20).ToList();
-
-                if (flash.Any()) grouped.Add(new("Nổi bật", flash));
-                if (newest.Any()) grouped.Add(new("Mới", newest));
-                if (suggest.Any()) grouped.Add(new("Gợi ý", suggest));
-
-                ViewBag.SearchResults = grouped; // Dùng để hiển thị thay thế
+                ViewBag.SearchResults = grouped;
                 ViewBag.IsSearching = true;
                 ViewBag.ResultCount = searchResults.Count;
             }
@@ -173,9 +140,9 @@ namespace webCore.Controllers
                 ViewBag.IsSearching = false;
             }
 
-            // TRẢ VỀ LUÔN TRANG CHỦ (Index.cshtml)
             return View("Index");
         }
+
         [HttpPost]
         public async Task<IActionResult> Sign_in(User loginUser)
         {
@@ -202,14 +169,15 @@ namespace webCore.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
         [HttpPost]
         public IActionResult Sign_out()
         {
             HttpContext.Session.Remove("UserToken");
             HttpContext.Session.Remove("UserName");
-
             return RedirectToAction("Index", "Home");
         }
+
         [HttpGet("api/breadcrumbs/{categoryId}")]
         public async Task<IActionResult> GetBreadcrumbs(string categoryId)
         {
@@ -237,20 +205,73 @@ namespace webCore.Controllers
 
             return Ok(breadcrumbs);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetProductsByPrice(decimal min, decimal max)
         {
             var products = await _productService.GetProductsByFinalPriceRangeAsync(min, max);
 
-            var groupedProducts = new Dictionary<string, List<Product_admin>>();
-
-            var featured = products.Where(p => p.DiscountPercentage > 0).ToList();
-            var normal = products.Where(p => p.DiscountPercentage == 0).ToList();
-
-            if (featured.Any()) groupedProducts.Add("Nổi bật", featured);
-            if (normal.Any()) groupedProducts.Add("Mới", normal);
+            // Phân loại theo Featured enum
+            var groupedProducts = ClassifyProductsByFeatured(products);
 
             return PartialView("_BookListPartial", groupedProducts.ToList());
+        }
+
+        // ===== PHƯƠNG THỨC PHÂN LOẠI SẢN PHẨM THEO FEATURED ENUM =====
+        private List<KeyValuePair<string, List<Product_admin>>> ClassifyProductsByFeatured(List<Product_admin> products)
+        {
+            var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
+
+            // Phân loại theo Featured enum:
+            // 0 = None, 1 = Highlighted (Nổi bật), 2 = New (Mới), 3 = Suggested (Gợi ý)
+
+            // 1. Nổi bật (Featured = 1)
+            var highlightedProducts = products
+                .Where(p => p.Featured == 1)
+                .OrderByDescending(p => p.Position)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(20)
+                .ToList();
+
+            // 2. Mới (Featured = 2)
+            var newProducts = products
+                .Where(p => p.Featured == 2)
+                .OrderByDescending(p => p.Position)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(20)
+                .ToList();
+
+            // 3. Gợi ý (Featured = 3)
+            var suggestedProducts = products
+                .Where(p => p.Featured == 3)
+                .OrderByDescending(p => p.Position)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(20)
+                .ToList();
+
+            // 4. Bán chạy (logic riêng - có thể là sản phẩm có discount hoặc logic khác)
+            // Nếu bạn có trường riêng cho "Bán chạy", sửa logic ở đây
+            var bestsellerProducts = products
+                .Where(p => p.DiscountPercentage > 0 && p.Featured != 1 && p.Featured != 2 && p.Featured != 3)
+                .OrderByDescending(p => p.DiscountPercentage)
+                .ThenByDescending(p => p.Position)
+                .Take(20)
+                .ToList();
+
+            // Thêm vào danh sách kết quả theo thứ tự
+            if (highlightedProducts.Any())
+                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Nổi bật", highlightedProducts));
+
+            if (newProducts.Any())
+                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Mới", newProducts));
+
+            if (suggestedProducts.Any())
+                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Gợi ý", suggestedProducts));
+
+            if (bestsellerProducts.Any())
+                grouped.Add(new KeyValuePair<string, List<Product_admin>>("Bán chạy", bestsellerProducts));
+
+            return grouped;
         }
     }
 }
