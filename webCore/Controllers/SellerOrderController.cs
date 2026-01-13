@@ -22,32 +22,26 @@ namespace webCore.Controllers
         }
         private string GetCurrentSellerId()
         {
-            // Lấy UserId từ Session, đây chính là SellerId
             var userId = HttpContext.Session.GetString("UserId");
             return userId;
         }
 
-        // Kiểm tra role Seller
         private bool IsSellerRole()
         {
             var roles = HttpContext.Session.GetString("UserRoles");
             if (string.IsNullOrEmpty(roles))
                 return false;
-            // UserRoles được lưu dạng "Buyer,Seller" hoặc "Seller"
             var roleList = roles.Split(',').Select(r => r.Trim()).ToList();
             return roleList.Contains("Seller");
         }
 
-        // Redirect về trang login API (hoặc trang chủ)
         private IActionResult RedirectToLogin()
         {
-            // Redirect về trang chủ hoặc trang login của bạn
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> OrderManagement(string status = null)
         {
-            // Kiểm tra đăng nhập và role
             if (!IsSellerRole())
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập với tài khoản Seller để truy cập trang này.";
@@ -60,10 +54,8 @@ namespace webCore.Controllers
                 return RedirectToLogin();
             }
 
-            // Lấy danh sách đơn hàng
             var orders = await _orderService.GetOrdersBySellerIdAsync(sellerId, status);
 
-            // Đếm số lượng đơn hàng theo trạng thái
             var statusCount = await _orderService.GetOrderStatusCountAsync(sellerId);
 
             ViewBag.StatusCount = statusCount;
@@ -73,7 +65,6 @@ namespace webCore.Controllers
             return View(orders);
         }
 
-        // GET: Chi tiết đơn hàng
         public async Task<IActionResult> OrderDetail(string id)
         {
             if (!IsSellerRole())
@@ -98,7 +89,6 @@ namespace webCore.Controllers
             return View(order);
         }
 
-        // GET: Chi tiết đơn hàng bị hủy
         public async Task<IActionResult> CancelDetail(string id)
         {
             if (!IsSellerRole())
@@ -123,7 +113,6 @@ namespace webCore.Controllers
             return View(order);
         }
 
-        // POST: Xác nhận đơn hàng
         [HttpPost]
         public async Task<IActionResult> ConfirmOrder(string orderId)
         {
@@ -147,7 +136,6 @@ namespace webCore.Controllers
             }
         }
 
-        // POST: Xác nhận nhiều đơn hàng
         [HttpPost]
         public async Task<IActionResult> ConfirmMultipleOrders([FromBody] List<string> orderIds)
         {
@@ -167,7 +155,6 @@ namespace webCore.Controllers
             }
         }
 
-        // POST: Đánh dấu đã chuẩn bị hàng
         [HttpPost]
         public async Task<IActionResult> ReadyToShip(string orderId)
         {
@@ -191,7 +178,6 @@ namespace webCore.Controllers
             }
         }
 
-        // POST: Đánh dấu đã giao hàng
         [HttpPost]
         public async Task<IActionResult> CompleteOrder(string orderId)
         {
@@ -215,7 +201,6 @@ namespace webCore.Controllers
             }
         }
 
-        // POST: Hủy đơn hàng
         [HttpPost]
         public async Task<IActionResult> CancelOrder(string orderId)
         {
@@ -239,7 +224,6 @@ namespace webCore.Controllers
             }
         }
 
-        // POST: Hủy nhiều đơn hàng
         [HttpPost]
         public async Task<IActionResult> CancelMultipleOrders([FromBody] List<string> orderIds)
         {

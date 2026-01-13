@@ -15,11 +15,8 @@ namespace webCore.MongoHelper
         {
             _productCollection = mongoDBService._productCollection;
         }
-
-        // Lấy danh sách sản phẩm có Status = "Hoạt động" và nhóm theo Featured (0,1,2,3)
         public async Task<Dictionary<string, List<Product_admin>>> GetProductsGroupedByFeaturedAsync()
         {
-            // Lọc sản phẩm: Deleted = false, Status = "Hoạt động", Featured thuộc 0,1,2,3
             var filter = Builders<Product_admin>.Filter.Eq(p => p.Deleted, false) &
                          Builders<Product_admin>.Filter.Eq(p => p.Status, "Hoạt động") &
                          Builders<Product_admin>.Filter.In(p => p.Featured, new[] { 0, 1, 2, 3 });
@@ -57,7 +54,6 @@ namespace webCore.MongoHelper
             return await _productCollection.Find(filter).ToListAsync();
         }
 
-        // Lấy tất cả sản phẩm
         public async Task<List<Product_admin>> GetProductsAsync()
         {
             return await _productCollection.Find(product => true).ToListAsync();
@@ -76,7 +72,6 @@ namespace webCore.MongoHelper
             return (int)productCount;
         }
 
-        // Lấy sản phẩm nổi bật có Status = "Hoạt động" và Featured thuộc 1,2,3
         public async Task<List<Product_admin>> GetFeaturedProductsAsync()
         {
             var filter = Builders<Product_admin>.Filter.Eq(p => p.Deleted, false) &
@@ -91,17 +86,15 @@ namespace webCore.MongoHelper
             return await _productCollection.Find(filter).ToListAsync();
         }
 
-        // Lấy danh sách sản phẩm bán chạy: Status = "Hoạt động", Featured thuộc 1,2,3
-        // Sắp xếp theo ngày tạo mới nhất
         public async Task<List<Product_admin>> GetBestsellerProductsAsync()
         {
             var filter = Builders<Product_admin>.Filter.Eq(p => p.Deleted, false) &
                          Builders<Product_admin>.Filter.Eq(p => p.Status, "Hoạt động") &
                          Builders<Product_admin>.Filter.In(p => p.Featured, new[]
                          {
-                             (int)FeaturedStatus.Highlighted,  // 1
-                             (int)FeaturedStatus.New,          // 2
-                             (int)FeaturedStatus.Suggested     // 3
+                             (int)FeaturedStatus.Highlighted,  
+                             (int)FeaturedStatus.New,        
+                             (int)FeaturedStatus.Suggested   
                          });
 
             var sort = Builders<Product_admin>.Sort.Descending(p => p.CreatedAt);
