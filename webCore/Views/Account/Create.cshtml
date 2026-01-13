@@ -44,7 +44,6 @@
     </form>
     </div>
     <script>
-        // LOAD ROLE TỪ API
         async function loadRoles() {
             const res = await fetch("/api/role/list");
             const roles = await res.json();
@@ -61,7 +60,6 @@
         }
         loadRoles();
 
-        // Preview ảnh
         function previewImage(e) {
             const file = e.target.files[0];
             if (file) {
@@ -69,7 +67,6 @@
             }
         }
 
-        // GỬI ĐẾN API
         document.getElementById("createForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -82,7 +79,6 @@
             const img = document.getElementById("image").files[0];
             if (img) fd.append("ProfileImage", img);
 
-            // LẤY ROLE TỪ DB
             fd.append("RoleId[0]", document.getElementById("role").value);
 
             const status = document.querySelector("input[name='Status']:checked").value;

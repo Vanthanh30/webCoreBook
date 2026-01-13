@@ -5,9 +5,7 @@
 
 <link rel="stylesheet" href="~/css/shop-register.css" asp-append-version="true">
 
-<!-- Main Content -->
 <div class="main-content">
-    <!-- Welcome Page -->
     <div id="welcomePage" class="welcome-page">
         <div class="welcome-icon"></div>
         <h1 class="welcome-title">Chào mừng đến với TYB BOOK!</h1>
@@ -18,17 +16,14 @@
         <button class="btn-start" onclick="showRegistrationForm()">Bắt đầu đăng ký</button>
     </div>
 
-    <!-- Registration Form -->
     <div id="registrationForm" class="registration-form">
         <div class="form-header">
             <h2>Đăng ký thông tin Shop</h2>
             <p>Vui lòng điền đầy đủ thông tin bên dưới</p>
         </div>
 
-        <!-- Form -->
         <form id="shopForm" method="post" asp-action="SubmitShopInfo" asp-controller="Shop_register" enctype="multipart/form-data">
 
-            <!-- Avatar Section -->
             <div class="avatar-section">
                 <div class="avatar-upload-wrapper">
                     <label for="avatarInput" class="avatar-preview">
@@ -45,7 +40,6 @@
                 <label class="avatar-label">Logo/Avatar Shop của bạn</label>
             </div>
 
-            <!-- Basic Information Section -->
             <div class="form-section">
                 <div class="section-title">
                     <i class="fa-solid fa-info-circle"></i>
@@ -88,7 +82,6 @@
                 </div>
             </div>
 
-            <!-- Contact Information Section -->
             <div class="form-section">
                 <div class="section-title">
                     <i class="fa-solid fa-address-book"></i>
@@ -96,7 +89,6 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- EMAIL -->
                     <div class="form-group">
                         <label class="form-label">
                             <span class="required">*</span> Email
@@ -106,7 +98,6 @@
                         <input type="hidden" id="email" name="Email">
                     </div>
 
-                    <!-- PHONE -->
                     <div class="form-group">
                         <label class="form-label">
                             <span class="required">*</span> Số điện thoại
@@ -120,7 +111,6 @@
 
             </div>
 
-            <!-- Address Section -->
             <div class="form-section">
                 <div class="section-title">
                     <i class="fa-solid fa-map-marker-alt"></i>
@@ -136,7 +126,6 @@
                 </div>
             </div>
 
-            <!-- Form Actions -->
             <div class="form-actions">
                 <button type="submit" class="btn-primary">
                     Đăng ký Shop <i class="fa-solid fa-arrow-right"></i>

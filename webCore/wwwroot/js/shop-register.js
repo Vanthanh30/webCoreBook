@@ -6,7 +6,6 @@
 
             alert(errorData?.message || "Bạn cần cập nhật thông tin trước khi đăng ký!");
 
-            // Redirect tới trang cập nhật thông tin
             window.location.href = "/Home/Index";
             return;
         }
@@ -14,12 +13,10 @@
 
         if (!data.success) {
             alert(data.message || "Bạn cần cập nhật thông tin trước khi đăng ký!");
-            // Redirect tới trang cập nhật
             window.location.href = "/Home/Index";
             return;
         }
 
-        // Nếu qua được kiểm tra thì mở form đăng ký
         document.getElementById('welcomePage').style.display = 'none';
         document.getElementById('registrationForm').classList.add('active');
 
@@ -29,7 +26,6 @@
     }
 }
 
-// Avatar Upload Preview
 const avatarInput = document.getElementById('avatarInput');
 const avatarPreview = document.getElementById('avatarPreview');
 const avatarPlaceholder = document.getElementById('avatarPlaceholder');
@@ -49,7 +45,6 @@ if (avatarInput) {
     });
 }
 
-// Character counter for shop name
 const shopNameInput = document.getElementById('shopName');
 const charCountSpan = document.getElementById('charCount');
 
@@ -59,7 +54,6 @@ if (shopNameInput && charCountSpan) {
     });
 }
 
-// Character counter for description
 const descriptionInput = document.getElementById('description');
 const descCharCountSpan = document.getElementById('descCharCount');
 
@@ -69,7 +63,6 @@ if (descriptionInput && descCharCountSpan) {
     });
 }
 
-// Province change handler
 const provinceSelect = document.getElementById('province');
 const districtSelect = document.getElementById('district');
 const wardSelect = document.getElementById('ward');
@@ -92,7 +85,6 @@ if (provinceSelect) {
     });
 }
 
-// District change handler
 if (districtSelect) {
     districtSelect.addEventListener('change', function () {
         const province = provinceSelect.value;
@@ -113,7 +105,6 @@ if (districtSelect) {
 
 const apiShopForm = document.getElementById("shopForm");
 
-// Load email/phone từ API
 async function loadUserInfo() {
     const res = await fetch("/api/shop/info", { credentials: "include" });
     if (!res.ok) {
@@ -126,14 +117,12 @@ async function loadUserInfo() {
     document.getElementById("emailDisplay").value = data.email;
     document.getElementById("phoneDisplay").value = data.phone;
 
-    // Hidden values
     document.getElementById("email").value = data.email;
     document.getElementById("phone").value = data.phone;
 }
 
 loadUserInfo();
 
-// SUBMIT REGISTER
 if (apiShopForm) {
     apiShopForm.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -153,16 +142,16 @@ if (apiShopForm) {
             let result = JSON.parse(text);
 
             if (!result.success) {
-                alert("❌ " + (result.message || "Đăng ký shop thất bại!"));
+                alert(" " + (result.message || "Đăng ký shop thất bại!"));
                 return;
             }
 
-            alert("🎉 Đăng ký shop thành công!");
+            alert(" Đăng ký shop thành công!");
             window.location.href = "/SellerDashboard/Dashboard";
 
         } catch (err) {
             console.error("Lỗi API:", err);
-            alert("⚠️ Lỗi khi gọi API!");
+            alert(" Lỗi khi gọi API!");
         }
     });
 }

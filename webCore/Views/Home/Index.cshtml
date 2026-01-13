@@ -6,7 +6,6 @@
     var featuredProducts = ViewBag.FeaturedProducts as List<webCore.Models.Product_admin>;
     var flashSaleProducts = ViewBag.FlashSaleProducts as List<webCore.Models.Product_admin>;
 
-    // === SỬA CHÍNH TẠI ĐÂY ===
     var isSearching = ViewBag.IsSearching == true;
     var searchResults = ViewBag.SearchResults as List<KeyValuePair<string, List<Product_admin>>>;
 
@@ -30,7 +29,6 @@
             display: block;
         }
 
-    /* Badge mới cho 3 phần chính */
     .section-badge {
         color: white;
         padding: 10px 25px;
@@ -45,15 +43,12 @@
         .section-badge.featured {
             background: #ff4757;
         }
-        /* Đỏ nổi bật */
         .section-badge.new {
             background: #2ed573;
         }
-        /* Xanh lá */
         .section-badge.bestseller {
             background: #1e90ff;
         }
-    /* Xanh dương */
     .price-select {
         width: 100%;
         padding: 8px 10px;
@@ -66,12 +61,10 @@
 <div class="home-wrapper">
     <div class="container-fluid">
         <div class="row">
-            <!-- SIDEBAR BÊN TRÁI -->
             <aside class="col-xl-2 col-lg-3 col-md-3 col-sm-12 pe-lg-3 mb-4 mb-lg-0">
                 <div class="filter-sidebar">
                     <div class="filter-header">BỘ LỌC</div>
 
-                    <!-- Lọc theo danh mục -->
                     <div class="filter-section">
                         <div class="filter-title">Lọc theo danh mục</div>
                         <div class="filter-options">
@@ -112,7 +105,6 @@
                         </div>
                     </div>
 
-                    <!-- Lọc theo giá -->
                     <div class="filter-section filter-price-section">
                         <div class="filter-section filter-price-section">
                             <div class="filter-title">Lọc theo giá</div>
@@ -128,7 +120,6 @@
                     </div>
                 </div>
 
-                <!-- FLASH SALE CHỈ HIỆN Ở SIDEBAR -->
                 @if (flashSaleProducts != null && flashSaleProducts.Any())
                 {
                     <div class="flash-sale-sidebar mt-4">
@@ -157,13 +148,10 @@
                 }
             </aside>
 
-            <!-- NỘI DUNG CHÍNH -->
             <main class="col-xl-10 col-lg-9 col-md-9 col-sm-12">
-                <!-- Banner carousel -->
                 <div class="main-banner mb-4">
                     <div id="bookCarousel" class="carousel slide rounded shadow" data-bs-ride="carousel" data-bs-interval="4000">
 
-                        @* Danh sách ảnh hard-code *@
                         @{
                             var slideImages = new List<string>
                                                 {
@@ -173,7 +161,6 @@
                                                 };
                         }
 
-                        <!-- Indicators -->
                         <div class="carousel-indicators">
                             @for (int i = 0; i < slideImages.Count; i++)
                             {
@@ -186,7 +173,6 @@
                             }
                         </div>
 
-                        <!-- Slideshow images -->
                         <div class="carousel-inner rounded">
                             @for (int i = 0; i < slideImages.Count; i++)
                             {
@@ -200,7 +186,6 @@
                 </div>
 
 
-                <!-- Tab danh mục (cuộn ngang) -->
                 <div class="category-tabs-container mb-4">
                     <button class="scroll-arrow left" onclick="scrollTabs(-1)">‹</button>
                     <div class="category-tabs" id="categoryTabs">
@@ -219,7 +204,6 @@
                     </div>
                     <button class="scroll-arrow right" onclick="scrollTabs(1)">›</button>
                 </div>
-                <!-- 3 NHÓM SẢN PHẨM CHÍNH: NỔI BẬT - MỚI NHẤT - BÁN CHẠY -->
                 <div class="product-list">
                     @if (displayGroups.Any())
                     {
@@ -298,7 +282,6 @@
     </div>
 </div>
 
-<!-- SCRIPT -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let currentCategoryId = "";
@@ -314,7 +297,6 @@
         } else {
             sub.classList.remove('show');
 
-            // Bỏ chọn toàn bộ checkbox con khi bỏ chọn cha
             sub.querySelectorAll('.child-checkbox').forEach(cb => cb.checked = false);
         }
     }
@@ -352,7 +334,6 @@
         const slider = btn.parentElement.querySelector('.products-slider');
         slider.scrollBy({ left: dir * 260, behavior: 'smooth' });
     }
-//Chức năng lọc
     function filterByCategory() {
         const parentCheckboxes = document.querySelectorAll('.parent-checkbox');
         const childCheckboxes = document.querySelectorAll('.child-checkbox');
@@ -368,12 +349,10 @@
             const checkedChildren = Array.from(children).filter(cb => cb.checked);
 
             if (checkedChildren.length > 0) {
-                // Có chọn con → dùng con
                 categoryIds.push(
                     ...checkedChildren.map(cb => cb.dataset.id)
                 );
             } else if (parent.checked) {
-                // Chỉ chọn cha → dùng cha (server sẽ expand ra con)
                 categoryIds.push(parentId);
             }
         });

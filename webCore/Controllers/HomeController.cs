@@ -25,7 +25,6 @@ namespace webCore.Controllers
             _userService = userService;
         }
 
-        // Trang chủ
         [ServiceFilter(typeof(SetLoginStatusFilter))]
         public async Task<IActionResult> Index()
         {
@@ -47,7 +46,6 @@ namespace webCore.Controllers
             return View();
         }
 
-        // Lấy danh sách sản phẩm theo danh mục (AJAX)
         public async Task<IActionResult> GetProductsByCategoryId(List<string> categoryId)
         {
             if (categoryId == null || !categoryId.Any())
@@ -60,10 +58,8 @@ namespace webCore.Controllers
                 return PartialView("_BookListPartial", orderedHomeProducts);
             }
 
-            // Lấy toàn bộ danh mục
             var allCategories = await _categoryService.GetCategoriesAsync();
-
-            // Xác định danh mục cuối cùng cần lọc
+                
             var finalCategoryIds = new HashSet<string>();
             foreach (var id in categoryId)
             {
@@ -84,7 +80,6 @@ namespace webCore.Controllers
                 }
             }
 
-            // Lấy sản phẩm theo danh mục
             var products = new List<Product_admin>();
             foreach (var catId in finalCategoryIds)
             {
@@ -94,7 +89,6 @@ namespace webCore.Controllers
 
             products = products.GroupBy(p => p.Id).Select(g => g.First()).ToList();
 
-            // Phân loại sản phẩm theo Featured enum
             var groupedProducts = ClassifyProductsByFeatured(products);
 
             var orderedGroupedProducts = groupedProducts
@@ -107,7 +101,6 @@ namespace webCore.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string q)
         {
-            // Lấy tất cả dữ liệu như trang chủ
             var categories = await _categoryService.GetCategoriesAsync();
             ViewBag.Categories = categories;
 
@@ -120,14 +113,12 @@ namespace webCore.Controllers
             var bestsellerProducts = await _productService.GetBestsellerProductsAsync();
             ViewBag.BestsellerProducts = bestsellerProducts;
 
-            // Xử lý tìm kiếm
             ViewBag.SearchQuery = q?.Trim() ?? "";
 
             if (!string.IsNullOrWhiteSpace(q))
             {
                 var searchResults = await _productService.SearchProductsAsync(q);
 
-                // ✅ SỬA: Phân loại theo Featured enum (giống trang chủ)
                 var grouped = ClassifyProductsByFeatured(searchResults);
 
                 ViewBag.SearchResults = grouped;
@@ -210,21 +201,15 @@ namespace webCore.Controllers
         {
             var products = await _productService.GetProductsByFinalPriceRangeAsync(min, max);
 
-            // Phân loại theo Featured enum
             var groupedProducts = ClassifyProductsByFeatured(products);
 
             return PartialView("_BookListPartial", groupedProducts.ToList());
         }
 
-        // ===== PHƯƠNG THỨC PHÂN LOẠI SẢN PHẨM THEO FEATURED ENUM =====
         private List<KeyValuePair<string, List<Product_admin>>> ClassifyProductsByFeatured(List<Product_admin> products)
         {
             var grouped = new List<KeyValuePair<string, List<Product_admin>>>();
 
-            // Phân loại theo Featured enum:
-            // 0 = None, 1 = Highlighted (Nổi bật), 2 = New (Mới), 3 = Suggested (Gợi ý)
-
-            // 1. Nổi bật (Featured = 1)
             var highlightedProducts = products
                 .Where(p => p.Featured == 1)
                 .OrderByDescending(p => p.Position)
@@ -232,7 +217,6 @@ namespace webCore.Controllers
                 .Take(20)
                 .ToList();
 
-            // 2. Mới (Featured = 2)
             var newProducts = products
                 .Where(p => p.Featured == 2)
                 .OrderByDescending(p => p.Position)
@@ -240,7 +224,6 @@ namespace webCore.Controllers
 .Take(20)
                 .ToList();
 
-            // 3. Gợi ý (Featured = 3)
             var suggestedProducts = products
                 .Where(p => p.Featured == 3)
                 .OrderByDescending(p => p.Position)
@@ -248,8 +231,6 @@ namespace webCore.Controllers
                 .Take(20)
                 .ToList();
 
-            // 4. Bán chạy (logic riêng - có thể là sản phẩm có discount hoặc logic khác)
-            // Nếu bạn có trường riêng cho "Bán chạy", sửa logic ở đây
             var bestsellerProducts = products
                 .Where(p => p.DiscountPercentage > 0 && p.Featured != 1 && p.Featured != 2 && p.Featured != 3)
                 .OrderByDescending(p => p.DiscountPercentage)
@@ -257,7 +238,6 @@ namespace webCore.Controllers
                 .Take(20)
                 .ToList();
 
-            // Thêm vào danh sách kết quả theo thứ tự
             if (highlightedProducts.Any())
                 grouped.Add(new KeyValuePair<string, List<Product_admin>>("Nổi bật", highlightedProducts));
 

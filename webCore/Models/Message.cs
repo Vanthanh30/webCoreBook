@@ -16,15 +16,12 @@ namespace webCore.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string ConversationId { get; set; } = string.Empty;
 
-        // Users._id
         public string SenderId { get; set; } = string.Empty;
 
         public string Content { get; set; } = string.Empty;
 
-        // text | system | product | order
         public string MessageType { get; set; }
 
-        // context (Shopee style)
         public string? ProductId { get; set; }
         public string? OrderId { get; set; }
 

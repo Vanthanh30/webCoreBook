@@ -16,16 +16,10 @@ namespace webCore.MongoHelper
             _detailProductCollection = mongoDBService._detailProductCollection;
         }
 
-        /*        public async Task<Product> GetProductByIdAsync(string id)
-                {
-                    return await _productCollection.Find(p => p.Id == id).FirstOrDefaultAsync();
-                }*/
-        // Phương thức lấy sản phẩm theo _id
         public async Task<Product_admin> GetProductByIdAsync(string productId)
         {
             FilterDefinition<Product_admin> filter;
 
-            // Kiểm tra nếu _id là dạng ObjectId
             if (ObjectId.TryParse(productId, out var objectId))
             {
                 filter = Builders<Product_admin>.Filter.Eq("_id", objectId);
@@ -39,9 +33,8 @@ namespace webCore.MongoHelper
         }
         public async Task<List<Product_admin>> GetProductsByCategoryAsync(string categoryId)
         {
-            // Truy vấn các sản phẩm theo categoryId từ cơ sở dữ liệu MongoDB
             var filter = Builders<Product_admin>.Filter.Eq(p => p.CategoryId, categoryId);
-            var products = await _detailProductCollection.Find(filter).ToListAsync();  // Sử dụng Find thay vì gọi phương thức không tồn tại
+            var products = await _detailProductCollection.Find(filter).ToListAsync();  
 
             return products;
         }

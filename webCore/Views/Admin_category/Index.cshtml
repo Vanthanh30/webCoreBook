@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "Admin";
-    var filterType = ViewBag.FilterType ?? "parent"; // Mặc định là parent
+    var filterType = ViewBag.FilterType ?? "parent"; 
 }
 <link rel="stylesheet" href="/css/Account_admin.css" />
 <style>
@@ -43,7 +43,6 @@
 <div class="container">
     <h1>Danh sách danh mục</h1>
 
-    <!-- Filter Buttons -->
     <div class="filter-buttons">
         <a href="@Url.Action("Index", "Admin_category", new { filter = "parent", page = 1 })"
            class="filter-btn @(filterType == "parent" ? "active" : "")">
@@ -110,7 +109,6 @@
             }
         </tbody>
     </table>
-    <!-- Pagination -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             @if (ViewBag.CurrentPage > 1)

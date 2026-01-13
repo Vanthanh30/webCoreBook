@@ -49,14 +49,13 @@
 
     <div class="container cart-container">
         <div class="row">
-            <!-- Cart Table Section -->
             <div class="col-md-8 section_1">
                 <div class="cart-table">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th><input type="checkbox" class="select-all">Chọn tất cả (<span id="cart-item-count">@Model.Count</span> sản phẩm)</th>
-                                <th>Đơn giá</th> <!-- Cột mới cho đơn giá -->
+                                <th>Đơn giá</th> 
                                 <th>Số lượng</th>
                                 <th>Thành tiền</th>
                                 <th></th>
@@ -68,8 +67,7 @@
                                 foreach (var item in Model)
                                 {
                                     var discountedPrice = item.Price * (1 - item.DiscountPercentage / 100);
-                                    var productId = item.ProductId.ToString();  // Chuyển ID sản phẩm thành string
-
+                                    var productId = item.ProductId.ToString();  
                                     <tr class="cart-item" data-product-id="@productId">
                                         <td>
                                             <div class="d-flex">
@@ -130,11 +128,9 @@
                 </div>
             </div>
 
-            <!-- Cart Summary Section -->
 
             <div class="col-md-4 section_2">
                 <div class="cart-summary">
-                    <!-- Discount Section -->
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
                         <h4>Khuyến mãi</h4>
@@ -151,20 +147,17 @@
 
                     <hr />
 
-                    <!-- Order Information -->
                     <h4>Thông tin đơn hàng</h4>
 
                     @{
                         decimal totalAmount = 0;
                         decimal voucherDiscount = 0;
 
-                        // Kiểm tra và lấy TotalAmount từ ViewData
                         if (ViewData["TotalAmount"] != null)
                         {
                             totalAmount = (decimal)ViewData["TotalAmount"];
                         }
 
-                        // Kiểm tra và lấy VoucherDiscount từ ViewData
                         if (ViewData["VoucherDiscount"] != null)
                         {
                             voucherDiscount = decimal.Parse(ViewData["VoucherDiscount"].ToString());
@@ -195,7 +188,6 @@
                         </span>
                     </p>
 
-                    <!-- Payment Button -->
                     <div class="btn_pay mt-3">
                         <form action="@Url.Action("Checkout", "Cart")" method="get">
                             <button type="submit" class="btn btn-success btn-block btn-pay">Thanh toán</button>
@@ -208,24 +200,22 @@
     <script>
         $(document).ready(function () {
 
-            // ================== Chế độ Sửa / Hủy ==================
             $("#btn-edit").click(function () {
                 $("#btn-delete-selected").show();
                 $("#btn-cancel-edit").show();
                 $(this).hide();
-                $(".btn-pay").hide(); // Ẩn nút thanh toán khi sửa
+                $(".btn-pay").hide(); 
             });
 
             $("#btn-cancel-edit").click(function () {
                 $("#btn-delete-selected").hide();
                 $("#btn-cancel-edit").hide();
                 $("#btn-edit").show();
-                $(".btn-pay").show(); // Hiện lại nút thanh toán
+                $(".btn-pay").show(); 
                 $(".select-item").prop("checked", false);
                 $(".select-all").prop("checked", false);
             });
 
-            // ================== Checkbox hành vi chung ==================
             $(".select-all").change(function () {
                 $(".select-item").prop("checked", $(this).prop("checked"));
             });
@@ -236,7 +226,6 @@
                 }
             });
 
-            // ================== Xử lý Xóa sản phẩm đã chọn ==================
             $("#btn-delete-selected").click(function () {
                 var selectedIds = [];
                 $(".select-item:checked").each(function () {
@@ -267,10 +256,9 @@
                 });
             });
 
-            // ================== Kiểm tra chọn trước khi thanh toán ==================
             $(".btn-pay").click(function (e) {
                 if ($(".select-item:checked").length === 0) {
-                    e.preventDefault(); // Ngăn chuyển trang
+                    e.preventDefault(); 
                     alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
                 }
             });

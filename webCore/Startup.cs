@@ -24,23 +24,18 @@ namespace webCore
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add controllers and views
             services.AddControllersWithViews();
             services.AddSignalR();
-            // Add MongoDB Client (singleton because it is thread-safe)
             services.AddSingleton<IMongoClient>(sp =>
             {
                 var logger = sp.GetRequiredService<ILogger<Startup>>();
 
-                // Read MongoDB configuration
                 var mongoConfig = Configuration.GetSection("MongoDB");
                 var mongoConnection = mongoConfig["ConnectionString"];
                 var databaseName = mongoConfig["DatabaseName"];
 
-                // Log and validate the connection string
                 if (string.IsNullOrWhiteSpace(mongoConnection))
                 {
                     logger.LogError("MongoDB connection string is missing or empty.");
@@ -50,7 +45,6 @@ namespace webCore
                 logger.LogInformation("MongoDB connection string is configured.");
                 return new MongoClient(mongoConnection);
             });
-            // Add MongoDB Database
             services.AddScoped<IMongoDatabase>(sp =>
             {
                 var mongoConfig = Configuration.GetSection("MongoDB");
@@ -60,25 +54,22 @@ namespace webCore
 
                 return client.GetDatabase(databaseName);
             });
-            // Register MongoDBService with DI container
             services.AddSingleton<MongoDBService>();
 
-            // Register Cloudinary service for image upload
             services.AddSingleton<CloudinaryService>();
             services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 104857600; // 100MB
+                options.MultipartBodyLengthLimit = 104857600; 
                 options.ValueLengthLimit = 104857600;
                 options.MultipartHeadersLengthLimit = 16384;
             });
             services.Configure<KestrelServerOptions>(options =>
             {
-                options.Limits.MaxRequestBodySize = 104857600; // 100MB
+                options.Limits.MaxRequestBodySize = 104857600; 
                 options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
                 options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(10);
             });
 
-            // Register services that will be used for the application
             services.AddScoped<ProductService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<DetailProductService>();
@@ -105,14 +96,13 @@ namespace webCore
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.Cookie.Name = ".AspBookCore.Session"; // Session cookie name
-                options.IdleTimeout = TimeSpan.FromMinutes(30); // Session expiration time
-                options.Cookie.IsEssential = true; // Cookie is required for the session
+                options.Cookie.Name = ".AspBookCore.Session";
+                options.IdleTimeout = TimeSpan.FromMinutes(30); 
+                options.Cookie.IsEssential = true; 
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Lax;
             });
 
-            // Register a global action filter
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SetLoginStatusFilter>();
@@ -120,23 +110,18 @@ namespace webCore
 
             services.AddScoped<SetLoginStatusFilter>();
 
-            // Configure JSON options
             services.AddControllers().AddJsonOptions(opts =>
             {
                 opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
 
-            // Access HTTP context for session management
             services.AddHttpContextAccessor();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Use session
             app.UseSession();
 
-            // Configure error handling and environment settings
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -147,25 +132,18 @@ namespace webCore
                 app.UseHsts();
             }
 
-            // Enable HTTPS redirection and static file serving
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            // Routing configuration
             app.UseRouting();
 
-            // Authorization middleware (if needed)
             app.UseAuthorization();
-
-            // Configure endpoints for the application
             app.UseEndpoints(endpoints =>
             {
-                // Default route
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ChatHub>("/chatHub");
-                // Custom route for DetailUserController
                 endpoints.MapControllerRoute(
                     name: "detailUser",
                     pattern: "DetailUser/{action=Index}/{id?}");

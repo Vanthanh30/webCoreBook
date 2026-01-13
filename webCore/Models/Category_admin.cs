@@ -32,9 +32,8 @@ namespace webCore.Models
 
         // ID của danh mục cha
         [MaxLength(100)]
-        public string ParentId { get; set; } // Đổi tên từ Parent_id thành ParentId
-                                             // Thuộc tính mới để lưu tên danh mục cha
-        
+        public string ParentId { get; set; } 
+                                            
         public string ParentTitle { get; set; }
 
         [MaxLength(50)]
@@ -58,28 +57,22 @@ namespace webCore.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Phương thức tạo slug
         private string GenerateSlug(string title)
         {
             if (string.IsNullOrWhiteSpace(title))
                 return string.Empty;
 
-            // Chuyển sang chữ thường
             string slug = title.ToLowerInvariant();
 
-            // Xóa dấu
             slug = RemoveDiacritics(slug);
 
-            // Thay thế các ký tự không hợp lệ bằng dấu gạch nối
             slug = Regex.Replace(slug, @"[^a-z0-9\s-]", string.Empty);
 
-            // Thay thế nhiều dấu gạch nối hoặc khoảng trắng bằng một dấu gạch nối
             slug = Regex.Replace(slug, @"[\s-]+", "-").Trim('-');
 
             return slug;
         }
 
-        // Phương thức xóa dấu
         private string RemoveDiacritics(string text)
         {
             var normalizedString = text.Normalize(NormalizationForm.FormD);

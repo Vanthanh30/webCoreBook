@@ -40,7 +40,6 @@
             const password = document.getElementById("password").value.trim();
             const errorBox = document.getElementById("errorBox");
 
-            // RESET lỗi
             errorBox.style.display = "none";
             errorBox.innerText = "";
             errorBox.style.color = "red";
@@ -84,11 +83,9 @@
                     return;
                 }
 
-                // Lưu admin info
                 localStorage.setItem("AdminId", result.adminId);
                 localStorage.setItem("AdminToken", result.token);
 
-                // Redirect to Dashboard page
                 window.location.href = "/Dashboard";
 
             } catch (err) {

@@ -10,12 +10,11 @@ namespace webCore.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        // Thay đổi: Chat theo SellerId thay vì OrderId
-        public string SellerId { get; set; }      // ID người bán
-        public string BuyerId { get; set; }       // ID người mua
+        public string SellerId { get; set; }    
+        public string BuyerId { get; set; }     
 
-        public string SenderId { get; set; }      // Người gửi (có thể là buyer hoặc seller)
-        public string ReceiverId { get; set; }    // Người nhận
+        public string SenderId { get; set; }      
+        public string ReceiverId { get; set; }   
 
         public string Message { get; set; }
         public DateTime SentAt { get; set; }

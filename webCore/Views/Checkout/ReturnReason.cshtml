@@ -41,7 +41,6 @@
                 border-bottom: none;
             }
 
-        /* Upload Area Styling */
         .media-upload-area {
             border: 2px dashed #dee2e6;
             border-radius: 8px;
@@ -67,7 +66,6 @@
                 color: #007bff;
             }
 
-        /* Preview Images */
         .preview-container {
             display: flex;
             gap: 10px;
@@ -163,7 +161,6 @@
 
 @section Scripts {
     <script>
-        // Hàm xem trước ảnh/video
         function previewMedia(input) {
             var container = document.getElementById('previewContainer');
             container.innerHTML = '';
@@ -189,7 +186,6 @@
             }
         }
 
-        // Xác nhận trước khi gửi
         function confirmSubmit() {
             return confirm("Bạn có chắc chắn muốn gửi yêu cầu trả hàng? Đơn hàng sẽ được hủy ngay sau khi gửi.");
         }

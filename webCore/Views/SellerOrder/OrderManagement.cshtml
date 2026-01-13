@@ -12,7 +12,6 @@
 <div class="container-fluid py-4">
     <h3 class="mb-4">Quản lý đơn hàng</h3>
 
-    <!-- Navigation Tabs -->
     <ul class="nav nav-pills mb-4" id="orderTabs">
         <li class="nav-item">
             <a class="nav-link @(string.IsNullOrEmpty(currentStatus) ? "active" : "")"
@@ -87,7 +86,6 @@
         </li>
     </ul>
 
-    <!-- Bulk Actions -->
     @if (currentStatus == "Chờ xác nhận" || currentStatus == "Chờ lấy hàng")
     {
         <div class="bg-light p-3 rounded mb-4 border d-flex justify-content-between align-items-center">
@@ -111,7 +109,6 @@
         </div>
     }
 
-    <!-- Order List -->
     <div class="order-list">
         @if (Model == null || !Model.Any())
         {
@@ -257,13 +254,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Xử lý checkbox chọn tất cả
             $('#selectAll').change(function () {
                 $('.order-checkbox').prop('checked', this.checked);
                 updateSelectedCount();
             });
 
-            // Xử lý checkbox đơn lẻ
             $(document).on('change', '.order-checkbox', function () {
                 updateSelectedCount();
                 var total = $('.order-checkbox').length;
@@ -271,14 +266,12 @@
                 $('#selectAll').prop('checked', total === checked);
             });
 
-            // Cập nhật số lượng đã chọn
             function updateSelectedCount() {
                 const count = $('.order-checkbox:checked').length;
                 $('#selectedCount').text(count);
                 $('#btnConfirmAll, #btnCancelAll').prop('disabled', count === 0);
             }
 
-            // Xác nhận tất cả
             $('#btnConfirmAll').click(function () {
                 const orderIds = $('.order-checkbox:checked').map(function () {
                     return $(this).val();
@@ -309,7 +302,6 @@
                 }
             });
 
-            // Hủy tất cả
             $('#btnCancelAll').click(function () {
                 const orderIds = $('.order-checkbox:checked').map(function () {
                     return $(this).val();
@@ -340,8 +332,6 @@
                 }
             });
         });
-
-        // Xác nhận đơn hàng
         function confirmOrder(orderId) {
             if (confirm('Xác nhận đơn hàng này?')) {
                 $.post('@Url.Action("ConfirmOrder", "SellerOrder")',
@@ -362,7 +352,6 @@
             }
         }
 
-        // Sẵn sàng giao hàng
         function readyToShip(orderId) {
             if (confirm('Đánh dấu đơn hàng đã chuẩn bị xong?')) {
                 $.post('@Url.Action("ReadyToShip", "SellerOrder")',
@@ -383,7 +372,6 @@
             }
         }
 
-        // Hoàn thành đơn hàng
         function completeOrder(orderId) {
             if (confirm('Xác nhận đơn hàng đã giao thành công?')) {
                 $.post('@Url.Action("CompleteOrder", "SellerOrder")',
@@ -404,7 +392,6 @@
             }
         }
 
-        // Hủy đơn hàng
         function cancelOrder(orderId) {
             if (confirm('Bạn có chắc muốn hủy đơn hàng này?')) {
                 $.post('@Url.Action("CancelOrder", "SellerOrder")',
@@ -425,12 +412,10 @@
             }
         }
 
-        // Liên hệ người mua
         function contactBuyer(userId) {
             showAlert('info', 'Chức năng chat đang được phát triển');
         }
 
-        // Hiển thị thông báo
         function showAlert(type, message) {
             const alertHtml = `
                         <div class="alert alert-${type} alert-dismissible fade show position-fixed"

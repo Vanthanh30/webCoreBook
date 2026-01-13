@@ -31,7 +31,6 @@
                     </ul>
                 </aside>
             <div class="col-md-8">
-                <!-- Sách cho bé Section -->
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h1>Sách cho bé</h1>
                     <div class="sorting-container d-flex">
@@ -44,7 +43,6 @@
                         <button class="btn5 ml-2" onclick="sortBooks()">Sắp xếp</button>
                     </div>
                 </div>
-            <!-- Danh sách sản phẩm -->
             <div class="product-list mt-5">
                 <div class="row">
                     @if (products != null && products.Any())
@@ -59,7 +57,6 @@
                                         <p class="card-text">
                                             @if (product.DiscountPercentage > 0)
                                             {
-                                                <!-- Bọc giảm giá trong một khung hình chữ nhật -->
                                                     <span class="badge discount-badge">
                                                         Giảm @product.DiscountPercentage%
                                                     </span>
@@ -100,11 +97,11 @@
             var arrow = item.querySelector(".arrow");
 
             if (subCategoryList.style.display === "none" || subCategoryList.style.display === "") {
-                subCategoryList.style.display = "block"; // Hiển thị danh sách con
-                arrow.classList.add("open"); // Thêm class 'open' để xoay mũi tên
+                subCategoryList.style.display = "block"; 
+                arrow.classList.add("open"); 
             } else {
-                subCategoryList.style.display = "none"; // Ẩn danh sách con
-                arrow.classList.remove("open"); // Gỡ class 'open' để mũi tên về trạng thái ban đầu
+                subCategoryList.style.display = "none"; 
+                arrow.classList.remove("open"); 
             }
         }
     </script>

@@ -29,7 +29,6 @@ namespace webCore.Models
         [BsonElement("Password")]
         public string Password { get; set; }
 
-        // Không lưu ConfirmPassword
         [BsonIgnore]
         public string ConfirmPassword { get; set; }
 
@@ -59,7 +58,7 @@ namespace webCore.Models
         public string Token { get; set; } = GenerateRandomString(20);
 
         [BsonElement("Status")]
-        public int? Status { get; set; } = 1; // 1 = hoạt động, 0 = khóa
+        public int? Status { get; set; } = 1; 
 
         [BsonElement("RoleId")]
         public List<string> RoleId { get; set; } = new List<string>();

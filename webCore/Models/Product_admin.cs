@@ -11,10 +11,10 @@ namespace webCore.Models
 {
     public enum FeaturedStatus
     {
-        None = 0,         // Không nổi bật
-        Highlighted = 1,  // Nổi bật
-        New = 2,          // Mới
-        Suggested = 3     // Gợi ý
+        None = 0,         
+        Highlighted = 1,  
+        New = 2,          
+        Suggested = 3    
     }
     [Table("Product")]
     public class Product_admin
@@ -45,7 +45,7 @@ namespace webCore.Models
 
         public string Image { get; set; }
 
-        [ForeignKey("Category_admin")] // Khóa ngoại liên kết với bảng Category
+        [ForeignKey("Category_admin")] 
         public string CategoryId { get; set; }
 
         public string CategoryTitle { get; set; }

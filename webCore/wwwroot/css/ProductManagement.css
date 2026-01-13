@@ -187,7 +187,6 @@
     border-color: #c3e6cb;
 }
 
-/* Styles cho trang ProductManagement.cshtml */
 
 .button-container {
     display: flex;
@@ -260,7 +259,6 @@ h1 {
         background-color: #f8f9fa;
     }
 
-/* CẢI THIỆN CỘT HÀNH ĐỘNG - CĂN GIỮA CÁC ICON */
 .actions-header,
 .actions-cell {
     text-align: center !important;

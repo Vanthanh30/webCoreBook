@@ -22,7 +22,6 @@
         </div>
     }
 
-    <!-- Bộ lọc trạng thái -->
 <div class="filter-container">
     <a href="@Url.Action("Index", "Admin_product", new { filter = "all" })"
        class="filter-btn @(ViewBag.CurrentFilter == "all" ? "active" : "")">
@@ -117,7 +116,6 @@
                         </td>
                         <td>@product.Position</td>
                         <td class="actions-cell">
-                            <!-- Nút xem chi tiết -->
                             <button class="icon-btn view-btn" title="Xem chi tiết"
                                     onclick="window.location.href='@Url.Action("Details", "Admin_product", new { id = product.Id })'">
                                 <i class="fas fa-eye"></i>
@@ -125,7 +123,6 @@
 
                             @if (product.Status == "Chờ duyệt")
                             {
-                                <!-- Nút duyệt -->
                                 <form action="@Url.Action("Approve", "Admin_product", new { id = product.Id })"
                                       method="post" style="display: inline-block;">
                                     @Html.AntiForgeryToken()
@@ -151,7 +148,6 @@
         </tbody>
     </table>
 
-    <!-- Pagination -->
     @if (ViewBag.TotalPages > 1)
     {
         <nav aria-label="Page navigation">

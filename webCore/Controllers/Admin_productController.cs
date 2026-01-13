@@ -37,11 +37,9 @@ namespace webCore.Controllers
 
                 const int pageSize = 5;
 
-                // Lấy tất cả sản phẩm và danh mục
                 var products = await _CategoryProductCollection.GetProduct();
                 var categories = await _CategoryProductCollection.GetCategory();
 
-                // Tạo dictionary để map CategoryId -> CategoryTitle
                 var categoryDictionary = new Dictionary<string, string>();
                 foreach (var cat in categories)
                 {
@@ -51,7 +49,6 @@ namespace webCore.Controllers
                     }
                 }
 
-                // Gán CategoryTitle cho mỗi product
                 foreach (var product in products)
                 {
                     if (!string.IsNullOrEmpty(product.CategoryId) && categoryDictionary.ContainsKey(product.CategoryId))
@@ -88,24 +85,19 @@ namespace webCore.Controllers
                 }
 
 
-                // Sắp xếp theo Position
                 var sortedProducts = filteredProducts.OrderBy(c => c.Position).ToList();
 
-                // Tính toán phân trang
                 var totalProducts = sortedProducts.Count;
                 var totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
 
-                // Đảm bảo page hợp lệ
                 if (page < 1) page = 1;
                 if (page > totalPages && totalPages > 0) page = totalPages;
 
-                // Lấy dữ liệu cho trang hiện tại
                 var productsToDisplay = sortedProducts
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
-                // Truyền thông tin phân trang vào ViewBag
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.CurrentFilter = filter;
@@ -120,7 +112,6 @@ namespace webCore.Controllers
             }
         }
 
-        // Xem chi tiết sản phẩm
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
@@ -143,7 +134,6 @@ namespace webCore.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Lấy thông tin category
                 if (!string.IsNullOrEmpty(product.CategoryId))
                 {
                     var category = await _CategoryProductCollection.GetCategoryByIdAsync(product.CategoryId);
@@ -163,7 +153,6 @@ namespace webCore.Controllers
             }
         }
 
-        // Duyệt sản phẩm (chuyển sang trạng thái Hoạt động)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(string id)
@@ -199,7 +188,6 @@ namespace webCore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Từ chối sản phẩm (chuyển sang trạng thái Không hoạt động)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(string id)

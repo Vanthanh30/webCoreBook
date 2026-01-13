@@ -43,7 +43,6 @@ namespace webCore.Controllers
             _messageService = messageService;
         }
 
-        // Phương thức tìm kiếm sản phẩm
         public async Task<IActionResult> Search(string searchQuery)
         {
             if (string.IsNullOrEmpty(searchQuery))
@@ -139,7 +138,6 @@ namespace webCore.Controllers
             }
         }
 
-        // ===== API LẤY THỐNG KÊ ĐÁNH GIÁ =====
         [HttpGet("api/reviews/stats/{productId}")]
         public async Task<IActionResult> GetReviewStats(string productId)
         {
@@ -162,12 +160,10 @@ namespace webCore.Controllers
                     });
                 }
 
-                // Tính toán thống kê
                 var avgQuality = reviews.Average(r => r.QualityRating);
                 var avgService = reviews.Average(r => r.ServiceRating);
                 var overallAvg = (avgQuality + avgService) / 2;
 
-                // Đếm số lượng mỗi mức sao
                 var ratingCounts = new int[5];
                 foreach (var review in reviews)
                 {
@@ -256,17 +252,14 @@ namespace webCore.Controllers
 
         public async Task<IActionResult> ContactSellerFromProduct(string productId)
         {
-            // 1️⃣ CHECK LOGIN
             var buyerId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(buyerId))
                 return RedirectToAction("Sign_in", "User");
 
-            // 2️⃣ LẤY PRODUCT
             var product = await _productService.GetProductByIdAsync(productId);
             if (product == null)
                 return NotFound("Product not found");
 
-            // 3️⃣ LẤY SHOP
             var shop = await _shopService.GetShopByUserIdAsync(product.SellerId);
             if (shop == null)
                 return NotFound("Shop not found");
@@ -280,7 +273,6 @@ namespace webCore.Controllers
                     message = "⚠️ Bạn không thể chat với sản phẩm của chính shop bạn"
                 });
             }
-            // 4️⃣ GET OR CREATE CONVERSATION
             var conversation = await _conversationService.GetOrCreateAsync(
                 buyerId: buyerId,
                 sellerId: sellerId,
@@ -294,7 +286,6 @@ namespace webCore.Controllers
                     productId: product.Id
                 );
 
-            // 6️⃣ REDIRECT VÀO CHAT + AUTO OPEN
             return Json(new
             {
                 success = true,

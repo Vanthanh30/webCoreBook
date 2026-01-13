@@ -20,7 +20,6 @@ namespace webCore.MongoHelper
             _configuration = configuration;
         }
 
-        // Tạo và gửi OTP
         public async Task<string> GenerateAndSendOTP(string email)
         {
             var otp = new Random().Next(100000, 999999).ToString();
@@ -47,8 +46,6 @@ namespace webCore.MongoHelper
                 throw new Exception("Không thể gửi email. Vui lòng thử lại.");
             }
         }
-
-        // Xác minh OTP
         public async Task<bool> VerifyOTP(string email, string otp)
         {
             var forgotPassword = await _forgotPasswords

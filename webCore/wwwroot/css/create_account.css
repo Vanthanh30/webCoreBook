@@ -1,6 +1,3 @@
-
-
-/* Kiểu dáng của container form */
 .form-container {
     background-color: #fff;
     padding: 20px 40px;
@@ -9,13 +6,11 @@
     width: 100%;
 }
 
-/* Kiểu tiêu đề */
 h2 {
     margin-bottom: 20px;
     text-align: center;
 }
 
-/* Kiểu dáng cho nhãn và ô nhập liệu */
 label {
     display: block;
     margin-bottom: 5px;
@@ -35,7 +30,6 @@ select {
     border-radius: 4px;
 }
 
-/* Kiểu dáng cho phần chọn trạng thái */
 .status {
     display: flex;
     align-items: center;
@@ -43,7 +37,6 @@ select {
     margin-bottom: 15px;
 }
 
-/* Kiểu nút */
 button {
     width: 100%;
     padding: 10px;
@@ -59,7 +52,6 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* Kiểu dáng cho container và ảnh xem trước */
 .image-preview-container {
     margin-bottom: 15px;
     text-align: center;
@@ -71,7 +63,7 @@ button:hover {
     height: auto;
     border-radius: 8px;
     border: 1px solid #ccc;
-    display: none; /* Ẩn ảnh trước khi có ảnh tải lên */
+    display: none; 
 }
 .alert {
     padding: 15px;

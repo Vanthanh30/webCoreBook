@@ -20,7 +20,6 @@ namespace webCore.Helper.Attributes
         {
             var http = context.HttpContext;
 
-            // 1) Chưa login admin
             if (!AdminAuthHelper.IsAdminLoggedIn(http))
             {
                 context.Result = new JsonResult(new
@@ -32,7 +31,6 @@ namespace webCore.Helper.Attributes
                 return;
             }
 
-            // 2) Lấy role từ session admin
             var adminRoles = AdminAuthHelper.GetAdminRoleNames(http);
 
             if (string.IsNullOrEmpty(adminRoles))
@@ -46,7 +44,6 @@ namespace webCore.Helper.Attributes
                 return;
             }
 
-            // 3) Kiểm tra role yêu cầu
             bool hasRole = _roles.Any(role =>
                 adminRoles.Contains(role, StringComparison.OrdinalIgnoreCase));
 

@@ -1,9 +1,8 @@
 
 @media (max-width: 768px) {
 
-    /* Thêm kho?ng cách gi?a các c?t */
     .text-center {
-        margin-bottom: 20px; /* T?o kho?ng cách gi?a các c?t khi xu?ng dòng */
+        margin-bottom: 20px;
     }
 }
 
@@ -78,16 +77,16 @@ div.btn_submit {
 
 
 .form-group {
-    margin-bottom: 20px; /* T?o kho?ng cách gi?a các nhóm form */
+    margin-bottom: 20px;
 }
 
     .form-group label {
         display: block;
-        margin-bottom: 10px; /* T?o kho?ng cách gi?a label và input */
-        font-weight: bold; /* ??m ch? c?a nhãn */
+        margin-bottom: 10px; 
+        font-weight: bold; 
     }
 
 .form-control {
-    padding: 10px; /* T?ng không gian bên trong ô nh?p */
-    border-radius: 5px; /* Bo tròn góc ô nh?p */
+    padding: 10px;
+    border-radius: 5px; 
 }

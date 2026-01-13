@@ -21,14 +21,12 @@ namespace webCore.Controllers
             _categoryProductCollection = categoryProductAdminService;
         }
 
-        // GET: DashboardController
         public async Task<ActionResult> Index()
         {
             var token = HttpContext.Session.GetString("AdminToken");
             ViewBag.AdminName = HttpContext.Session.GetString("AdminName");
             ViewBag.Token = token;
 
-            // Lấy số liệu thống kê
             var allUsers = await _useradminService.GetAllUsersAsync();
             var totalUsers = allUsers.Count;
 
@@ -45,7 +43,6 @@ namespace webCore.Controllers
                 .Take(5)
                 .ToList();
 
-            // Tạo dictionary để map CategoryId -> CategoryTitle
             var categoryDictionary = new Dictionary<string, string>();
             foreach (var cat in allCategories)
             {
@@ -55,7 +52,6 @@ namespace webCore.Controllers
                 }
             }
 
-            // Gán CategoryTitle cho mỗi sản phẩm cần duyệt
             foreach (var product in pendingProducts)
             {
                 if (!string.IsNullOrEmpty(product.CategoryId) && categoryDictionary.ContainsKey(product.CategoryId))
@@ -64,7 +60,6 @@ namespace webCore.Controllers
                 }
             }
 
-            // Truyền dữ liệu vào ViewBag
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalCategories = totalCategories;
             ViewBag.TotalProducts = totalProducts;

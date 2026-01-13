@@ -1,30 +1,26 @@
-﻿﻿ /* General styling */
-body {
+﻿﻿body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
     margin: 0;
     padding: 0;
 }
 
-/* Styling for the main promotions card */
 .promotions-card {
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-    /* Title of the promotions card */
     .promotions-card .card-title {
-        font-size: 1.3rem; /* Slightly smaller title */
+        font-size: 1.3rem; 
         color: #0d6efd;
         margin-bottom: 20px;
     }
 
-/* Card styling for each promotion */
 .card {
     border-radius: 10px;
     transition: transform 0.2s;
-    font-size: 0.85rem; /* Smaller font size for all cards */
+    font-size: 0.85rem; 
 }
 
     .card:hover {
@@ -32,27 +28,24 @@ body {
     }
 
 .card-title {
-    font-size: 0.9rem; /* Smaller card title */
+    font-size: 0.9rem; 
     color: #0d6efd;
 }
 
 .card-text {
-    font-size: 0.75rem; /* Smaller text */
+    font-size: 0.75rem; 
     color: #555;
     margin-bottom: 10px;
 }
-
-/* Uniform button styling */
 .btn {
-    font-size: 0.75rem; /* Smaller font size */
-    height: 35px; /* Reduced height for buttons */
+    font-size: 0.75rem;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 5px;
 }
 
-/* Ensure card content is spaced properly */
 .card-body {
     display: flex;
     flex-direction: column;
@@ -60,7 +53,6 @@ body {
 
 }
 
-/* Responsive layout */
 @media (max-width: 768px) {
     .promotions-card .card-title {
         font-size: 1.1rem;
@@ -79,19 +71,14 @@ body {
     }
 }
 
-/* Adjusted for smaller cards on larger screens */
 .col-6 {
-    /* 2 columns for small screens */
     width: 50%;
 }
 
 .col-md-4 {
-    /* 3 columns for medium screens */
     width: 33.33%;
 }
 
 .col-lg-2 {
-    /* 6 columns for larger screens */
     width: 16.66%;
 }
-s

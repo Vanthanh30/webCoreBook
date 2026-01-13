@@ -1,5 +1,4 @@
-﻿
-.shop-profile-container {
+﻿.shop-profile-container {
     padding: 20px;
     margin-top: 20px;
 }
@@ -11,7 +10,6 @@
     padding: 25px;
 }
 
-/* Tiêu đề và Nút hành động */
 .header-section {
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
@@ -40,7 +38,6 @@
         border-color: #545b62;
     }
 
-/* Phần hiển thị thông tin (View Mode) */
 .info-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -48,8 +45,8 @@
 }
 
 .info-row {
-    display: flex; /* Sử dụng Flexbox để căn chỉnh tốt hơn */
-    align-items: flex-start; /* Căn chỉnh nội dung hàng đầu tiên */
+    display: flex;
+    align-items: flex-start; 
     padding: 15px 0;
     border-bottom: 1px solid #f0f0f0;
 }
@@ -59,22 +56,22 @@
     }
 
 .info-label {
-    flex: 0 0 30%; /* Chiếm 30% chiều rộng */
-    font-weight: 600; /* Tăng độ đậm */
+    flex: 0 0 30%; 
+    font-weight: 600; 
     color: #495057;
     padding-right: 15px;
 }
 
 .info-value {
-    flex: 1; /* Chiếm phần còn lại */
+    flex: 1; 
     color: #212529;
-    word-break: break-word; /* Ngắt từ dài nếu cần */
-    min-height: 24px; /* Đảm bảo chiều cao tối thiểu */
+    word-break: break-word;
+    min-height: 24px;
 }
 
 /* Logo */
 .logo-preview {
-    width: 80px; /* Giảm kích thước logo để không quá to */
+    width: 80px; 
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
@@ -88,7 +85,6 @@
     gap: 15px;
 }
 
-/* Chế độ chỉnh sửa (Edit Mode) */
 #editShopForm .form-group {
     margin-bottom: 20px;
 }
@@ -119,23 +115,21 @@
     border: 1px solid #ced4da;
     display: block;
 
-/* Logo trong Edit Mode */
-.edit-logo-container {
+    .edit-logo-container {
     margin-top: 10px;
     margin-bottom: 15px;
-}
+
+                         }
 
     .edit-logo-container img {
         margin-right: 15px;
     }
 
-/* Alert styles (Giả định đang dùng Bootstrap) */
 .alert {
     border-radius: 8px;
     margin-bottom: 20px;
 }
 
-/* Utilities (Cần thiết cho việc hiển thị/ẩn) */
 .edit-mode, .view-mode {
     transition: opacity 0.3s ease-in-out;
 }

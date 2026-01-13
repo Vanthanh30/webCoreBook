@@ -1,5 +1,4 @@
-﻿
-.order-cancel-card {
+﻿.order-cancel-card {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -96,7 +95,6 @@
     text-align: right;
 }
 
-/* Tổng tiền vừa phải, đẹp như Shopee */
 .total-summary {
     font-size: 1rem;
 }
@@ -117,10 +115,9 @@
         font-weight: 700;
         color: #ee4d2d;
     }
-/* Căn chỉnh đẹp cho phần tổng thanh toán */
 .bg-light .d-flex.justify-content-between {
     min-width: 280px;
-    gap: 20px; /* Khoảng cách giữa chữ và số */
+    gap: 20px; 
 }
 
 .bg-light .border-top {

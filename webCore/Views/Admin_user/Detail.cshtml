@@ -19,16 +19,13 @@ else
 
             <form method="post" enctype="multipart/form-data">
                 <div class="row">
-                    <!-- Phần hiển thị ảnh đại diện -->
                     <div class="col-md-3 text-center">
                         <img id="profilePreview" src="@Model.ProfileImage" )"
                              alt="Ảnh đại diện" class="rounded-circle mb-3" style="width: 120px; height: 120px;" />
                     </div>
 
-                    <!-- Các trường thông tin -->
                     <div class="col-md-9">
                         <div class="form-row">
-                            <!-- Name -->
                             <div class="form-group col-md-6">
                                 <label for="name">Họ và tên</label>
                                 <p>@Model.Name</p>
@@ -37,7 +34,6 @@ else
                                 <label for="email">Email</label>
                                 <p>@Model.Email</p>
                             </div>
-                            <!-- Phone -->
                             <div class="form-group col-md-6">
                                 <label for="phone">Số điện thoại</label>
                                 <p>@Model.Phone</p>

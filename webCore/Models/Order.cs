@@ -19,7 +19,7 @@ namespace webCore.Models
         public decimal TotalAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal FinalAmount { get; set; }
-        public string Status { get; set; }  // "pending"
+        public string Status { get; set; }  
         public DateTime CreatedAt { get; set; }
       
     }

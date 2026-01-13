@@ -1,4 +1,3 @@
-/* Định dạng chung cho trang */
 body {
     display: flex;
     justify-content: center;
@@ -9,7 +8,6 @@ body {
     background-color: #e8f0fe;
 }
 
-/* Định dạng cho container */
 .login-container {
     width: 350px;
     padding: 40px 30px;
@@ -19,7 +17,6 @@ body {
     text-align: center;
 }
 
-/* Tiêu đề */
 h2 {
     color: #333;
     font-size: 24px;
@@ -27,7 +24,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Định dạng cho input */
 .input-group {
     margin-bottom: 20px;
     text-align: left;
@@ -54,7 +50,6 @@ input[type="password"]:focus {
     outline: none;
 }
 
-/* Định dạng cho nút đăng nhập */
 .login-btn {
     width: 100%;
     padding: 12px;
@@ -74,7 +69,6 @@ input[type="password"]:focus {
     transform: translateY(-2px);
 }
 
-/* Định dạng liên kết */
 .link {
     display: block;
     margin-top: 20px;

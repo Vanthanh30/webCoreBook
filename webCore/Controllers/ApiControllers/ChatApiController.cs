@@ -30,8 +30,6 @@ namespace webCore.Controllers.ApiControllers
             _orderService = orderService;
             _productService = productService;
         }
-
-        // GET /api/chat/conversations?mode=buyer|seller
         [HttpGet("conversations")]
         public async Task<IActionResult> GetConversations(string mode = "buyer")
         {
@@ -69,7 +67,6 @@ namespace webCore.Controllers.ApiControllers
             return Ok(result);
         }
 
-        // GET /api/chat/messages?conversationId=...
         [HttpGet("messages")]
         public async Task<IActionResult> GetMessages([FromQuery] string conversationId, [FromQuery] int limit = 50)
         {

@@ -25,7 +25,6 @@
 </head>
 <body>
     <div class="container my-5">
-        <!-- Thêm vùng thông báo lỗi -->
         <div id="error-message" class="alert alert-danger d-none" role="alert">
             Lỗi xảy ra. Vui lòng thử lại sau.
         </div>
@@ -68,19 +67,16 @@
         const discount = this.getAttribute('data-discount');
         const voucherId = this.getAttribute('data-voucher-id');
 
-        // Gửi dữ liệu voucher đến server bằng AJAX
         fetch('@Url.Action("ApplyVoucher", "VoucherClient")', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `discount=${discount}&voucherId=${voucherId}` // Truyền đúng dữ liệu
+            body: `discount=${discount}&voucherId=${voucherId}` 
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Nếu yêu cầu thành công, chuyển hướng về trang giỏ hàng
-                @*window.location.href = '@Url.Action("Cart", "Cart")';*@
                 const returnFlag = sessionStorage.getItem("ReturnUrl");
                 if (returnFlag === "cart") {
                     window.location.href = '@Url.Action("Cart","Cart")';
@@ -88,14 +84,12 @@
                     window.location.href = '@Url.Action("Checkout","Cart")';
                 }
             } else {
-                // Hiển thị thông báo lỗi trong vùng thông báo
                 const errorMessage = document.getElementById('error-message');
                 errorMessage.textContent = data.message;
                 errorMessage.classList.remove('d-none');
             }
         })
         .catch(error => {
-            // Hiển thị thông báo lỗi khi có lỗi từ server
             const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = 'Lỗi kết nối với server. Vui lòng thử lại sau.';
             errorMessage.classList.remove('d-none');

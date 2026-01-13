@@ -42,37 +42,29 @@ namespace webCore.Controllers
                     }
                 }
 
-                // Sort categories based on position
                 var sortedCategories = categories.OrderBy(c => c.Position).ToList();
 
-                // Filter categories based on filter parameter
                 List<Category_admin> filteredCategories;
                 if (filter == "parent")
                 {
-                    // Chỉ lấy danh mục cha (không có ParentId hoặc ParentId rỗng)
                     filteredCategories = sortedCategories.Where(c => string.IsNullOrEmpty(c.ParentId)).ToList();
                 }
                 else if (filter == "child")
                 {
-                    // Chỉ lấy danh mục con (có ParentId)
                     filteredCategories = sortedCategories.Where(c => !string.IsNullOrEmpty(c.ParentId)).ToList();
                 }
                 else
                 {
-                    // Lấy tất cả
                     filteredCategories = sortedCategories;
                 }
 
-                // Pagination logic
                 int itemsPerPage = 5;
                 int skip = (page - 1) * itemsPerPage;
                 var pagedCategories = filteredCategories.Skip(skip).Take(itemsPerPage).ToList();
 
-                // Total number of categories to calculate total pages
                 int totalCategories = filteredCategories.Count();
                 int totalPages = (int)Math.Ceiling(totalCategories / (double)itemsPerPage);
 
-                // Pass pagination and filter information to the view
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.FilterType = filter;
@@ -123,16 +115,13 @@ namespace webCore.Controllers
 
                 try
                 {
-                    // Lưu danh mục vào cơ sở dữ liệu
                     await _CategoryProductCollection.SaveCatelogyAsync(category);
 
-                    // Cập nhật ParentTitle
                     if (!string.IsNullOrEmpty(parentId))
                     {
                         var parentCategory = categories.FirstOrDefault(c => c.Id == parentId);
                         category.ParentTitle = parentCategory?.Title;
 
-                        // Cập nhật lại danh mục đã lưu với ParentTitle
                         await _CategoryProductCollection.UpdateCategoryAsync(category);
                     }
                 }
@@ -176,17 +165,14 @@ namespace webCore.Controllers
             {
                 try
                 {
-                    // Fetch the existing category from the database to retain its Position
                     var existingCategory = await _CategoryProductCollection.GetCategoryByIdAsync(category.Id);
                     if (existingCategory == null)
                     {
-                        return NotFound(); // If the category doesn't exist, return 404
+                        return NotFound();
                     }
 
-                    // Preserve the Position from the existing category
                     category.Position = existingCategory.Position;
 
-                    // Update the category in the database
                     await _CategoryProductCollection.UpdateCategoryAsync(category);
                 }
                 catch (Exception ex)
@@ -215,36 +201,29 @@ namespace webCore.Controllers
 
             try
             {
-                // Lấy danh mục cần xóa
                 var categoryToDelete = await _CategoryProductCollection.GetCategoryByIdAsync(id);
                 if (categoryToDelete == null)
                 {
-                    return NotFound(); // Nếu danh mục không tồn tại
+                    return NotFound();
                 }
 
-                // Lấy tất cả danh mục từ DB
                 var allCategories = await _CategoryProductCollection.GetCategory();
 
-                // Tìm danh mục con của danh mục cần xóa
                 var categoriesToDelete = GetAllChildCategories(allCategories, id);
-                categoriesToDelete.Add(categoryToDelete); // Bao gồm danh mục cha cần xóa
-
-                // Xóa tất cả danh mục đã tìm được
+                categoriesToDelete.Add(categoryToDelete); 
                 foreach (var category in categoriesToDelete)
                 {
                     await _CategoryProductCollection.DeleteCategoryAsync(category.Id);
                 }
 
-                // Lấy danh sách còn lại sau khi xóa
                 var remainingCategories = allCategories
                     .Where(c => !categoriesToDelete.Any(d => d.Id == c.Id))
                     .OrderBy(c => c.Position)
                     .ToList();
 
-                // Cập nhật lại vị trí của các danh mục còn lại
                 for (int i = 0; i < remainingCategories.Count; i++)
                 {
-                    remainingCategories[i].Position = i + 1; // Bắt đầu từ vị trí 1
+                    remainingCategories[i].Position = i + 1; 
                     await _CategoryProductCollection.UpdateCategoryAsync(remainingCategories[i]);
                 }
             }
@@ -259,10 +238,9 @@ namespace webCore.Controllers
                 ModelState.AddModelError("", "Could not delete category from database. Please try again.");
             }
 
-            return RedirectToAction(nameof(Index)); // Trả về danh sách sau khi xử lý
+            return RedirectToAction(nameof(Index)); 
         }
 
-        // Hàm hỗ trợ lấy tất cả danh mục con của một danh mục
         private List<Category_admin> GetAllChildCategories(List<Category_admin> categories, string parentId)
         {
             var result = new List<Category_admin>();
@@ -270,25 +248,20 @@ namespace webCore.Controllers
             foreach (var category in categories.Where(c => c.ParentId == parentId))
             {
                 result.Add(category);
-                // Đệ quy để lấy danh mục con của danh mục này
                 result.AddRange(GetAllChildCategories(categories, category.Id));
             }
 
             return result;
         }
 
-        //phân cấp bậc
-        //phân cấp bậc
         private List<Category_admin> GetHierarchicalCategories(List<Category_admin> categories, string parentId = null, int level = 0)
         {
             var result = new List<Category_admin>();
 
             foreach (var category in categories.Where(c => c.ParentId == parentId))
             {
-                // Thêm dấu gạch ngang để thể hiện cấp bậc
                 category.Title = new string('-', level * 2) + " " + category.Title;
                 result.Add(category);
-                // Đệ quy để lấy danh mục con
                 result.AddRange(GetHierarchicalCategories(categories, category.Id, level + 1));
             }
 

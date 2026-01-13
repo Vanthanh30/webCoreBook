@@ -7,7 +7,6 @@ using webCore.Helpers.Attributes;
 
 namespace webCore.Controllers
 {
-    /*[AuthorizeRole("Seller")]*/
     public class SellerDashboardController : BaseController
     {
         public IActionResult Dashboard()

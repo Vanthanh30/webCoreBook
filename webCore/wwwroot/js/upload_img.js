@@ -6,11 +6,11 @@ function previewImage(event) {
         const reader = new FileReader();
         reader.onload = function (e) {
             imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block'; // Hiển thị ảnh xem trước
+            imagePreview.style.display = 'block';
         }
         reader.readAsDataURL(file);
     } else {
-        imagePreview.style.display = 'none'; // Ẩn ảnh nếu không có ảnh nào được chọn
+        imagePreview.style.display = 'none'; 
     }
 }
 

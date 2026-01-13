@@ -12,7 +12,6 @@
 
 <div class="checkout-page">
     <div class="container">
-        <!-- Page Title -->
         <div class="page-header">
             <h2 class="page-title">THÔNG TIN THANH TOÁN</h2>
             <div class="checkout-steps">
@@ -34,7 +33,6 @@
         </div>
 
         <div class="row">
-            <!-- Left Column - Products Table -->
             <div class="col-lg-8 col-md-12 mb-4">
                 <div class="checkout-products">
                     <div class="products-header">
@@ -115,22 +113,8 @@
                 </div>
             </div>
 
-            <!-- Right Column - Summary & Payment -->
             <div class="col-lg-4 col-md-12">
                 <div class="checkout-summary">
-                    <!-- Voucher Section -->
-@*                    @if (!string.IsNullOrEmpty(Model.VoucherDiscount))
-                    {
-                        <div class="alert alert-info">
-                            <strong>Khuyến mãi:</strong> Giảm @Model.VoucherDiscount %
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning">
-                            <strong>Khuyến mãi:</strong> Không có khuyến mãi.
-                        </div>
-                    }*@
                     <div class="discount-box">
                         <div id="error-message" class="alert alert-danger" role="alert" style="display: none;"></div>
                         <h4>Khuyến mãi</h4>
@@ -147,7 +131,6 @@
 
                     <hr class="summary-divider" />
 
-                    <!-- Price Summary -->
                     <div class="price-summary">
                         <h4><i class="fas fa-calculator"></i> Chi tiết thanh toán</h4>
 
@@ -173,13 +156,11 @@
                         </div>
                     </div>
 
-                    <!-- Payment Note -->
                     <div class="payment-note">
                         <i class="fas fa-info-circle"></i>
                         <span>Bạn sẽ được chuyển đến trang thanh toán sau khi nhấn nút bên dưới</span>
                     </div>
 
-                    <!-- Payment Button -->
                     <div class="payment-actions">
                         <a href="/Checkout/PaymentInfo" class="btn btn-payment">
                             <i class="fas fa-lock"></i> Tiến hành thanh toán
@@ -189,7 +170,6 @@
                         </a>
                     </div>
 
-                    <!-- Security Icons -->
                     <div class="security-badges">
                         <div class="security-item">
                             <i class="fas fa-shield-alt"></i>
@@ -213,7 +193,6 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Add animation when page loads
             $('.product-item').each(function(index) {
                 $(this).css('animation-delay', (index * 0.1) + 's');
             });

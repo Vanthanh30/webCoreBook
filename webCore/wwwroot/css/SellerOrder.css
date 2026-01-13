@@ -1,5 +1,4 @@
-﻿/* ===================== ORDER CARD ===================== */
-.order-card {
+﻿.order-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -35,7 +34,6 @@
     margin-bottom: 16px;
 }
 
-    /* Fix size image */
     .product-item img {
         width: 80px;
         height: 80px;
@@ -46,7 +44,6 @@
         border: 1px solid #eee;
     }
 
-/* Info */
 .product-info {
     flex: 1;
     display: flex;
@@ -74,7 +71,6 @@
     font-size: 14px;
 }
 
-/* Total */
 .order-total {
     text-align: right;
     padding: 14px 20px;
@@ -83,7 +79,6 @@
     font-size: 16px;
 }
 
-/* Actions bottom */
 .order-actions {
     margin-top: auto;
     text-align: right;
@@ -92,13 +87,11 @@
     z-index: 10;
 }
 
-/* Badge */
 .badge {
     font-size: 13px;
     padding: 4px 8px;
 }
 
-/* Responsive */
 @media (max-width: 576px) {
     .product-item img {
         width: 70px;
@@ -109,8 +102,6 @@
         padding: 15px;
     }
 }
-
-/* ===================== TABS ===================== */
 #orderTabs .nav-link {
     color: #1976D2;
     border: 1px solid #dce3e8;
@@ -143,7 +134,6 @@
         font-size: 13px;
     }
 
-/* Badge Colors */
 .badge-secondary {
     background-color: #616161 !important;
     color: #fff;

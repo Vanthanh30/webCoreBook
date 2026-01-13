@@ -43,7 +43,6 @@ namespace webCore.MongoHelper
         {
             await _accountCollection.InsertOneAsync(account);
         }
-        // Get account by ID
         public async Task<User> GetAccountByIdAsync(string id)
         {
             return await _accountCollection.Find(account => account.Id == id).FirstOrDefaultAsync();
@@ -54,7 +53,6 @@ namespace webCore.MongoHelper
             await _accountCollection.ReplaceOneAsync(account => account.Id == updatedAccount.Id, updatedAccount);
         }
 
-        // Delete an account by ID
         public async Task DeleteAccountAsync(string id)
         {
             var filter = Builders<User>.Filter.Eq(a => a.Id, id);

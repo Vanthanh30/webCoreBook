@@ -19,7 +19,6 @@ namespace webCore.Services
             _CategoryCollection = mongoDatabase.GetCollection<Category_admin>("Category");
             _ProductCollection = mongoDatabase.GetCollection<Product_admin>("Product");
         }
-        //Category
         public async Task<List<Category_admin>> GetCategory()
         {
             return await _CategoryCollection.Find(_ => true).ToListAsync();
@@ -42,7 +41,6 @@ namespace webCore.Services
             var filter = Builders<Category_admin>.Filter.Eq(c => c.Id, id);
             await _CategoryCollection.DeleteOneAsync(filter);
         }
-        //Product
         public async Task<List<Product_admin>> GetProduct()
         {
             return await _ProductCollection.Find(_ => true).ToListAsync();

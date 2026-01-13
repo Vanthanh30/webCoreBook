@@ -1,5 +1,4 @@
-﻿/* ===== HEADER STYLES ===== */
-header {
+﻿header {
     background-color: #66C5FF;
     padding: 15px 0;
 }
@@ -9,7 +8,6 @@ header {
         align-items: center;
     }
 
-/* Logo Styles */
 .inner-logo a {
     display: flex;
     align-items: center;
@@ -17,7 +15,7 @@ header {
 }
 
 .inner-img img {
-    width: 150px; /* Kích thước logo 150px */
+    width: 150px;
     height: auto;
 }
 
@@ -38,8 +36,6 @@ header {
     font-weight: bold;
     color: #333;
 }
-
-/* Search Form Styles */
 .inner-search {
     display: flex;
     align-items: center;
@@ -61,7 +57,6 @@ header {
         height: 40px;
     }
 
-/* Icon Container Styles */
 .items-icon {
     display: flex;
     justify-content: flex-end;
@@ -100,7 +95,6 @@ header {
     .inner-user a:hover {
         color: #28a745;
     }
-/* sectio-one */
 .section-one .inner-info {
     width: 190px;
     border-radius: 15px;
@@ -133,13 +127,10 @@ header {
     height: 120px;
     border-radius: 50%;
 }
-/* sectio-one */
-/* Footer background */
 footer {
-    background-color: #66C5FF; /* Màu nền đen */
+    background-color: #66C5FF;
 }
 
-/* Logo trong footer */
 .footer-logo a {
     font-size: 44px;
     font-weight: bold;
@@ -150,31 +141,26 @@ footer {
 .footer-logo .title-second {
     font-size: 44px;
 }
-/* Icon Mạng xã hội */
 .social-icons a {
     font-size: 35px;
 }
 
     .social-icons a:hover {
-        color: #28a745; /* Màu khi hover */
+        color: #28a745; 
     }
 
 .contact-info p:nth-child(1) {
     font-weight: bold;
     font-size: 20px;
 }
-/* Liên hệ */
 .contact-info p {
     margin: 0;
     font-size: 14px;
 }
-
-/* Dòng chữ bản quyền */
 footer p {
     font-size: 14px;
     color: #333;
 }
-/* payment */
 .section-two {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -221,4 +207,3 @@ footer p {
     border-radius: 10px;
     background-color: #DBECF7;
 }
-/* payment */

@@ -40,7 +40,6 @@ namespace webCore.Controllers.ApiControllers
 
             foreach (var acc in selected)
             {
-                // Lấy tên role từ RoleId
                 var roleNames = new List<string>();
 
                 foreach (var roleId in acc.RoleId)
@@ -119,7 +118,6 @@ namespace webCore.Controllers.ApiControllers
             if (existingAccount == null)
                 return NotFound(new { success = false, message = "Không tìm thấy tài khoản." });
 
-            // KIỂM TRA EMAIL ĐÃ TỒN TẠI TRONG USER KHÁC
             var duplicate = (await _accountService.GetAccounts())
                 .FirstOrDefault(a => a.Email == updated.Email && a.Id != id);
 
@@ -131,7 +129,6 @@ namespace webCore.Controllers.ApiControllers
             existingAccount.Phone = updated.Phone;
             existingAccount.Status = updated.Status;
 
-            // ROLE
             if (updated.RoleId != null && updated.RoleId.Any())
                 existingAccount.RoleId = updated.RoleId;
 

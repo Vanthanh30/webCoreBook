@@ -32,7 +32,6 @@ namespace webCore.Controllers.ApiControllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterShop([FromForm] Shop model, IFormFile Avatar)
         {
-            // ⭐ Lấy UserId từ Session
             string userId = HttpContext.Session.GetString("UserId");
 
             if (string.IsNullOrEmpty(userId))
@@ -44,7 +43,6 @@ namespace webCore.Controllers.ApiControllers
                 });
             }
 
-            // ⭐ Lấy user từ DB
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
             {
@@ -55,7 +53,6 @@ namespace webCore.Controllers.ApiControllers
                 });
             }
 
-            // ⭐ Kiểm tra đã có shop chưa
             var existedShop = await _shopService.GetShopByUserIdAsync(user.Id);
             if (existedShop != null)
             {
@@ -66,25 +63,19 @@ namespace webCore.Controllers.ApiControllers
                 });
             }
 
-            // ⭐ Upload avatar
             string shopImage = "default-image-url";
             if (Avatar != null)
             {
                 shopImage = await _cloudinaryService.UploadImageAsync(Avatar);
             }
 
-            // ⭐ Gán thông tin tự động từ user
             model.UserId = user.Id;
             model.Email = user.Email;
             model.Phone = user.Phone;
             model.ShopImage = shopImage;
 
-            // ⭐ Tạo Shop
             await _shopService.CreateShopAsync(model);
 
-            // ======================
-            // ⭐ THÊM ROLE SELLER
-            // ======================
             var sellerRole = await _roleService.GetRoleByNameAsync("Seller");
             if (sellerRole == null)
             {
@@ -95,7 +86,6 @@ namespace webCore.Controllers.ApiControllers
                 });
             }
 
-            // ⭐ Gọi UserService để thêm role
             await _userService.AddRoleToUserAsync(user.Id, sellerRole.Id);
             var roles = HttpContext.Session.GetString("UserRoles");
             var roleList = roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -224,7 +214,6 @@ namespace webCore.Controllers.ApiControllers
                     });
                 }
 
-                // Cập nhật thông tin
                 existingShop.ShopName = model.ShopName;
                 existingShop.Description = model.Description;
                 existingShop.BusinessType = model.BusinessType;
@@ -233,7 +222,6 @@ namespace webCore.Controllers.ApiControllers
                 existingShop.Phone = model.Phone;
                 existingShop.UpdatedAt = DateTime.UtcNow;
 
-                // Upload ảnh mới nếu có
                 if (Avatar != null && Avatar.Length > 0)
                 {
                     existingShop.ShopImage = await _cloudinaryService.UploadImageAsync(Avatar);

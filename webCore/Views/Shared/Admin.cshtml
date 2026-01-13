@@ -52,7 +52,6 @@
 </head>
 <body>
     <div class="d-flex flex-column">
-        <!-- Header -->
         <div class="content flex-grow-1">
             <div class="inner-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -66,7 +65,6 @@
                 </div>
             </div>
         </div>
-        <!-- Sidebar and Main Content -->
         <div class="d-flex">
             <nav class="sidebar bg-light border-right" style="width: 220px">
                 <div class="list-group">
@@ -92,9 +90,6 @@
                     <a href="/Voucher" class="list-group-item list-group-item-action">
                         <i class="fas fa-tags"></i> Mã Giảm Giá
                     </a>
-                    <a href="/Setting" class="list-group-item list-group-item-action">
-                        <i class="fas fa-cog"></i> Cài Đặt
-                    </a>
                     <a href="#" class="list-group-item list-group-item-action text-danger" id="logoutBtn">
                         <i class="fas fa-sign-out-alt"></i> Đăng Xuất
                     </a>
@@ -108,28 +103,22 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <script>
-        // Lấy thông tin admin từ localStorage khi trang load
         window.addEventListener('DOMContentLoaded', async function() {
             const adminId = localStorage.getItem('AdminId');
             const adminToken = localStorage.getItem('AdminToken');
             
-            // Kiểm tra xem có đăng nhập chưa
             if (!adminId || !adminToken) {
-                // Nếu không có thông tin đăng nhập, redirect về trang login
                 window.location.href = '/Admin_singin';
                 return;
             }
             
             try {
-                // Gọi API để lấy thông tin admin
                 const response = await fetch(`/api/adminSignin/info?adminId=${adminId}`);
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Cập nhật tên admin
                     document.getElementById('adminName').textContent = result.name;
                     
-                    // Cập nhật avatar
                     const avatarDiv = document.getElementById('adminAvatar');
                     if (result.avatar) {
                         avatarDiv.innerHTML = `<img src="${result.avatar}" alt="Admin Avatar" />`;
@@ -138,31 +127,23 @@
                     }
                 } else {
                     console.error('Không thể lấy thông tin admin:', result.message);
-                    // Nếu lỗi, xóa localStorage và redirect về login
                     localStorage.removeItem('AdminId');
                     localStorage.removeItem('AdminToken');
                     window.location.href = '/Admin_singin';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                // Nếu có lỗi, vẫn cho phép truy cập nhưng hiển thị thông báo
                 document.getElementById('adminName').textContent = 'Admin';
             }
         });
         
-        // Xử lý đăng xuất
         document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
             
-            // Xóa AdminId và Token khỏi localStorage
             localStorage.removeItem('AdminId');
             localStorage.removeItem('AdminToken');
             
-            // Hoặc xóa tất cả localStorage
-            // localStorage.clear();
-            
             try {
-                // Gọi API logout để xóa session
                 await fetch('/api/adminSignin/logout', {
                     method: 'POST'
                 });
@@ -170,7 +151,6 @@
                 console.error('Logout error:', error);
             }
             
-            // Redirect về trang login
             window.location.href = '/Admin_singin';
         });
     </script>

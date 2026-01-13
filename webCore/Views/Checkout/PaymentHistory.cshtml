@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="~/css/PaymentHistory.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <style>
-        /* Fix margin cho title */
         .cart-title {
             margin-top: 0 !important;
             padding-top: 20px;
@@ -35,10 +34,9 @@
             padding: 6px 18px;
             font-size: 13px;
             font-weight: 500;
-            color: white; /* Mặc định chữ trắng cho đẹp */
+            color: white; 
         }
 
-        /* Định nghĩa màu sắc cho từng trạng thái */
         .badge-warning {
             background-color: #ffc107;
             color: #212529;
@@ -85,7 +83,6 @@
             margin-top: 5px;
         }
 
-        /* Fix overlay cho dialog */
         .overlay {
             display: none;
             position: fixed;
@@ -146,7 +143,6 @@
     {
         foreach (var order in Model)
         {
-            // Xác định class màu sắc dựa trên trạng thái
             string statusClass = "badge-secondary";
             switch (order.Status)
             {
@@ -246,17 +242,14 @@
 @section Scripts {
     <script src="~/js/PaymentHistory.js" asp-append-version="true"></script>
     <script>
-        // Filter functionality
         document.querySelectorAll('.status-filter-btn').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const status = this.getAttribute('data-status');
 
-                // Update active button
                 document.querySelectorAll('.status-filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
 
-                // Filter orders
                 document.querySelectorAll('.order-card').forEach(card => {
                     if (status === 'Tất cả' || card.getAttribute('data-status') === status) {
                         card.style.display = 'block';

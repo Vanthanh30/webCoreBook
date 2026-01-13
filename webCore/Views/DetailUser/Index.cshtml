@@ -12,19 +12,16 @@
 
 <div class="user-profile-page">
     <div class="container">
-        <!-- Back Button -->
         <div class="back-button-wrapper">
             <a href="/Home/Index" class="back-button">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
 
-        <!-- Page Title -->
         <div class="page-header">
             <h2 class="page-title">THÔNG TIN CÁ NHÂN</h2>
         </div>
 
-        <!-- Success/Error Messages -->
         @if (TempData["Message"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -35,11 +32,9 @@
             </div>
         }
 
-        <!-- Profile Form -->
         <div class="profile-card">
             <form method="post" enctype="multipart/form-data">
                 <div class="row">
-                    <!-- Left Column - Profile Picture -->
                     <div class="col-lg-3 col-md-4 mb-4">
                         <div class="profile-picture-section">
                             <div class="profile-picture-wrapper">
@@ -67,10 +62,8 @@
                         </div>
                     </div>
 
-                    <!-- Right Column - Form Fields -->
                     <div class="col-lg-9 col-md-8">
                         <div class="form-content">
-                            <!-- Row 1: Name & Phone -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="form-group-custom">
@@ -108,7 +101,6 @@
                                 </div>
                             </div>
 
-                            <!-- Row 2: Gender & Birthday -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="form-group-custom">
@@ -160,7 +152,6 @@
                                 </div>
                             </div>
 
-                            <!-- Row 3: Email & Password -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="form-group-custom">
@@ -194,7 +185,6 @@
                                 </div>
                             </div>
 
-                            <!-- Row 4: Address -->
                             <div class="row">
                                 <div class="col-12 mb-3">
                                     <div class="form-group-custom">
@@ -211,7 +201,6 @@
                                 </div>
                             </div>
 
-                            <!-- Submit Button -->
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary btn-update">
                                     <i class="fas fa-save"></i> Cập nhật thông tin
@@ -228,18 +217,15 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Preview Profile Image
         document.getElementById('profileImageInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
-                // Check file size (2MB max)
                 if (file.size > 2 * 1024 * 1024) {
                     alert('Kích thước ảnh không được vượt quá 2MB!');
                     this.value = '';
                     return;
                 }
 
-                // Check file type
                 if (!file.type.startsWith('image/')) {
                     alert('Vui lòng chọn file ảnh!');
                     this.value = '';
@@ -254,7 +240,6 @@
             }
         });
 
-        // Auto-hide alert after 5 seconds
         $(document).ready(function() {
             setTimeout(function() {
                 $('.alert').fadeOut('slow');

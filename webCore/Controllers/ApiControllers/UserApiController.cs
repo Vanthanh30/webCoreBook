@@ -70,7 +70,6 @@ namespace webCore.Controllers.ApiControllers
                 {
                     roleNames.Add(role.Name);
 
-                    // Nếu là admin → không cho đăng nhập
                     if (role.Name.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                     {
                         return Unauthorized(new

@@ -16,7 +16,6 @@
         <div class="signin-wrapper">
             <div class="signin-card">
                 <div class="row no-gutters">
-                    <!-- Left Side - Logo & Branding -->
                     <div class="col-lg-5 col-md-6 d-none d-md-flex">
                         <div class="logo-section">
                             <div class="logo-wrapper">
@@ -37,10 +36,8 @@
                         </div>
                     </div>
 
-                    <!-- Right Side - Login Form -->
                     <div class="col-lg-7 col-md-6">
                         <div class="form-section">
-                            <!-- Mobile Logo -->
                             <div class="mobile-logo d-md-none">
                                 <img src="/image/logo.png" alt="TYB Book" />
                             </div>
@@ -129,17 +126,13 @@
         errorBox.classList.add("d-none");
         errorMessage.innerText = "";
 
-        // Regex kiểm tra email
         const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        // Validate email
         if (!emailRegex.test(email)) {
             errorBox.classList.remove("d-none");
             errorMessage.innerText = "Email không đúng định dạng (ví dụ: ten@email.com)";
             return;
         }
-
-        // Validate password
         if (password.length < 5) {
             errorBox.classList.remove("d-none");
             errorMessage.innerText = "Mật khẩu phải có ít nhất 5 ký tự";
@@ -190,7 +183,6 @@
             }
         }
 
-        // Press Enter to submit
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('loginForm').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {

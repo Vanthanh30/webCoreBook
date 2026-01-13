@@ -22,14 +22,12 @@ namespace webCore.Helper.Attributes
         {
             var http = context.HttpContext;
 
-            // Kiểm tra đăng nhập
             if (!AdminAuthHelper.IsAdminLoggedIn(http))
             {
                 context.Result = new RedirectToActionResult("AdminLogin", "Admin", null);
                 return;
             }
 
-            // Kiểm tra role
             if (!AdminAuthHelper.HasRole(http, _requiredRole))
             {
                 context.Result = new RedirectToActionResult("AccessDenied", "Error", null);

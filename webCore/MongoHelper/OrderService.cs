@@ -17,7 +17,6 @@ namespace webCore.MongoHelper
             _orders = mongoDBService._orders;
         }
 
-        // Lưu đơn hàng
         public async Task SaveOrderAsync(Order order)
         {
             if (order.Id == ObjectId.Empty)
@@ -26,7 +25,6 @@ namespace webCore.MongoHelper
             }
             else
             {
-                // Đã có ID -> Cập nhật (Replace)
                 var filter = Builders<Order>.Filter.Eq(x => x.Id, order.Id);
                 await _orders.ReplaceOneAsync(filter, order, new ReplaceOptions { IsUpsert = true });
             }

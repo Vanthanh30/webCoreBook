@@ -1,38 +1,28 @@
-﻿// Hàm format tiền VND - FIX: loại bỏ số thập phân
-function formatVND(value) {
+﻿function formatVND(value) {
     return Math.round(value).toLocaleString('vi-VN') + ' ₫';
 }
 
 $(document).ready(function () {
-    // ================== CÁC HÀM CHÍNH ==================
-
-    // Cập nhật giá thành tiền cho mỗi sản phẩm
     function updatePrice(row) {
         var discountedPrice = parseFloat(row.find('.price-column').data('price')) *
             (1 - parseFloat(row.find('.price-column').data('discount')) / 100);
         var quantity = parseInt(row.find('.quantity-input').val());
 
-        // Tính thành tiền với số lượng
         var totalPrice = discountedPrice * quantity;
 
-        // FIX: Sử dụng formatVND thay vì toFixed(2)
         row.find('.price-column2').text(formatVND(totalPrice));
 
-        // Cập nhật lại dữ liệu tổng tiền của sản phẩm
         row.find('.price-column2').data('total', totalPrice);
     }
 
-    // Cập nhật tổng tiền của giỏ hàng
     function updateSummary() {
         let totalAmount = 0;
 
-        // Duyệt qua các checkbox được chọn
         $(".select-item:checked").each(function () {
             let itemTotal = $(this).closest("tr").find(".price-column2").data("total");
             totalAmount += parseFloat(itemTotal);
         });
 
-        // Lấy % voucher từ text hiển thị (nếu có)
         let voucherPercent = 0;
         let voucherText = $("#voucher-discount").text();
         let match = voucherText.match(/Giảm\s+(\d+)%/);
@@ -40,19 +30,15 @@ $(document).ready(function () {
             voucherPercent = parseFloat(match[1]);
         }
 
-        // Tính khuyến mãi
         let discountAmount = totalAmount * (voucherPercent / 100);
 
-        // Tính tổng tiền sau khi trừ khuyến mãi
         let finalAmount = totalAmount - discountAmount;
 
-        // FIX: Sử dụng formatVND thay vì toFixed(2)
         $(".summary-amount").text(formatVND(totalAmount));
         $(".summary-discount").text(formatVND(discountAmount));
         $(".summary-total").text(formatVND(finalAmount));
     }
 
-    // Cập nhật số lượng sản phẩm trong giỏ hàng
     function updateCartItemCount() {
         var itemCount = $("tr.cart-item").length;
         $("#cart-item-count").text(itemCount);
@@ -64,8 +50,6 @@ $(document).ready(function () {
             $(".select-all").prop("disabled", false);
         }
     }
-
-    // Cập nhật số lượng trong MongoDB
     function updateQuantityInDB(row, quantity) {
         var productId = row.data('product-id');
         $.ajax({
@@ -84,7 +68,6 @@ $(document).ready(function () {
         });
     }
 
-    // Lưu trạng thái sản phẩm đã chọn lên server
     function saveSelectedProducts() {
         const selectedProductIds = $(".select-item:checked")
             .map(function () {
@@ -110,14 +93,12 @@ $(document).ready(function () {
             });
     }
 
-    // Cập nhật trạng thái checkbox "Chọn tất cả"
     function updateSelectAllState() {
         const totalItems = $(".select-item").length;
         const selectedItems = $(".select-item:checked").length;
         $(".select-all").prop("checked", totalItems === selectedItems);
     }
 
-    // Kiểm tra xem có sản phẩm nào được chọn không
     function checkIfProductSelected() {
         if ($(".select-item:checked").length === 0) {
             $("#error-message").text("Vui lòng chọn ít nhất một sản phẩm để áp dụng khuyến mãi.");
@@ -127,8 +108,6 @@ $(document).ready(function () {
         $("#error-message").hide();
         return true;
     }
-
-    // Kiểm tra trạng thái của các checkbox cho voucher
     function checkSelectedProducts() {
         var isAnyItemChecked = $(".select-item:checked").length > 0;
 
@@ -137,9 +116,6 @@ $(document).ready(function () {
         }
     }
 
-    // ================== SỰ KIỆN TẠI SỐ LƯỢNG ==================
-
-    // Giảm số lượng
     $('.btn-minus').on('click', function () {
         var quantityInput = $(this).closest('.quantity').find('.quantity-input');
         var quantity = parseInt(quantityInput.val()) - 1;
@@ -151,7 +127,6 @@ $(document).ready(function () {
         }
     });
 
-    // Tăng số lượng
     $('.btn-plus').on('click', function () {
         var quantityInput = $(this).closest('.quantity').find('.quantity-input');
         var quantity = parseInt(quantityInput.val()) + 1;
@@ -162,8 +137,6 @@ $(document).ready(function () {
             updateQuantityInDB($(this).closest('tr'), quantity);
         }
     });
-
-    // Thay đổi trực tiếp số lượng
     $('.quantity-input').on('change', function () {
         var quantity = parseInt($(this).val());
         if (isNaN(quantity) || quantity < 1) {
@@ -177,10 +150,6 @@ $(document).ready(function () {
         updateSummary();
         updateQuantityInDB($(this).closest('tr'), quantity);
     });
-
-    // ================== SỰ KIỆN CHECKBOX ==================
-
-    // Thay đổi checkbox sản phẩm
     $(".select-item").change(function () {
         updateSummary();
         saveSelectedProducts();
@@ -191,8 +160,6 @@ $(document).ready(function () {
             $("#error-message").hide();
         }
     });
-
-    // Chọn tất cả
     $(".select-all").change(function () {
         const isChecked = $(this).prop("checked");
         $(".select-item").prop("checked", isChecked);
@@ -204,10 +171,6 @@ $(document).ready(function () {
             $("#error-message").hide();
         }
     });
-
-    // ================== SỰ KIỆN XÓA SẢN PHẨM ==================
-
-    // Xóa một sản phẩm
     $(".delete-product").click(function () {
         var productId = $(this).closest("tr").find(".select-item").data("id");
         var rowToDelete = $(this).closest("tr");
@@ -236,8 +199,6 @@ $(document).ready(function () {
         });
     });
 
-    // ================== CHẾ ĐỘ SỬA / HỦY ==================
-
     $("#btn-edit").click(function () {
         $("#btn-delete-selected").show();
         $("#btn-cancel-edit").show();
@@ -254,7 +215,6 @@ $(document).ready(function () {
         $(".select-all").prop("checked", false);
     });
 
-    // Xóa nhiều sản phẩm đã chọn
     $("#btn-delete-selected").click(function () {
         var selectedIds = [];
         $(".select-item:checked").each(function () {
@@ -286,9 +246,6 @@ $(document).ready(function () {
         });
     });
 
-    // ================== SỰ KIỆN KHÁC ==================
-
-    // Kiểm tra trước khi thanh toán
     $(".btn-pay").click(function (e) {
         if ($(".select-item:checked").length === 0) {
             e.preventDefault();
@@ -296,14 +253,12 @@ $(document).ready(function () {
         }
     });
 
-    // Kiểm tra khi click vào liên kết chọn khuyến mãi
     $(".apply-discount").click(function (e) {
         if (!checkIfProductSelected()) {
             e.preventDefault();
         }
     });
 
-    // ================== KHỞI TẠO BAN ĐẦU ==================
     updateSelectAllState();
     checkSelectedProducts();
 });

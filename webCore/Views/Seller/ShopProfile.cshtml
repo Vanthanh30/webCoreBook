@@ -137,7 +137,6 @@
 <script>
     let shopData = null;
 
-    // Load shop info
     async function loadShopInfo() {
         try {
             const response = await fetch('/api/shop/my-shop');
@@ -163,7 +162,6 @@
         }
     }
 
-    // Display shop info in view mode
     function displayShopInfo(data) {
         document.getElementById('viewShopName').textContent = data.shopName || '-';
         document.getElementById('viewBusinessType').textContent = data.businessType || '-';
@@ -180,11 +178,9 @@
         }
     }
 
-    // Toggle edit mode
     function toggleEditMode() {
         if (!shopData) return;
 
-        // Fill edit form
         document.getElementById('ShopName').value = shopData.shopName || '';
         document.getElementById('BusinessType').value = shopData.businessType || '';
         document.getElementById('Address').value = shopData.address || '';
@@ -199,18 +195,15 @@
             editCurrentImage.src = '/images/default-shop-logo.png';
         }
 
-        // Reset image input and preview
         document.getElementById('Avatar').value = '';
         document.getElementById('newLogoPreviewContainer').style.display = 'none';
         document.getElementById('newLogoPreview').src = '';
 
 
-        // Toggle display
         document.getElementById('viewMode').style.display = 'none';
         document.getElementById('editMode').style.display = 'block';
     }
 
-    // Cancel edit
     function cancelEdit() {
         document.getElementById('editMode').style.display = 'none';
         document.getElementById('viewMode').style.display = 'block';
@@ -219,7 +212,6 @@
         document.getElementById('newLogoPreview').src = '';
     }
 
-    // Preview new logo
     function previewNewLogo(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('newLogoPreview');
@@ -228,21 +220,19 @@
     
     if (file) {
         preview.src = URL.createObjectURL(file);
-        previewContainer.style.display = 'block'; // Hiển thị cả container
+        previewContainer.style.display = 'block'; 
     } else {
-        previewContainer.style.display = 'none'; // Ẩn cả container
+        previewContainer.style.display = 'none'; 
         preview.src = '';
     }
     }
 
-    // Update shop
     async function handleUpdateShop(event) {
         event.preventDefault();
 
         const form = document.getElementById('editShopForm');
         const formData = new FormData(form);
 
-        // Reset alerts
         document.getElementById('errorAlert').style.display = 'none';
         document.getElementById('successAlert').style.display = 'none';
 
@@ -261,17 +251,14 @@
                 return;
             }
 
-            // Success
             shopData = result.data;
             displayShopInfo(shopData);
 
             document.getElementById('successAlert').textContent = 'Cập nhật shop thành công!';
             document.getElementById('successAlert').style.display = 'block';
 
-            // Back to view mode
             cancelEdit();
 
-            // Hide success after 3s
             setTimeout(() => {
                 document.getElementById('successAlert').style.display = 'none';
             }, 3000);
@@ -286,6 +273,5 @@
         }
     }
 
-    // Load on page ready
     loadShopInfo();
 </script>

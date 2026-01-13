@@ -27,8 +27,8 @@
 
         <label for="ParentId">Danh mục cha</label>
         <select id="ParentId" name="ParentId" class="form-control">
-            <option value="">Không có</option> <!-- Tùy chọn không có danh mục cha -->
-            @foreach (var parentCategory in ViewBag.Categories) // Lấy danh sách danh mục cha từ ViewBag
+            <option value="">Không có</option> 
+            @foreach (var parentCategory in ViewBag.Categories) 
             {
                 <option value="@parentCategory.Id">@parentCategory.Title</option>
             }

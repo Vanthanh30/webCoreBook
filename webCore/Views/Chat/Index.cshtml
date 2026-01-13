@@ -32,7 +32,6 @@
                 <div class="chat-title">
                     @(mode == "seller" ? "💬 Kênh người bán" : "💬 Chat của tôi")
                 </div>
-                @*            <div class="badge">Mode: @mode</div>*@
             </div>
 
             <div id="conversationList"></div>
@@ -240,7 +239,6 @@
 
             await ensureSignalR();
 
-            // join group (validate quyền trong Hub)
             await connection.invoke("JoinConversation", conversationId);
 
             await loadMessages(conversationId);
@@ -257,11 +255,9 @@
             input.value = "";
             input.focus();
 
-            // refresh sidebar preview (đơn giản)
             loadConversations();
         }
 
-        // init
         (async function initChat() {
             await loadConversations();
 

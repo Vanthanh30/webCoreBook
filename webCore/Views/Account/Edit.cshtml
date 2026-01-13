@@ -6,7 +6,6 @@
 }
 
 <style>
-    /* General container for the form */
     .form-container {
         width: 100%;
         margin: 20px auto;
@@ -164,21 +163,19 @@
             document.getElementById("inactive").checked = true;
     }
 
-    // ⭐ HIỂN THỊ ICON NẾU KHÔNG CÓ ẢNH
     function loadPreviewImage(profileImage) {
         const container = document.querySelector(".image-preview-container");
         const img = document.getElementById("imagePreview");
 
-        container.innerHTML = ""; // Xóa icon cũ nếu có
-        container.appendChild(img); // thêm img vào lại
+        container.innerHTML = ""; 
+        container.appendChild(img); 
 
         if (profileImage && profileImage !== "default-image-url") {
             img.src = profileImage;
             img.style.display = "block";
         } else {
-            img.style.display = "none"; // Ẩn ảnh
+            img.style.display = "none"; 
 
-            // Thêm icon
             container.innerHTML += `
                 <i class="fas fa-user-circle"
                    style="font-size: 80px; color: #999; display:block; text-align:center;">
@@ -186,7 +183,6 @@
         }
     }
 
-    // ⭐ Chọn file thì hiện preview ảnh
     function previewImage(e) {
         const file = e.target.files[0];
         const img = document.getElementById("imagePreview");
@@ -196,7 +192,6 @@
             img.src = URL.createObjectURL(file);
             img.style.display = "block";
 
-            // Xóa icon khi chọn ảnh
             container.querySelector("i")?.remove();
         }
     }
@@ -219,7 +214,6 @@
         });
     }
 
-    // ⭐ Submit Form
     document.getElementById("editForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -237,7 +231,6 @@
         const status = document.querySelector("input[name='Status']:checked").value;
         fd.append("Status", parseInt(status));
 
-        // ⭐ Sửa lỗi roleId
         const roleId = document.getElementById("RoleId").value;
         fd.append("RoleId[0]", roleId);
 

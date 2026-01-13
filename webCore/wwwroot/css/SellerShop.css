@@ -1,9 +1,7 @@
-﻿/* Root variables for dynamic theming */
-:root {
+﻿:root {
     --shop-theme-color: #66C5FF;
 }
 
-/* Shop Header */
 .shop-header {
     background: #f5f5f5;
     padding: 20px 0;
@@ -139,7 +137,6 @@
         font-size: 14px;
     }
 
-/* Navigation Tabs */
 .nav-tabs-wrapper {
     background: white;
     border-bottom: 1px solid #e0e0e0;
@@ -181,7 +178,6 @@
             background: #ff4757;
         }
 
-/* Content Area */
 .content-area {
     background: #f5f5f5;
     min-height: 500px;
@@ -196,7 +192,6 @@
         display: block;
     }
 
-/* Recommendation Section */
 .recommendation-section {
     margin-bottom: 30px;
     background: white;
@@ -231,7 +226,6 @@
     gap: 15px;
 }
 
-/* Banner Section */
 .banner-section {
     margin: 25px 0;
     border-radius: 8px;
@@ -245,7 +239,6 @@
         display: block;
     }
 
-/* Section Title */
 .section-title {
     font-size: 18px;
     font-weight: 600;
@@ -256,7 +249,6 @@
     border-radius: 8px 8px 0 0;
 }
 
-/* Product Grid */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -388,7 +380,6 @@
         font-size: 13px;
     }
 
-/* Filter Bar */
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -424,7 +415,6 @@
         color: white;
     }
 
-/* Category List */
 .category-list {
     display: flex;
     flex-direction: column;
@@ -485,7 +475,6 @@
     color: #ff4757;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .shop-header-flex {
         flex-direction: column;

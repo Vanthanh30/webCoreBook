@@ -65,7 +65,6 @@
         </tbody>
     </table>
 
-    <!-- Pagination -->
     @if (ViewBag.TotalPages > 1)
     {
         <nav aria-label="Page navigation" style="display: flex; justify-content: center; margin-top: 20px;">
@@ -92,9 +91,8 @@
             method: 'POST'
         })
         .then(response => {
-            // Kiểm tra nếu phản hồi từ server thành công (HTTP status 200)
             if (response.ok) {
-                location.reload(); // Tải lại trang sau khi cập nhật trạng thái
+                location.reload(); 
             } else {
                 alert('Đã xảy ra lỗi khi cập nhật trạng thái.');
             }

@@ -9,10 +9,10 @@ namespace webCore.Models
 {
     public class ForgotPassword
     {
-        [BsonId] // MongoDB's default _id field
+        [BsonId] 
         public ObjectId Id { get; set; }
-        public string Email { get; set; }  // Địa chỉ email của người dùng
-        public string OTP { get; set; }   // Mã OTP được gửi qua email
+        public string Email { get; set; }  
+        public string OTP { get; set; }   
         public DateTime? OTPExpiry { get; set; } 
     }
 }

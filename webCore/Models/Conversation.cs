@@ -13,13 +13,10 @@ namespace webCore.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
 
-        // Users._id
         public string BuyerId { get; set; } = string.Empty;
 
-        // Users._id (shop owner)
         public string SellerId { get; set; } = string.Empty;
 
-        // Shops._id
         public string ShopId { get; set; } = string.Empty;
 
         public string ? LastMessage { get; set; }

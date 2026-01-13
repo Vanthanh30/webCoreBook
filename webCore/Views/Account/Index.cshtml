@@ -66,7 +66,6 @@
         </tr>
     </template>
 
-    <!-- PAGINATION HTML -->
     <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center" id="paginationContainer">
 
@@ -74,7 +73,6 @@
                 <a class="page-link" href="#" id="prevLink">Trước</a>
             </li>
 
-            <!-- TEMPLATE FOR PAGE NUMBERS -->
             <template id="pageNumberTemplate">
                 <li class="page-item page-number">
                     <a class="page-link"></a>
@@ -146,7 +144,6 @@
         renderPagination(result.total);
     }
 
-    // RENDER PAGINATION
     function renderPagination(totalItems) {
         const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -155,7 +152,6 @@
         const prevLink = document.getElementById("prevLink");
         const nextLink = document.getElementById("nextLink");
 
-        // PREVIOUS
         if (page <= 1) {
             prevPage.classList.add("disabled");
             prevLink.href = "#";
@@ -164,7 +160,6 @@
             prevLink.href = `/Account?page=${page - 1}`;
         }
 
-        // NEXT
         if (page >= totalPages) {
             nextPage.classList.add("disabled");
             nextLink.href = "#";
@@ -173,12 +168,10 @@
             nextLink.href = `/Account?page=${page + 1}`;
         }
 
-        // Remove old page numbers
         document.querySelectorAll(".page-number").forEach(el => el.remove());
 
         const template = document.getElementById("pageNumberTemplate");
 
-        // Add page numbers
         for (let i = 1; i <= totalPages; i++) {
             const node = template.content.cloneNode(true);
             const li = node.querySelector("li");
@@ -192,7 +185,6 @@
             nextPage.before(li);
         }
     }
-    // DELETE ACCOUNT
     document.addEventListener("click", async function (e) {
         if (!e.target.closest(".delete-btn")) return;
 

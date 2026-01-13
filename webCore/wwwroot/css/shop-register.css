@@ -1,12 +1,9 @@
-﻿/* wwwroot/css/shop-register.css */
-
-* {
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Main Content */
 .main-content {
     max-width: 1000px;
     margin: 40px auto;
@@ -16,7 +13,6 @@
     padding: 50px 70px;
 }
 
-/* Welcome Page */
 .welcome-page {
     text-align: center;
 }
@@ -84,7 +80,6 @@
         box-shadow: 0 6px 25px rgba(102, 197, 255, 0.4);
     }
 
-/* Registration Form */
 .registration-form {
     display: none;
 }
@@ -112,7 +107,6 @@
         font-size: 14px;
     }
 
-/* Avatar Upload Section */
 .avatar-section {
     text-align: center;
     margin-bottom: 40px;
@@ -193,7 +187,6 @@
     font-size: 14px;
 }
 
-/* Form Fields */
 .form-section {
     background: white;
     padding: 35px;
@@ -281,7 +274,6 @@ select.form-control {
     margin-top: 5px;
 }
 
-/* Address Section */
 .address-list {
     margin-top: 15px;
 }
@@ -355,7 +347,6 @@ select.form-control {
         margin-right: 8px;
     }
 
-/* Two Column Layout */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -363,7 +354,6 @@ select.form-control {
     align-items: start;
 }
 
-/* Form Actions */
 .form-actions {
     display: flex;
     justify-content: center;
@@ -408,14 +398,12 @@ select.form-control {
         box-shadow: 0 6px 25px rgba(102, 197, 255, 0.4);
     }
 
-/* Helper Text */
 .helper-text {
     font-size: 12px;
     color: #999;
     margin-top: 5px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .main-content {
         margin: 20px;

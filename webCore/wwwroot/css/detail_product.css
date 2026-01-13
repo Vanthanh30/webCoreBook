@@ -6,7 +6,6 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.07);
     overflow: hidden;
 }
-/* Breadcrumb */
 
 .breadcrumb {
     padding: 16px 30px;
@@ -15,19 +14,15 @@
     color: #666;
     border-bottom: 1px solid #eee;
 }
-/* Main row */
-
 .main-row {
     display: flex;
     padding: 40px 40px 50px;
 }
-/* Cột trái - Ảnh sản phẩm */
 
 .left-col {
     flex: 0 0 460px;
     text-align: center;
 }
-/* Wrapper cho ảnh chính - THÊM MỚI */
 
 .product-image-wrapper {
     position: relative;
@@ -63,13 +58,11 @@
 .product-image-wrapper.no-image img {
     display: none;
 }
-/* Cột phải - Thông tin */
 
 .right-col {
     flex: 1;
     padding-left: 50px;
 }
-/* Tiêu đề sản phẩm */
 
 .product-title {
     font-size: 30px;
@@ -78,7 +71,6 @@
     margin-bottom: 20px;
     line-height: 1.3;
 }
-/* Giá */
 
 .price-current {
     font-size: 38px;
@@ -101,7 +93,6 @@
     font-size: 16px;
     font-weight: 600;
 }
-/* Số lượng */
 
 .quantity-row {
     display: flex;
@@ -148,7 +139,6 @@
         font-size: 16px;
         background: #fff;
     }
-/* Nút hành động */
 
 .buttons-row {
     display: flex;
@@ -187,7 +177,6 @@
         background: #2980b9;
         transform: translateY(-2px);
     }
-/* Mô tả */
 
 .description {
     margin-top: 50px;
@@ -201,7 +190,6 @@
         font-weight: 700;
         margin-bottom: 20px;
     }
-/* Ảnh sản phẩm tương tự - THÊM MỚI */
 
 .similar-product-image {
     position: relative;
@@ -237,7 +225,6 @@
 .similar-product-image.no-image img {
     display: none;
 }
-/* Responsive */
 
 @media (max-width: 992px) {
     .main-row {
@@ -307,7 +294,6 @@
         height: 150px;
     }
 }
-/* Reviews Section */
 
 .reviews-section {
     max-width: 1260px;
@@ -332,7 +318,6 @@
     font-weight: 700;
     color: #222;
 }
-/* Rating Summary */
 
 .rating-summary {
     display: flex;
@@ -368,7 +353,6 @@
     color: #666;
     font-size: 14px;
 }
-/* Rating Breakdown */
 
 .rating-breakdown {
     flex: 1;
@@ -414,7 +398,6 @@
     width: 40px;
     text-align: right;
 }
-/* Filter Tabs */
 
 .filter-tabs {
     display: flex;
@@ -449,7 +432,6 @@
     .filter-tab i {
         font-size: 13px;
     }
-/* Review List */
 
 .reviews-list {
     display: flex;
@@ -474,7 +456,7 @@
 
 .review-header {
     display: flex;
-    align-items: flex-start; /* ÉP lên trên */
+    align-items: flex-start; 
 }
 
 .rating-right {
@@ -595,7 +577,6 @@
         color: white;
         text-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
-/* Load More Button */
 
 .load-more-container {
     text-align: center;
@@ -623,7 +604,6 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
-/* Empty State */
 
 .empty-reviews {
     text-align: center;
@@ -642,7 +622,6 @@
         color: #666;
         margin-bottom: 10px;
     }
-/* Loading */
 
 .loading {
     text-align: center;
@@ -793,7 +772,6 @@ header {
         font-size: 24px !important;
     }
 
-    /* User text */
     header .user-name {
         font-size: 12px !important;
         line-height: 1.2 !important;
@@ -808,13 +786,11 @@ header {
         gap: 4px !important;
     }
 
-        /* icon */
         header .inner-user i {
             font-size: 22px !important;
             line-height: 1 !important;
         }
 
-        /* text */
         header .inner-user .user-name,
         header .inner-user span,
         header .inner-user a {

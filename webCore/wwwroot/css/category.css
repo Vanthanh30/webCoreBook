@@ -1,4 +1,3 @@
-/* ===== HEADER STYLES ===== */
 header {
     background-color: #66C5FF;
     padding: 15px 0;
@@ -9,7 +8,6 @@ header {
         align-items: center;
     }
 
-/* Logo Styles */
 .inner-logo a {
     display: flex;
     align-items: center;
@@ -17,7 +15,7 @@ header {
 }
 
 .inner-img img {
-    width: 150px; /* Kích thước logo 150px */
+    width: 150px;
     height: auto;
 }
 
@@ -45,26 +43,25 @@ header {
     color: gray;
     text-decoration: line-through;
     margin-right: 10px;
-    font-size: 14px; /* Kích thước font cho dễ nhìn */
+    font-size: 14px;
 }
 
 .new-price {
     color: #28a745;
     font-weight: bold;
-    font-size: 16px; /* Tăng kích thước font cho nổi bật */
+    font-size: 16px; 
 }
 
 .discount-percentage {
-    background-color: #ff5722; /* Màu nền cho % giảm giá */
+    background-color: #ff5722; 
     color: #fff;
     border-radius: 50%;
     display: inline-block;
     padding: 3px 6px;
     font-size: 0.8rem;
-    margin-left: 10px; /* Khoảng cách giữa % giảm giá và giá mới */
+    margin-left: 10px;
 }
 
-/* Search Form Styles */
 .inner-search {
     display: flex;
     align-items: center;
@@ -86,18 +83,15 @@ header {
         height: 40px;
     }
 
-/* Định dạng cho icon cart */
 .inner-cart i {
     font-size: 1.5rem;
     color: #000;
 }
 
-/* Định dạng cho icon user */
 .inner-user i {
     font-size: 1.5rem;
     color: #000;
 }
-/* Icon Container Styles */
 .items-icon {
     display: flex;
     justify-content: center;
@@ -139,19 +133,17 @@ header {
         color: #28a745;
     }
 
-/* Định dạng cho phần tên người dùng */
 .user-name {
-    margin-top: 10px; /* Khoảng cách giữa icon và username */
-    text-align: right; /* Căn giữa username dưới cả hai icon */
+    margin-top: 10px; 
+    text-align: right; 
     font-size: 0.9rem;
     color: #000;
     margin-right: 55px;
 }
-/* Dropdown Styles */
 .user-dropdown {
     position: absolute;
-    right: 20px; /* Đặt vị trí bên phải phù hợp */
-    top: 80px; /* Đặt vị trí bên dưới icon user */
+    right: 20px; 
+    top: 80px; 
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -174,12 +166,10 @@ header {
 .hidden {
     display: none !important;
 }
-/* ===== SECTION STYLES ===== */
 #section-one {
     padding: 40px 0;
 }
 
-/* List Styles */
 .list-group-item {
     cursor: pointer;
 }
@@ -189,7 +179,7 @@ header {
     color: white;
     font-weight: bold;
     border: none;
-    margin: 0; /* Loại bỏ margin nếu có */
+    margin: 0; 
     border-radius: 0;
 }
 
@@ -209,7 +199,6 @@ header {
     transform: rotate(180deg);
 }
 
-/* Carousel Styles */
 .carousel-item img {
     width: 100%;
     height: auto;
@@ -242,10 +231,9 @@ header {
     margin-left: 100px;
 }
 
-/* Card Styles */
 .card {
     margin-bottom: 20px;
-    position: relative; /* Cần thiết để định vị nhãn giảm giá */
+    position: relative;
 }
 
 .card-img-top {
@@ -263,10 +251,8 @@ header {
     font-weight: bold;
     color: #28a745;
 }
-
-/* Các kiểu cho phần giảm giá */
 .discount-badge {
-    background-color: #ff5722; /* Màu nền cho badge giảm giá */
+    background-color: #ff5722;
     color: white;
     padding: 3px 6px;
     font-size: 14px;
@@ -286,7 +272,7 @@ header {
 }
 
 .card {
-    position: relative; /* Cần thiết để định vị nhãn giảm giá */
+    position: relative; 
 }
 
 .card-img-top {
@@ -297,11 +283,11 @@ header {
 .arrow {
     display: inline-block;
     transition: transform 0.3s ease;
-    transform: rotate(-90deg); /* Mặc định chỉ sang trái */
+    transform: rotate(-90deg); 
 }
 
     .arrow.open {
-        transform: rotate(-1deg); /* Xoay xuống khi mở */
+        transform: rotate(-1deg); 
     }
 
 .subcategories {
@@ -309,13 +295,10 @@ header {
     list-style-type: none;
     padding-left: 20px;
 }
-/* ===== FOOTER STYLES ===== */
-/* Footer background */
 footer {
-    background-color: #66C5FF; /* Màu nền đen */
+    background-color: #66C5FF; 
 }
 
-/* Logo trong footer */
 .footer-logo a {
     font-size: 44px;
     font-weight: bold;
@@ -326,26 +309,23 @@ footer {
 .footer-logo .title-second {
     font-size: 44px;
 }
-/* Icon Mạng xã hội */
 .social-icons a {
     font-size: 35px;
 }
 
     .social-icons a:hover {
-        color: #28a745; /* Màu khi hover */
+        color: #28a745;
     }
 
 .contact-info p:nth-child(1) {
     font-weight: bold;
     font-size: 20px;
 }
-/* Liên hệ */
 .contact-info p {
     margin: 0;
     font-size: 14px;
 }
 
-/* Dòng chữ bản quyền */
 footer p {
     font-size: 14px;
     color: #333;
@@ -359,11 +339,11 @@ footer p {
 .arrow {
     display: inline-block;
     transition: transform 0.3s ease;
-    transform: rotate(-90deg); /* Mặc định chỉ sang trái */
+    transform: rotate(-90deg);
 }
 
     .arrow.open {
-        transform: rotate(-1deg); /* Xoay xuống khi mở */
+        transform: rotate(-1deg); 
     }
 
 .subcategories {
@@ -371,7 +351,6 @@ footer p {
     list-style-type: none;
     padding-left: 20px;
 }
-/* CTA Button */
 .btn-primary {
     background-color: #28a745;
     border-color: #28a745;

@@ -54,7 +54,7 @@ namespace webCore.Controllers
                 { 1, allReviews.Count(r => r.QualityRating == 1) }
             };
 
-            var filteredReviews = allReviews; // Dùng biến trung gian
+            var filteredReviews = allReviews;
             if (rating.HasValue && rating.Value > 0)
             {
                 filteredReviews = allReviews.Where(r => r.QualityRating == rating.Value).ToList();

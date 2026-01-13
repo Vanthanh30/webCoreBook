@@ -17,19 +17,16 @@ namespace webCore.MongoHelper
             _chatCollection = mongoService._chatCollection;
         }
 
-        // ✅ FIXED: Lấy danh sách các cuộc trò chuyện của user
         public async Task<List<ConversationInfo>> GetConversationsForUserAsync(string userId, bool isSeller)
         {
             FilterDefinition<ChatMessage> filter;
 
             if (isSeller)
             {
-                // Seller: Lấy tất cả tin nhắn có SellerId = userId
                 filter = Builders<ChatMessage>.Filter.Eq(m => m.SellerId, userId);
             }
             else
             {
-                // ✅ Buyer: Lấy tất cả tin nhắn có BuyerId = userId
                 filter = Builders<ChatMessage>.Filter.Eq(m => m.BuyerId, userId);
             }
 
@@ -43,7 +40,6 @@ namespace webCore.MongoHelper
                 return new List<ConversationInfo>();
             }
 
-            // ✅ Log để debug
             foreach (var msg in messages.Take(3))
             {
                 Console.WriteLine($"[ChatService] Sample message - SellerId: {msg.SellerId}, BuyerId: {msg.BuyerId}, SenderId: {msg.SenderId}");
@@ -53,7 +49,6 @@ namespace webCore.MongoHelper
 
             if (isSeller)
             {
-                // ✅ Seller: Nhóm theo BuyerId
                 var grouped = messages
                     .Where(m => !string.IsNullOrEmpty(m.BuyerId))
                     .GroupBy(m => m.BuyerId);
@@ -79,7 +74,6 @@ namespace webCore.MongoHelper
             }
             else
             {
-                // ✅ FIXED: Buyer - Nhóm theo SellerId
                 var grouped = messages
                     .Where(m => !string.IsNullOrEmpty(m.SellerId))
                     .GroupBy(m => m.SellerId);
@@ -109,7 +103,6 @@ namespace webCore.MongoHelper
             return conversations.OrderByDescending(c => c.LastMessageTime).ToList();
         }
 
-        // Lấy tin nhắn giữa buyer và seller
         public async Task<List<ChatMessage>> GetMessagesBetweenUsersAsync(string buyerId, string sellerId)
         {
             var filter = Builders<ChatMessage>.Filter.And(
@@ -126,10 +119,8 @@ namespace webCore.MongoHelper
             return messages;
         }
 
-        // ✅ Thêm tin nhắn mới với validation đầy đủ
         public async Task AddMessageAsync(ChatMessage message)
         {
-            // ✅ VALIDATION: Đảm bảo SellerId và BuyerId không null
             if (string.IsNullOrEmpty(message.SellerId))
             {
                 throw new ArgumentException("SellerId cannot be null or empty");
@@ -157,7 +148,6 @@ namespace webCore.MongoHelper
             Console.WriteLine($"[ChatService] Message added successfully with Id: {message.Id}");
         }
 
-        // Kiểm tra xem đã có cuộc trò chuyện giữa buyer và seller chưa
         public async Task<bool> HasConversationAsync(string buyerId, string sellerId)
         {
             var filter = Builders<ChatMessage>.Filter.And(
@@ -169,7 +159,6 @@ namespace webCore.MongoHelper
             return count > 0;
         }
 
-        // Lấy tin nhắn cuối cùng giữa buyer và seller
         public async Task<ChatMessage> GetLastMessageAsync(string buyerId, string sellerId)
         {
             var filter = Builders<ChatMessage>.Filter.And(
@@ -183,7 +172,6 @@ namespace webCore.MongoHelper
         }
     }
 
-    // Class hỗ trợ hiển thị thông tin cuộc trò chuyện
     public class ConversationInfo
     {
         public string OtherUserId { get; set; }

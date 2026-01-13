@@ -1,14 +1,11 @@
-﻿// Global flag to prevent multiple initializations
-var dropdownInitialized = false;
+﻿var dropdownInitialized = false;
 
-// Initialize dropdown functionality
 function initializeUserDropdown() {
     if (dropdownInitialized) return;
     dropdownInitialized = true;
 
     console.log("=== Initializing user dropdown ===");
 
-    // Get all DOM elements
     var userIcon = document.getElementById("userIcon");
     var userDropdownMenu = document.getElementById("userDropdownMenu");
     var profileLink = document.getElementById("profileLink");
@@ -19,7 +16,6 @@ function initializeUserDropdown() {
     var loginLink = document.getElementById("loginLink");
     var registerLink = document.getElementById("registerLink");
 
-    // Get login status from body attribute
     var isLoggedIn = document.body.getAttribute("data-logged-in") === "True";
 
     console.log("Elements found:", {
@@ -33,12 +29,10 @@ function initializeUserDropdown() {
         return false;
     }
 
-    // Remove any existing click handlers by cloning
     var newUserIcon = userIcon.cloneNode(true);
     userIcon.parentNode.replaceChild(newUserIcon, userIcon);
     userIcon = document.getElementById("userIcon");
 
-    // Add click handler to toggle dropdown
     userIcon.addEventListener('click', function (e) {
         console.log("✅ User icon clicked!");
         e.preventDefault();
@@ -51,7 +45,6 @@ function initializeUserDropdown() {
         }
     });
 
-    // Close dropdown when clicking outside
     var clickOutsideHandler = function (e) {
         var icon = document.getElementById("userIcon");
         var dropdown = document.getElementById("userDropdownMenu");
@@ -63,40 +56,32 @@ function initializeUserDropdown() {
         }
     };
 
-    // Remove old listener and add new one
     document.removeEventListener('click', clickOutsideHandler);
     document.addEventListener('click', clickOutsideHandler);
 
-    // Show/hide menu items based on login status
     console.log("Setting menu visibility for isLoggedIn:", isLoggedIn);
 
     if (isLoggedIn) {
-        // User is logged in - show profile, seller channel, orders, logout
         if (profileLink) profileLink.style.display = "block";
         if (sellerChannelContainer) sellerChannelContainer.style.display = "block";
         if (orderLink) orderLink.style.display = "block";
         if (logoutButton && logoutButton.parentElement) {
             logoutButton.parentElement.style.display = "block";
         }
-        // Hide login and register
         if (loginLink) loginLink.style.display = "none";
         if (registerLink) registerLink.style.display = "none";
     } else {
-        // User is not logged in - hide all user options
         if (profileLink) profileLink.style.display = "none";
         if (sellerChannelContainer) sellerChannelContainer.style.display = "none";
         if (orderLink) orderLink.style.display = "none";
         if (logoutButton && logoutButton.parentElement) {
             logoutButton.parentElement.style.display = "none";
         }
-        // Show login and register
         if (loginLink) loginLink.style.display = "block";
         if (registerLink) registerLink.style.display = "block";
     }
 
-    // Handle seller channel link click - check if user has shop
     if (sellerChannelLink) {
-        // Remove old handler
         var newSellerLink = sellerChannelLink.cloneNode(true);
         sellerChannelLink.parentNode.replaceChild(newSellerLink, sellerChannelLink);
 
@@ -130,26 +115,21 @@ function initializeUserDropdown() {
     return true;
 }
 
-// Main initialization
 function init() {
     console.log("=== Layout.js init() called ===");
     initializeUserDropdown();
     updateCartCount();
 }
 
-// Initialize on DOMContentLoaded
 if (document.readyState === 'loading') {
     document.addEventListener("DOMContentLoaded", init);
 } else {
-    // DOM already loaded
     init();
 }
 
-// Handle logout
 async function handleLogout(event) {
     event.preventDefault();
 
-    // Clear local storage
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRoles");
@@ -163,7 +143,6 @@ async function handleLogout(event) {
     }
 }
 
-// Update cart item count
 function updateCartCount() {
     const cartCountElement = document.getElementById('cart-item-1');
     if (!cartCountElement) return;
@@ -182,11 +161,9 @@ $(document).on('cartUpdated', function (e, itemCount) {
     const cartCountElement = document.getElementById('cart-item-1');
     if (!cartCountElement) return;
 
-    // Update UI immediately
     if (typeof itemCount === 'number') {
         cartCountElement.textContent = itemCount;
     } else {
-        // fallback (rare case)
         updateCartCount();
     }
 });

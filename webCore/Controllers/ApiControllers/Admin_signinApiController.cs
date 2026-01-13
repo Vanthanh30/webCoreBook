@@ -36,7 +36,6 @@ namespace webCore.Controllers.ApiControllers
             if (account.Status != 1)
                 return Unauthorized(new { success = false, message = "Tài khoản đã bị khóa." });
 
-            // ⭐ KIỂM TRA ROLE ADMIN
             bool isAdmin = false;
             List<string> roleNames = new();
 
@@ -55,7 +54,6 @@ namespace webCore.Controllers.ApiControllers
             if (!isAdmin)
                 return Unauthorized(new { success = false, message = "Bạn không có quyền truy cập trang quản trị." });
 
-            // SAVE SESSION
             HttpContext.Session.SetString("AdminId", account.Id);
             HttpContext.Session.SetString("AdminToken", account.Token);
             HttpContext.Session.SetString("AdminName", account.Name);

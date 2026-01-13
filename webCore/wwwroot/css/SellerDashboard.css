@@ -96,7 +96,6 @@
         margin-right: 4px;
     }
 
-/* Responsive điều chỉnh nhỏ */
 @media (max-width: 768px) {
     .task-card h2 {
         font-size: 2rem;

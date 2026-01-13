@@ -11,12 +11,11 @@ namespace webCore.Controllers
 {
     public class ChatController : BaseController
     {
-        // /Chat?mode=buyer OR /Chat?mode=seller
         public IActionResult Index(string mode = "buyer")
         {
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
-                return RedirectToAction("Sign_in", "User"); // đổi theo route login của bạn
+                return RedirectToAction("Sign_in", "User"); 
 
             mode = (mode ?? "buyer").ToLower().Trim();
             if (mode != "buyer" && mode != "seller") mode = "buyer";

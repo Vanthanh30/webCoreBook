@@ -1,11 +1,9 @@
-﻿/* Cart Page Container */
-.cart-page {
+﻿.cart-page {
     background-color: #f8f9fa;
     min-height: calc(100vh - 200px);
     padding: 30px 0;
 }
 
-/* Cart Title */
 .cart-title {
     margin-top: 20px;
     margin-left: -30px;
@@ -23,8 +21,6 @@
     clip-path: polygon(0% 0%, 85% 0%, 95% 50%, 85% 100%, 0% 100%);
     border: none;
 }
-
-/* Edit Controls */
 .edit-controls {
     text-align: right;
     margin-bottom: 20px;
@@ -43,13 +39,10 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-/* Cart Container */
 .cart-container {
     max-width: 1200px;
     margin: 0 auto;
 }
-
-/* Cart Table */
 .cart-table {
     background-color: white;
     border-radius: 12px;
@@ -93,7 +86,6 @@
         vertical-align: middle;
     }
 
-/* Checkbox Styling */
 input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -101,7 +93,6 @@ input[type="checkbox"] {
     margin-right: 15px;
 }
 
-/* Product Info */
 .product-info .d-flex {
     align-items: center;
     gap: 15px;
@@ -131,7 +122,6 @@ input[type="checkbox"] {
         overflow: hidden;
     }
 
-/* Price Display - ENHANCED */
 .price-display {
     display: flex;
     flex-direction: column;
@@ -150,14 +140,12 @@ input[type="checkbox"] {
     text-decoration: line-through;
 }
 
-/* Item Total - ENHANCED */
 .item-total {
     font-size: 17px;
     font-weight: 700;
     color: #212529;
 }
 
-/* Quantity Control */
 .quantity-control {
     display: flex;
     justify-content: center;
@@ -196,7 +184,6 @@ input[type="checkbox"] {
             border-color: #dee2e6;
         }
 
-/* Action Column */
 .delete-product {
     width: 38px;
     height: 38px;
@@ -210,7 +197,6 @@ input[type="checkbox"] {
         box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
     }
 
-/* Empty Cart */
 .empty-cart {
     padding: 60px 20px !important;
     color: #6c757d;
@@ -225,7 +211,6 @@ input[type="checkbox"] {
         margin: 0;
     }
 
-/* Cart Summary */
 .cart-summary {
     background-color: white;
     padding: 25px;
@@ -242,7 +227,6 @@ input[type="checkbox"] {
         margin-bottom: 20px;
     }
 
-/* Discount Box - ENHANCED */
 .discount-box {
     background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
     border: 2px solid #ffd4d4;
@@ -317,7 +301,6 @@ input[type="checkbox"] {
         font-size: 14px;
     }
 
-/* Order Summary Rows - ENHANCED */
 .order-summary-row {
     display: flex;
     justify-content: space-between;
@@ -364,7 +347,6 @@ input[type="checkbox"] {
         font-weight: 800 !important;
     }
 
-/* Payment Button */
 .btn_pay {
     margin-top: 25px;
 }
@@ -397,7 +379,6 @@ input[type="checkbox"] {
         font-size: 18px;
     }
 
-/* Responsive Design */
 @media (max-width: 992px) {
     .cart-summary {
         position: static;
@@ -492,34 +473,29 @@ input[type="checkbox"] {
 }
 
 
-/* Cột sản phẩm */
 .cart-table th:first-child,
 .cart-table td:first-child {
     width: 40%;
 }
 
-/* Đơn giá */
 .cart-table th:nth-child(2),
 .cart-table td:nth-child(2) {
     width: 15%;
     text-align: center;
 }
 
-/* Số lượng */
 .cart-table th:nth-child(3),
 .cart-table td:nth-child(3) {
     width: 25%;
     text-align: center;
 }
 
-/* Thành tiền */
 .cart-table th:nth-child(4),
 .cart-table td:nth-child(4) {
     width: 15%;
     text-align: right;
 }
 
-/* Hành động */
 .cart-table th:nth-child(5),
 .cart-table td:nth-child(5) {
     width: 5%;

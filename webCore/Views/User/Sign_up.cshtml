@@ -19,7 +19,6 @@
         <div class="signup-wrapper">
             <div class="signup-card">
                 <div class="row no-gutters">
-                    <!-- Left Side - Logo & Branding -->
                     <div class="col-lg-5 col-md-6 d-none d-md-flex">
                         <div class="logo-section">
                             <div class="logo-wrapper">
@@ -40,10 +39,8 @@
                         </div>
                     </div>
 
-                    <!-- Right Side - Signup Form -->
                     <div class="col-lg-7 col-md-6">
                         <div class="form-section">
-                            <!-- Mobile Logo -->
                             <div class="mobile-logo d-md-none">
                                 <img src="/image/logo.png" alt="TYB Book" />
                             </div>
@@ -54,7 +51,6 @@
                             </div>
 
                             <form id="signupForm" onsubmit="return signup(event)">
-                                <!-- Email -->
                                 <div class="form-group-custom">
                                     <label for="email" class="form-label">
                                         <i class="fas fa-envelope"></i>
@@ -73,7 +69,6 @@
                                     <div id="emailError" class="error-message"></div>
                                 </div>
 
-                                <!-- Password -->
                                 <div class="form-group-custom">
                                     <label for="password" class="form-label">
                                         <i class="fas fa-lock"></i>
@@ -97,7 +92,6 @@
                                     </small>
                                 </div>
 
-                                <!-- Confirm Password -->
                                 <div class="form-group-custom">
                                     <label for="confirmPassword" class="form-label">
                                         <i class="fas fa-lock"></i>
@@ -122,14 +116,11 @@
                                         </div>
                                     }
                                 </div>
-
-                                <!-- Submit Button -->
                                 <button type="submit" class="btn btn-signup">
                                     <i class="fas fa-user-plus"></i>
                                     Đăng ký
                                 </button>
 
-                                <!-- Login Link -->
                                 <div class="auth-footer">
                                     <p>
                                         Đã có tài khoản?
@@ -141,7 +132,6 @@
                                 </div>
                             </form>
 
-                            <!-- Security Note -->
                             <div class="security-note">
                                 <i class="fas fa-shield-alt"></i>
                                 <span>Thông tin của bạn được bảo mật an toàn</span>
@@ -171,14 +161,12 @@
                 return;
             }
 
-    // ✅ Validate password length (>= 5)
             if (password.length < 6) {
                 document.getElementById("confirmError").innerText =
                     "Mật khẩu phải có ít nhất 6 ký tự";
                 return;
             }
 
-            // Kiểm tra mật khẩu khớp
             if (password !== confirm) {
                 document.getElementById("confirmError").innerText = "Mật khẩu không khớp";
                 return;
@@ -221,7 +209,6 @@
             }
         }
 
-        // Press Enter to submit
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('signupForm').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
@@ -230,7 +217,6 @@
                 }
             });
 
-            // Real-time password match validation
             document.getElementById('confirmPassword').addEventListener('input', function() {
                 const password = document.getElementById('password').value;
                 const confirm = this.value;

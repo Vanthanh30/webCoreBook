@@ -2,13 +2,11 @@
 let selectedBuyerId = null;
 let orderId = null;
 
-// Kết nối SignalR
 const connection = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub?userId=" + sellerId)
     .build();
 
 connection.on("ReceiveMessage", (msg) => {
-    // Hiển thị tin nhắn nếu liên quan đến khách hàng đang chọn
     if (msg.SenderId === selectedBuyerId || msg.ReceiverId === selectedBuyerId) {
         appendMessage(msg, msg.SenderId === sellerId);
     }
@@ -16,7 +14,6 @@ connection.on("ReceiveMessage", (msg) => {
 
 connection.start().catch(err => console.error(err.toString()));
 
-// Gửi tin nhắn text
 document.getElementById("sendBtn").addEventListener("click", async () => {
     const input = document.getElementById("messageInput");
     if (!input.value || !selectedBuyerId) return;
@@ -39,7 +36,6 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
     input.value = "";
 });
 
-// Hiển thị tin nhắn lên UI
 function appendMessage(msg, isMine) {
     const chatMessages = document.getElementById("chatMessages");
     const div = document.createElement("div");
@@ -51,13 +47,11 @@ function appendMessage(msg, isMine) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Chọn buyer từ sidebar
 document.querySelectorAll(".chat-list-item").forEach(el => {
     el.addEventListener("click", async () => {
         selectedBuyerId = el.dataset.userid;
         orderId = el.dataset.orderid;
 
-        // Lấy lịch sử chat
         const res = await fetch(`/api/chat/history/${orderId}`);
         const msgs = await res.json();
 
@@ -65,7 +59,6 @@ document.querySelectorAll(".chat-list-item").forEach(el => {
         chatMessages.innerHTML = "";
         msgs.forEach(msg => appendMessage(msg, msg.SenderId === sellerId));
 
-        // Cập nhật header
         document.getElementById("headerName").innerText = el.dataset.name;
         document.getElementById("headerAvatar").src = el.dataset.avatar || "/images/avatar-default.png";
     });

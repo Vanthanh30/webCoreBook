@@ -20,14 +20,12 @@ namespace webCore.Helpers.Attributes
         {
             var http = context.HttpContext;
 
-            // 1) Kiểm tra đăng nhập
             if (!UserAuthHelper.IsLoggedIn(http))
             {
                 context.Result = new RedirectToActionResult("Sign_in", "User", null);
                 return;
             }
 
-            // 2) Lấy danh sách role từ session
             var userRolesString = UserAuthHelper.GetUserRoles(http);
 
             if (string.IsNullOrEmpty(userRolesString))
@@ -36,12 +34,10 @@ namespace webCore.Helpers.Attributes
                 return;
             }
 
-            // Roles lưu dạng JSON → tách ra
             var userRoles = userRolesString.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                            .Select(r => r.Trim().ToLower())
                                            .ToList();
 
-            // 3) Kiểm tra user có ít nhất 1 role hợp lệ không
             bool allowed = _roles.Any(requiredRole =>
                 userRoles.Contains(requiredRole.ToLower())
             );

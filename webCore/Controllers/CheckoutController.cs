@@ -88,7 +88,6 @@ namespace webCore.Controllers
             decimal discountAmount = decimal.Parse(HttpContext.Session.GetString("DiscountAmount"));
             decimal finalAmount = decimal.Parse(HttpContext.Session.GetString("FinalAmount"));
 
-            // Nếu có voucher thì cập nhật số lần dùng
             string voucherId = HttpContext.Session.GetString("SelectedVoucherId");
             if (!string.IsNullOrEmpty(voucherId))
             {
@@ -100,7 +99,6 @@ namespace webCore.Controllers
                 }
             }
 
-            // Tạo đơn hàng
             var order = new Order
             {
                 UserId = userId,
@@ -117,7 +115,6 @@ namespace webCore.Controllers
 
             await SaveOrderAndUpdateStockAsync(order, items);
 
-            // Clear session
             HttpContext.Session.Remove("CheckoutItems");
             HttpContext.Session.Remove("SelectedVoucher");
             HttpContext.Session.Remove("SelectedVoucherId");
@@ -210,19 +207,16 @@ namespace webCore.Controllers
             if (string.IsNullOrEmpty(buyerId))
                 return RedirectToAction("Sign_in", "User");
 
-            // 1️⃣ LẤY ORDER
             var order = await _orderService.GetOrderByIdAsync(orderId);
             if (order == null)
                 return NotFound("Order not found");
 
-            // 2️⃣ LẤY SELLER + SHOP
             var firstItem = order.Items.FirstOrDefault();
             if (firstItem == null)
                 return BadRequest("Order has no items");
 
             var sellerId = firstItem.SellerId;
 
-            // Lấy shop theo sellerId (đúng DB bạn)
             var shop = await _shopService.GetShopByUserIdAsync(sellerId);
             if (shop == null)
                 return BadRequest("Shop not found");
@@ -233,7 +227,6 @@ namespace webCore.Controllers
                 shopId: shop.Id
             );
 
-            // 6️⃣ Gửi system message gắn Order (Shopee-style)
             await _messageService.SaveSystemAsync(
                 conversationId: conversation.Id,
                 content: $"📦 Trao đổi về đơn hàng #{order.Id}",
@@ -241,7 +234,6 @@ namespace webCore.Controllers
                 orderId: order.Id.ToString()   
             );
 
-            // 5️⃣ REDIRECT SANG CHAT + AUTO OPEN
             return RedirectToAction("Index", "Chat", new
             {
                 mode = "buyer",
@@ -290,7 +282,7 @@ namespace webCore.Controllers
             return View(order);
         }
         [HttpPost]
-        [RequestSizeLimit(104857600)] // 100MB
+        [RequestSizeLimit(104857600)] 
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)] 
         public async Task<IActionResult> SubmitReturnRequest(string orderId, string reason, List<IFormFile> mediaFiles)
         {
@@ -397,7 +389,7 @@ namespace webCore.Controllers
             return View(item);
         }
         [HttpPost]
-        [RequestSizeLimit(104857600)] // 100MB
+        [RequestSizeLimit(104857600)] 
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<IActionResult> SubmitReview(string orderId, string productId, int qualityRating, int serviceRating, string comment, List<IFormFile> mediaFiles)
         {

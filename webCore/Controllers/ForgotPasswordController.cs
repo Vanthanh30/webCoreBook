@@ -20,14 +20,12 @@ namespace webCore.Controllers
             _userService = userService;
         }
 
-        // Giao diện gửi OTP
         [HttpGet("send-otp-view")]
         public IActionResult SendOtpView()
         {
             return View("SendOtp");
         }
 
-        // API gửi OTP qua email
         [HttpPost("send-otp")]
         public async Task<IActionResult> SendOTP([FromForm] string email)
         {
@@ -46,7 +44,6 @@ namespace webCore.Controllers
                     return View("SendOtp");
                 }
 
-                // Gửi OTP tới email
                 await _forgotPasswordService.GenerateAndSendOTP(email);
                 ViewBag.Message = "OTP đã được gửi tới email của bạn.";
                 return RedirectToAction("VerifyOtpView", new { email = email });
@@ -58,7 +55,6 @@ namespace webCore.Controllers
             }
         }
 
-        // Giao diện xác minh OTP
         [HttpGet("verify-otp-view")]
         public IActionResult VerifyOtpView([FromQuery] string email)
         {
@@ -68,18 +64,17 @@ namespace webCore.Controllers
                 return View("SendOtp");
             }
 
-            ViewBag.Email = email; // Truyền email vào View
+            ViewBag.Email = email; 
             return View("VerifyOtp");
         }
 
-        // API xác minh OTP
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOTP([FromForm] string email, [FromForm] string otp)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(otp))
             {
                 ViewBag.Error = "Email và OTP không được để trống.";
-                ViewBag.Email = email; // Đảm bảo email được giữ lại
+                ViewBag.Email = email;
                 return View("VerifyOtp");
             }
 
@@ -94,7 +89,7 @@ namespace webCore.Controllers
                     return View("VerifyOtp");
                 }
 
-                TempData["Email"] = email; // Lưu email tạm thời
+                TempData["Email"] = email; 
                 return RedirectToAction("ResetPasswordView");
             }
             catch (Exception ex)
@@ -105,7 +100,6 @@ namespace webCore.Controllers
             }
         }
 
-        // Giao diện đặt lại mật khẩu
         [HttpGet("reset-password-view")]
         public IActionResult ResetPasswordView()
         {
@@ -119,14 +113,13 @@ namespace webCore.Controllers
             return RedirectToAction("SendOtpView");
         }
 
-        // API đặt lại mật khẩu
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromForm] string email, [FromForm] string newPassword, [FromForm] string confirmPassword)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newPassword) || newPassword != confirmPassword)
             {
                 ViewBag.Error = "Email, mật khẩu và xác nhận mật khẩu không được để trống và mật khẩu phải khớp.";
-                ViewBag.Email = email; // Đảm bảo email được giữ lại
+                ViewBag.Email = email;
                 return View("ResetPassword");
             }
 

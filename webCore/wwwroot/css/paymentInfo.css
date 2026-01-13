@@ -1,11 +1,9 @@
-﻿/* Payment Info Page */
-.payment-info-page {
+﻿.payment-info-page {
     background-color: #f8f9fa;
     min-height: calc(100vh - 200px);
     padding: 40px 0;
 }
 
-/* Page Title */
 .page-title-main {
     text-align: center;
     color: #3db6ff;
@@ -16,7 +14,6 @@
     text-shadow: 0 2px 4px rgba(61, 182, 255, 0.1);
 }
 
-/* Products Table */
 .payment-products-table {
     background: white;
     border-radius: 12px;
@@ -56,7 +53,6 @@
         border-bottom: none;
     }
 
-/* Product Image */
 .product-image-small {
     width: 60px;
     height: 60px;
@@ -83,7 +79,6 @@
     border: 2px dashed #dee2e6;
 }
 
-/* Summary Row in Table */
 .summary-row-table {
     background-color: #f8f9fa;
     font-weight: 600;
@@ -101,7 +96,6 @@
         font-weight: 700;
     }
 
-/* Payment Form Box */
 .payment-form-box {
     background: white;
     border-radius: 12px;
@@ -125,7 +119,6 @@
             font-size: 20px;
         }
 
-/* Form Group */
 .form-group {
     margin-bottom: 20px;
 }
@@ -143,7 +136,6 @@
             color: #66C5FF;
         }
 
-/* Form Control Custom */
 .form-control-custom {
     width: 100%;
     padding: 12px 15px;
@@ -169,7 +161,6 @@ textarea.form-control-custom {
     min-height: 90px;
 }
 
-/* Submit Button */
 .btn-submit-payment {
     width: 100%;
     padding: 15px 20px;
@@ -204,7 +195,6 @@ textarea.form-control-custom {
         font-size: 18px;
     }
 
-/* Security Note */
 .security-note {
     margin-top: 20px;
     padding: 15px;
@@ -228,7 +218,6 @@ textarea.form-control-custom {
         line-height: 1.5;
     }
 
-/* Order Summary Box */
 .order-summary-box {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 10px;
@@ -277,7 +266,6 @@ textarea.form-control-custom {
     font-size: 18px;
 }
 
-/* Payment Methods */
 .payment-methods {
     margin-top: 20px;
 }
@@ -325,7 +313,6 @@ textarea.form-control-custom {
     color: #66C5FF;
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
     .payment-form-box {
         position: static;
@@ -415,7 +402,6 @@ textarea.form-control-custom {
     }
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;

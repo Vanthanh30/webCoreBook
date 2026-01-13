@@ -63,7 +63,6 @@
     color: white !important;
     border-color: #007bff !important;
 }
-/*css dialog*/
 .custom-overlay {
     display: none;
     position: fixed;
@@ -91,7 +90,6 @@
     font-family: Arial, sans-serif;
 }
 
-/* Header sản phẩm */
 .dialog-product-info {
     display: flex;
     position: relative;
@@ -157,7 +155,6 @@
         color: #333;
     }
 
-/* Đánh giá sao */
 .rating-row {
     display: flex;
     align-items: center;
@@ -181,7 +178,6 @@
         color: #ffc107;
     }
 
-/* Textarea có dòng kẻ (giống vở) */
 .lined-textarea {
     width: 100%;
     border: 1px solid #ddd;
@@ -195,7 +191,6 @@
     resize: none;
 }
 
-/* Media Upload Buttons */
 .media-upload-container {
     display: flex;
     gap: 20px;
@@ -242,7 +237,6 @@
             color: #007bff;
         }
 
-/* Nút Gửi */
 .dialog-actions {
     text-align: center;
     margin-top: 25px;

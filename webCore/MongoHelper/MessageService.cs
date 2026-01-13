@@ -12,7 +12,6 @@ namespace webCore.MongoHelper
         Task<List<Message>> GetMessagesAsync(string conversationId, int limit = 50);
         Task<Message> SaveTextAsync(string conversationId, string senderId, string content);
 
-        // Shopee-style context (system card)
         Task<Message> SaveSystemAsync(string conversationId, string content, string messageType, string? productId = null, string? orderId = null);
 
         Task<bool> CanAccessAsync(string conversationId, string userId);
